@@ -1,0 +1,15 @@
+[package]
+name = "transit-board"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bytes = "1.5.0"
+minreq ={ version="2.11.0", features=["https"] }
+dotenvy = "0.15.7"
+prost = "0.12.3"
+
+[build-dependencies]
+prost-build = { version = "0.12.3" }
