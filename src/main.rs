@@ -13,8 +13,8 @@ fn main() {
     let mut lehman = StationHandler::new(api_key.to_string(), Lines::_4, "405S".to_string(), 5);
     let mut bedford = StationHandler::new(api_key.to_string(), Lines::D, "D03S".to_string(), 5);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
-    let mut bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string()]);
-    let mut bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string(), "803061".to_string()]);
+    let mut bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()]);
+    let mut bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()]); //, "803061".to_string() // Not needed?
     lehman.refresh();
     bedford.refresh();
     //grand_central.refresh();
