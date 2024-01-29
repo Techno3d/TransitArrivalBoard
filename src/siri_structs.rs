@@ -9,7 +9,7 @@ pub struct BusData {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct Siri {
-    pub service_delivery: ServiceDelivery,
+    pub service_delivery: Option<ServiceDelivery>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -17,13 +17,13 @@ pub struct Siri {
 pub struct ServiceDelivery {
     pub response_timestamp: String,
     pub stop_monitoring_delivery: Vec<StopMonitoringDelivery>,
-    pub situation_exchange_delivery: Vec<SituationExchangeDelivery>,
+    pub situation_exchange_delivery: Option<Vec<SituationExchangeDelivery>>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct StopMonitoringDelivery {
-    pub monitored_stop_visit: Vec<MonitoredStopVisit>,
+    pub monitored_stop_visit: Option<Vec<MonitoredStopVisit>>,
     pub response_timestamp: String,
     pub valid_until: String,
 }
@@ -79,10 +79,10 @@ pub struct Location {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct MonitoredCall {
-    pub aimed_arrival_time: String,
-    pub expected_arrival_time: String,
-    pub arrival_proximity_text: String,
-    pub expected_departure_time: String,
+    pub aimed_arrival_time: Option<String>,
+    pub expected_arrival_time: Option<String>,
+    pub arrival_proximity_text: Option<String>,
+    pub expected_departure_time: Option<String>,
     pub distance_from_stop: i32,
     pub number_of_stops_away: i32,
     pub stop_point_ref: String,

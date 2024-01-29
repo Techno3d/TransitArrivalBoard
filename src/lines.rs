@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 #[allow(dead_code)]
 pub enum Lines {
     A, C, E, B, D, F, M, G, J, Z, N, Q, R, W, L, _1, _2, _3, _4, _5, _6, _7, SIR
@@ -26,6 +26,8 @@ impl Lines {
             "4" => Lines::_4,
             "B" => Lines::B,
             "D" => Lines::D,
+            "6" => Lines::_6,
+            "1" => Lines::_1,
             _ => Lines::_4,
         }
     }

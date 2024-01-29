@@ -1,0 +1,208 @@
+import { AboutSlint, Button, VerticalBox , ListView, GridBox} from "std-widgets.slint";
+
+export struct BusInfo {
+    name: string,
+    uptown: string,
+    downtown: string,
+    uptown-times: [int],
+    downtown-times: [int],
+}
+
+export struct BusStopInfo {
+    stop-name: string,
+    busses: [BusInfo],
+}
+
+component Stop {
+    in property <BusStopInfo> stop-info;
+    VerticalLayout {
+        alignment: start;
+        spacing: 0px;
+        padding: 0px;
+        HorizontalLayout {
+            alignment: center;
+            Text {
+                text: stop-info.stop-name;
+                font-size: 30px;
+                font-weight: 900;
+            }
+        }
+
+        for bus in stop-info.busses : Rectangle {
+            VerticalLayout {
+                HorizontalLayout {
+                    alignment: center;
+                    Rectangle {
+                        border-color: #3c7cea;
+                        border-width: 2px;
+                        border-radius: 10px;
+                        width: 300px;
+                        Text {
+                            text: bus.name;
+                            font-size: 20px;
+                        }
+                    }
+                }
+                HorizontalLayout {
+                    alignment: center;
+                    Rectangle {
+                        background: red;
+                        height: 4px;
+                        width: 300px;
+                    }
+                }
+                HorizontalLayout {
+                    alignment: center;
+                    spacing: 10px;
+                    VerticalLayout {
+                        Text {
+                            text: bus.uptown;
+                            font-size: 20px;
+                        }
+                        for time in bus.uptown-times : HorizontalLayout {
+                            alignment: end;
+                            Rectangle {
+                                background: #eaeaea;
+                                //border-radius: 5px;
+                                width: 120px;
+                                Text {
+                                    font-size: 21px;
+                                    text: time + " mins";
+                                    font-weight: 900;
+                                    //color: white;
+                                }
+                            }
+                        }
+                    }
+                    if bus.uptown-times.length != 0 && bus.downtown-times.length != 0 : HorizontalLayout {
+                        alignment: center;
+                        Rectangle {
+                            //background: black;
+                            width: 5%;
+                            //height: 100%;
+                        }
+                        Rectangle {
+                            background: black;
+                            width: 4px;
+                        }
+                        Rectangle {
+                            //background: black;
+                            width: 5%;
+                            //height: 100%;
+                        }
+                    }
+                    VerticalLayout {
+                        HorizontalLayout {
+                            alignment: center;
+                            Text {
+                                text: bus.downtown;
+                                font-size: 20px;
+                            }
+                        }
+                        for time in bus.downtown-times : HorizontalLayout {
+                            alignment: bus.uptown-times.length == 0 ? center : start;
+                            Rectangle {
+                                background: #eaeaea;
+                                //border-radius: 5px;
+                                width: 120px;
+                                height: 25px;
+                                Text {
+                                    //color: white;
+                                    text: time + " mins";
+                                    font-size: 21px;
+                                    font-weight: 900;
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle {
+                    height: 30px;
+                }
+            }
+        }
+    }
+}
+
+export struct TrainInfo {
+    route-name: string,
+    color: brush,
+    times: [int],
+}
+
+export struct StationInfo {
+    station-name: string,
+    trains: [TrainInfo],
+    walk-time: int,
+}
+
+component ArrivalLine {
+    in property <string> train-name;
+    in property <[int]> arrival-times;
+    in property <brush> bg-color;
+    in property <int> walk-time;
+    HorizontalLayout {
+       Rectangle {
+            background: bg-color;
+            width: 105px;
+            height: 105px;
+            Text {
+                font-size: 40px;
+                font-weight: 400;
+                color: white;
+                text: " (" + train-name + ")\n[SB]";
+                horizontal-alignment: center;
+            }
+       } 
+       for arrivaltime in arrival-times: HorizontalLayout {
+            Rectangle {
+                height: 105px;
+                width: 105px;
+                background: #eaeaea;
+                Text {
+                    font-size: 40px;
+                    text: arrivaltime;
+                    font-weight: 400;
+                }
+                Rectangle {
+                    height: 100%;
+                    width: 100%;
+                    background: arrivaltime < walk-time ? #f73d2c55 : #f73d2c00;
+                }
+            }
+            Rectangle {
+                background: grey;
+                width: 4px;
+                //height: 105px;
+            }
+        }
+    }
+}
+
+export component ArrivalBoard {
+in property <[StationInfo]> inp;
+in property <[BusStopInfo]> businp;
+    VerticalBox {
+        alignment: start;
+        for station in inp: VerticalBox {
+            Text {
+                text: station.station-name;
+                font-size: 24px;
+                horizontal-alignment: center;
+                font-weight: 500;
+            }
+            for train in station.trains: ArrivalLine {
+                bg-color: train.color;
+                train-name: train.route-name;
+                arrival-times: train.times;
+                walk-time: station.walk-time;
+            }
+        }
+        HorizontalLayout {
+            alignment: center;
+            for stop in businp : Stop {
+                stop-info: stop;
+            }
+        }
+    }
+}
