@@ -15,6 +15,7 @@ export struct BusStopInfo {
 
 component Stop {
     in property <BusStopInfo> stop-info;
+    in property <length> hl;
     VerticalLayout {
         alignment: start;
         spacing: 0px;
@@ -142,12 +143,12 @@ component ArrivalLine {
     in property <brush> bg-color;
     in property <int> walk-time;
     HorizontalLayout {
-       Rectangle {
+       line := Rectangle {
             background: bg-color;
-            width: 105px;
-            height: 105px;
+            width: parent.width * 0.09;
+            height: parent.width * 0.09;
             Text {
-                font-size: 40px;
+                font-size: parent.height*0.381;
                 font-weight: 400;
                 color: white;
                 text: " (" + train-name + ")\n[SB]";
@@ -156,11 +157,11 @@ component ArrivalLine {
        } 
        for arrivaltime in arrival-times: HorizontalLayout {
             Rectangle {
-                height: 105px;
-                width: 105px;
+                height: line.height;
+                width: line.width;
                 background: #eaeaea;
                 Text {
-                    font-size: 40px;
+                    font-size: parent.height*0.4;
                     text: arrivaltime;
                     font-weight: 400;
                 }
@@ -179,15 +180,17 @@ component ArrivalLine {
     }
 }
 
-export component ArrivalBoard {
-in property <[StationInfo]> inp;
-in property <[BusStopInfo]> businp;
+export component ArrivalBoard inherits Window {
+    in property <[StationInfo]> inp;
+    in property <[BusStopInfo]> businp;
+    no-frame: true;
+
     VerticalBox {
         alignment: start;
         for station in inp: VerticalBox {
             Text {
                 text: station.station-name;
-                font-size: 24px;
+                font-size: 30px;
                 horizontal-alignment: center;
                 font-weight: 500;
             }
@@ -202,6 +205,7 @@ in property <[BusStopInfo]> businp;
             alignment: center;
             for stop in businp : Stop {
                 stop-info: stop;
+                hl: self.height;
             }
         }
     }

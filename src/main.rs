@@ -70,6 +70,7 @@ fn main() {
             sleep(Duration::from_secs(60));
         }
     });
+    board.window().set_fullscreen(true);
     board.run().unwrap();
     _quit = true;
     handle.join().unwrap();
