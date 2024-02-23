@@ -1,5 +1,3 @@
-import { AboutSlint, Button, VerticalBox , ListView, GridBox} from "std-widgets.slint";
-
 export struct BusInfo {
     name: string,
     uptown: string,
@@ -15,7 +13,7 @@ export struct BusStopInfo {
 
 component Stop {
     in property <BusStopInfo> stop-info;
-    in property <length> hl;
+    property <length> relative: 14px;
     VerticalLayout {
         alignment: start;
         spacing: 0px;
@@ -24,7 +22,7 @@ component Stop {
             alignment: center;
             Text {
                 text: stop-info.stop-name;
-                font-size: 30px;
+                font-size: relative*3;
                 font-weight: 900;
             }
         }
@@ -35,12 +33,12 @@ component Stop {
                     alignment: center;
                     Rectangle {
                         border-color: #3c7cea;
-                        border-width: 2px;
+                        border-width: relative*0.2;
                         border-radius: 10px;
                         width: 300px;
                         Text {
                             text: bus.name;
-                            font-size: 20px;
+                            font-size: relative*2;
                         }
                     }
                 }
@@ -48,26 +46,25 @@ component Stop {
                     alignment: center;
                     Rectangle {
                         background: red;
-                        height: 4px;
+                        height: relative*0.4;
                         width: 300px;
                     }
                 }
                 HorizontalLayout {
                     alignment: center;
-                    spacing: 10px;
+                    spacing: relative;
                     VerticalLayout {
                         Text {
                             text: bus.uptown;
-                            font-size: 20px;
+                            font-size: relative*2;
                         }
                         for time in bus.uptown-times : HorizontalLayout {
                             alignment: end;
                             Rectangle {
                                 background: #eaeaea;
-                                //border-radius: 5px;
                                 width: 120px;
                                 Text {
-                                    font-size: 21px;
+                                    font-size: relative*2.1;
                                     text: time + " mins";
                                     font-weight: 900;
                                     //color: white;
@@ -78,18 +75,14 @@ component Stop {
                     if bus.uptown-times.length != 0 && bus.downtown-times.length != 0 : HorizontalLayout {
                         alignment: center;
                         Rectangle {
-                            //background: black;
                             width: 5%;
-                            //height: 100%;
                         }
                         Rectangle {
                             background: black;
                             width: 4px;
                         }
                         Rectangle {
-                            //background: black;
                             width: 5%;
-                            //height: 100%;
                         }
                     }
                     VerticalLayout {
@@ -97,20 +90,19 @@ component Stop {
                             alignment: center;
                             Text {
                                 text: bus.downtown;
-                                font-size: 20px;
+                                font-size: relative*2;
                             }
                         }
                         for time in bus.downtown-times : HorizontalLayout {
                             alignment: bus.uptown-times.length == 0 ? center : start;
                             Rectangle {
                                 background: #eaeaea;
-                                //border-radius: 5px;
                                 width: 120px;
-                                height: 25px;
+                                height: relative*2.5;
                                 Text {
                                     //color: white;
                                     text: time + " mins";
-                                    font-size: 21px;
+                                    font-size: relative*2;
                                     font-weight: 900;
                                 }
                             }
@@ -118,7 +110,7 @@ component Stop {
                     }
                 }
                 Rectangle {
-                    height: 30px;
+                    height: relative*2;
                 }
             }
         }
@@ -143,10 +135,13 @@ component ArrivalLine {
     in property <brush> bg-color;
     in property <int> walk-time;
     HorizontalLayout {
+        Rectangle {
+            width: 10px;
+        }
        line := Rectangle {
             background: bg-color;
-            width: parent.width * 0.09;
-            height: parent.width * 0.09;
+            width: parent.width * 0.08;
+            height: parent.width * 0.08;
             Text {
                 font-size: parent.height*0.381;
                 font-weight: 400;
@@ -185,9 +180,21 @@ export component ArrivalBoard inherits Window {
     in property <[BusStopInfo]> businp;
     no-frame: true;
 
-    VerticalBox {
+    VerticalLayout {
         alignment: start;
-        for station in inp: VerticalBox {
+        HorizontalLayout {
+            alignment: center;
+            Text {
+                text: "Transit Board";
+                font-size: 40px;
+                font-weight: 600;
+            }
+        }
+        for station in inp: VerticalLayout {
+            Rectangle {
+                width: 100%;
+                height: 40px;
+            }
             Text {
                 text: station.station-name;
                 font-size: 30px;
@@ -200,12 +207,22 @@ export component ArrivalBoard inherits Window {
                 arrival-times: train.times;
                 walk-time: station.walk-time;
             }
+            Rectangle {
+                width: 100%;
+                height: 40px;
+            }
         }
         HorizontalLayout {
             alignment: center;
             for stop in businp : Stop {
                 stop-info: stop;
-                hl: self.height;
+            }
+        }
+        VerticalLayout {
+            alignment: end;
+            Text {
+                text: "Made with ❤️ by Transit Club";
+                font-size: 10px;
             }
         }
     }
