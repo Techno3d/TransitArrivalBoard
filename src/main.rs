@@ -1,7 +1,7 @@
 mod lines;
 mod siri_structs;
 
-use std::{rc::Rc, thread::sleep, time::Duration};
+use std::{rc::Rc, sync::mpsc::{self, Receiver, Sender}, thread::sleep, time::Duration};
 
 use slint::{ComponentHandle, VecModel};
 use transit_board::{lines::Lines, ArrivalBoard, BusStopHandler, BusStopInfo, StationHandler, StationInfo};
@@ -45,10 +45,9 @@ fn main() {
 
     let board = ArrivalBoard::new().unwrap();
     let board_weak = board.as_weak();
-    let mut _quit = false;
+    let (send, recv): (Sender<bool>, Receiver<bool>) = mpsc::channel();
     let handle = std::thread::spawn(move || {
         loop {
-            if _quit { return ; }
             lehman.refresh();
             bedford.refresh();
             bx1028.refresh();
@@ -67,12 +66,17 @@ fn main() {
                 let businp = Rc::new(VecModel::from(businp));
                 board_copy.unwrap().set_businp(businp.into());
             }).unwrap();
-            sleep(Duration::from_secs(60));
+            match recv.recv_timeout(Duration::from_secs(60)) {
+                Ok(r) => {
+                    if r { return; }
+                },
+                Err(_) => {},
+            };
         }
     });
     board.window().set_fullscreen(true);
     board.run().unwrap();
-    _quit = true;
+    let _ = send.send(true);
     handle.join().unwrap();
     //board.set_inp(Rc::new(VecModel::from(inp)).into());
 }
