@@ -127,6 +127,7 @@ export struct StationInfo {
     station-name: string,
     trains: [TrainInfo],
     walk-time: int,
+    delay: int,
 }
 
 component ArrivalLine {
@@ -134,6 +135,7 @@ component ArrivalLine {
     in property <[int]> arrival-times;
     in property <brush> bg-color;
     in property <int> walk-time;
+    in property <int> delay;
     HorizontalLayout {
         Rectangle {
             width: 10px;
@@ -172,6 +174,46 @@ component ArrivalLine {
                 //height: 105px;
             }
         }
+        HorizontalLayout {
+            alignment: end;
+            if delay >= 22 && delay <= 26 : Rectangle {
+                Text {
+                    text: "Delays";
+                    font-weight: 900;
+                    font-size: line.height*0.4;
+                }
+            }
+            if delay > 26 : Rectangle {
+                Text {
+                    text: "Sever Delays";
+                    font-weight: 900;
+                    font-size: line.height*0.4;
+                }
+            }
+            Rectangle {
+               width: line.width;
+               height: line.height;
+            }
+            VerticalLayout {
+                alignment: center;
+                Text {
+                    text: "Avg. Walk Time";
+                    font-size: line.height*0.1;
+                    font-weight: 500;
+                }
+                HorizontalLayout {
+                    alignment: center;
+                    Text {
+                        text: walk-time;
+                        font-size: line.height*0.4;
+                    }
+                }
+            }
+            Rectangle {
+               width: line.width;
+               height: line.height;
+            }
+        }
     }
 }
 
@@ -206,6 +248,7 @@ export component ArrivalBoard inherits Window {
                 train-name: train.route-name;
                 arrival-times: train.times;
                 walk-time: station.walk-time;
+                delay: station.delay;
             }
             Rectangle {
                 width: 100%;
@@ -222,7 +265,7 @@ export component ArrivalBoard inherits Window {
             alignment: end;
             Text {
                 text: "Made with ❤️ by Transit Club";
-                font-size: 10px;
+                font-size: 20px;
             }
         }
     }

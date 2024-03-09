@@ -10,6 +10,7 @@ slint::include_modules!();
 
 pub mod lines;
 pub mod siri_structs;
+pub mod mercury;
 pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
@@ -20,12 +21,13 @@ pub struct StationHandler {
     pub station_code: String,
     pub times: Vec<(Lines, u64)>,
     pub walk_time: i32,
+    pub delay: i32,
     api_key: String,
 }
 
 impl StationHandler {
     pub fn new(api_key: String, line: Lines, station_code: String, walk_time: i32) -> Self {
-        Self { api_key, line, station_code, times: vec![], walk_time }
+        Self { api_key, line, station_code, times: vec![], walk_time, delay: 0 }
     }
 
     pub fn refresh(&mut self) {
@@ -71,7 +73,7 @@ impl StationHandler {
             })
         }
 
-        StationInfo { station_name: station_code_to_name(&self.station_code).into(), trains: Rc::new(VecModel::from(train_info)).into(), walk_time: self.walk_time }
+        StationInfo { station_name: station_code_to_name(&self.station_code).into(), trains: Rc::new(VecModel::from(train_info)).into(), walk_time: self.walk_time, delay: self.delay }
     }
 
     fn get_time_map(&self) -> HashMap<Lines, Vec<i32>> {
@@ -201,7 +203,14 @@ impl BusStopHandler {
             };
             for visit in monitored_visit {
                 //let route_name = visit.monitored_vehicle_journey.line_ref.split("_").last().unwrap();
-                let route_name = visit.monitored_vehicle_journey.published_line_name.get(0).unwrap();
+                let route_name = visit.monitored_vehicle_journey.published_line_name.get(0).unwrap().trim();
+                let route_name = match route_name {
+                    "CO-OP CITY EARHART LANE via GUNHILL" => "CO-OP CITY",
+                    "FORDHAM CENTER 192 ST via GUNHILL" => "FORDHAM CENTER",
+                    "CO-OP CITY EARHART LANE via ALLERTON AV" => "CO-OP CITY",
+                    "CO-OP CITY BAY PLAZA via ALLERTON AV" => "CO-OP CITY BAY PLAZA",
+                    a => a,
+                };
                 let dest = visit.monitored_vehicle_journey.destination_name.get(0).unwrap();
                 let time = visit.monitored_vehicle_journey.monitored_call.expected_arrival_time.unwrap_or("Now".to_owned()); // If it isn't given, bus is at stop waiting to leave
                 let mut min_away = 0;
