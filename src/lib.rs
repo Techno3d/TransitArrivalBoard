@@ -203,15 +203,15 @@ impl BusStopHandler {
             };
             for visit in monitored_visit {
                 //let route_name = visit.monitored_vehicle_journey.line_ref.split("_").last().unwrap();
-                let route_name = visit.monitored_vehicle_journey.published_line_name.get(0).unwrap().trim();
-                let route_name = match route_name {
+                let route_name = visit.monitored_vehicle_journey.published_line_name.get(0).unwrap();
+                let dest = visit.monitored_vehicle_journey.destination_name.get(0).unwrap().trim();
+                let dest = match dest {
                     "CO-OP CITY EARHART LANE via GUNHILL" => "CO-OP CITY",
                     "FORDHAM CENTER 192 ST via GUNHILL" => "FORDHAM CENTER",
                     "CO-OP CITY EARHART LANE via ALLERTON AV" => "CO-OP CITY",
                     "CO-OP CITY BAY PLAZA via ALLERTON AV" => "CO-OP CITY BAY PLAZA",
                     a => a,
                 };
-                let dest = visit.monitored_vehicle_journey.destination_name.get(0).unwrap();
                 let time = visit.monitored_vehicle_journey.monitored_call.expected_arrival_time.unwrap_or("Now".to_owned()); // If it isn't given, bus is at stop waiting to leave
                 let mut min_away = 0;
                 // Let the cursed code begin
