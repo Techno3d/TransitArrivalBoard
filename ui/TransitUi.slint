@@ -257,8 +257,14 @@ export component ArrivalBoard inherits Window {
         }
         HorizontalLayout {
             alignment: center;
-            for stop in businp : Stop {
-                stop-info: stop;
+            for stop in businp : HorizontalLayout {
+                Stop {
+                    stop-info: stop;
+                }
+                Rectangle {
+                    width: 100px;
+                    height: 100%;
+                }
             }
         }
         VerticalLayout {
