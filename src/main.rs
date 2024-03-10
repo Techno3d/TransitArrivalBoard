@@ -40,25 +40,31 @@ fn main() {
                 Ok(r) => r,
                 Err(_) => Default::default(),
             };
+            let mut lehman_delays: Vec<i32> = vec![];
+            let mut bedford_delays: Vec<i32> = vec![];
             for entity in delays.entity {
                 for informed in entity.alert.unwrap().informed_entity.unwrap() {
                     if let Some(selector) = informed.transit_realtime_mercury_entity_selector {
                         let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
                         if decomposed.get(1).unwrap() == &"4" {
-                            lehman.delay = match (*decomposed.get(2).unwrap()).parse() {
+                            lehman_delays.push(match (*decomposed.get(2).unwrap()).parse() {
                                 Ok(x) => x,
                                 Err(_) => 0,
-                            };
+                            });
                         }
                         if decomposed.get(1).unwrap() == &"B" || decomposed.get(1).unwrap() == &"D"  {
-                            bedford.delay = match (*decomposed.get(2).unwrap()).parse() {
+                            bedford_delays.push(match (*decomposed.get(2).unwrap()).parse() {
                                 Ok(x) => x,
                                 Err(_) => 0,
-                            };
+                            });
                         }
                     }
                 }
             }
+            lehman_delays.sort();
+            bedford_delays.sort();
+            lehman.delay = *(lehman_delays.last().unwrap_or(&0));
+            bedford.delay = *(bedford_delays.last().unwrap_or(&0));
 
             let inp = vec![lehman.clone(),bedford.clone()];
             let businp = vec![bx1028.clone(), bx2526.clone()];

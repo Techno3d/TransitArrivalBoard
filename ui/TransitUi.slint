@@ -177,17 +177,19 @@ component ArrivalLine {
         HorizontalLayout {
             alignment: end;
             if delay >= 22 && delay <= 26 : Rectangle {
+                background: #f73d2c55;
                 Text {
                     text: "Delays";
                     font-weight: 900;
-                    font-size: line.height*0.4;
+                    font-size: line.height*0.381;
                 }
             }
             if delay > 26 : Rectangle {
+                background: #f73d2c55;
                 Text {
-                    text: "Sever Delays";
+                    text: "Severe\nDelays";
                     font-weight: 900;
-                    font-size: line.height*0.4;
+                    font-size: line.height*0.381;
                 }
             }
             Rectangle {

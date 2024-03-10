@@ -43,8 +43,9 @@ pub struct Periods {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct InformedEntity {
-    pub agency_ed: Option<String>,
+    pub agency_id: Option<String>,
     pub route_id: Option<String>,
+    #[serde(rename = "transit_realtime.mercury_entity_selector")]
     pub transit_realtime_mercury_entity_selector: Option<MercurySelector>,
     pub stop_id: Option<String>,
 }
