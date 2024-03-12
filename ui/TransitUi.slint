@@ -13,6 +13,7 @@ export struct BusStopInfo {
 
 component Stop {
     in property <BusStopInfo> stop-info;
+    in property <float> scale: 1.0;
     property <length> relative: 14px;
     VerticalLayout {
         alignment: start;
@@ -22,7 +23,7 @@ component Stop {
             alignment: center;
             Text {
                 text: stop-info.stop-name;
-                font-size: relative*3;
+                font-size: relative*3*scale;
                 font-weight: 900;
             }
         }
@@ -33,12 +34,12 @@ component Stop {
                     alignment: center;
                     Rectangle {
                         border-color: #3c7cea;
-                        border-width: relative*0.2;
+                        border-width: relative*0.2*scale;
                         border-radius: 10px;
                         width: 300px;
                         Text {
                             text: bus.name;
-                            font-size: relative*2;
+                            font-size: relative*2*scale;
                         }
                     }
                 }
@@ -46,17 +47,17 @@ component Stop {
                     alignment: center;
                     Rectangle {
                         background: red;
-                        height: relative*0.4;
+                        height: relative*0.4*scale;
                         width: 300px;
                     }
                 }
                 HorizontalLayout {
                     alignment: center;
-                    spacing: relative;
+                    spacing: relative*scale;
                     VerticalLayout {
                         Text {
                             text: bus.uptown;
-                            font-size: relative*2;
+                            font-size: relative*2*scale;
                         }
                         for time in bus.uptown-times : HorizontalLayout {
                             alignment: end;
@@ -64,7 +65,7 @@ component Stop {
                                 background: #eaeaea;
                                 width: 120px;
                                 Text {
-                                    font-size: relative*2.1;
+                                    font-size: relative*2.1*scale;
                                     text: time + " mins";
                                     font-weight: 900;
                                     //color: white;
@@ -90,7 +91,7 @@ component Stop {
                             alignment: center;
                             Text {
                                 text: bus.downtown;
-                                font-size: relative*2;
+                                font-size: relative*2*scale;
                             }
                         }
                         for time in bus.downtown-times : HorizontalLayout {
@@ -98,11 +99,11 @@ component Stop {
                             Rectangle {
                                 background: #eaeaea;
                                 width: 120px;
-                                height: relative*2.5;
+                                height: relative*2.5*scale;
                                 Text {
                                     //color: white;
                                     text: time + " mins";
-                                    font-size: relative*2;
+                                    font-size: relative*2*scale;
                                     font-weight: 900;
                                 }
                             }
@@ -110,7 +111,7 @@ component Stop {
                     }
                 }
                 Rectangle {
-                    height: relative*2;
+                    height: relative*2*scale;
                 }
             }
         }
@@ -222,6 +223,7 @@ component ArrivalLine {
 export component ArrivalBoard inherits Window {
     in property <[StationInfo]> inp;
     in property <[BusStopInfo]> businp;
+    in property <float> scale;
     no-frame: true;
 
     VerticalLayout {
@@ -230,7 +232,7 @@ export component ArrivalBoard inherits Window {
             alignment: center;
             Text {
                 text: "Transit Board";
-                font-size: 40px;
+                font-size: 40px*scale;
                 font-weight: 600;
             }
         }
@@ -241,7 +243,7 @@ export component ArrivalBoard inherits Window {
             }
             Text {
                 text: station.station-name;
-                font-size: 30px;
+                font-size: 30px*scale;
                 horizontal-alignment: center;
                 font-weight: 500;
             }
@@ -262,6 +264,7 @@ export component ArrivalBoard inherits Window {
             for stop in businp : HorizontalLayout {
                 Stop {
                     stop-info: stop;
+                    scale: scale;
                 }
                 Rectangle {
                     width: 100px;
@@ -272,7 +275,7 @@ export component ArrivalBoard inherits Window {
             alignment: end;
             Text {
                 text: "Made with ❤️ by Transit Club";
-                font-size: 20px;
+                font-size: 20px*scale;
             }
         }
     }

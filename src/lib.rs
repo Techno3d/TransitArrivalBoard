@@ -59,6 +59,7 @@ impl StationHandler {
                 }
             }
         }
+        self.times.truncate(5);
     }
 
     pub fn serialize(&self) -> StationInfo {

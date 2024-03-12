@@ -11,6 +11,10 @@ fn main() {
     dotenvy::dotenv().unwrap();
     let api_key = std::env::var("NYCTKEY").unwrap();
     let api_key_bus = std::env::var("MTABUSKEY").unwrap();
+    let bus_scale = std::env::var("BUSSCALE").unwrap_or("1.0".to_string());
+    println!("{}", bus_scale);
+    let bus_scale: f32 = bus_scale.parse().unwrap_or(1.0);
+    println!("{}", bus_scale);
     let mut lehman = StationHandler::new(api_key.to_string(), Lines::_4, "405S".to_string(), 10);
     let mut bedford = StationHandler::new(api_key.to_string(), Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
@@ -20,6 +24,7 @@ fn main() {
     bedford.refresh();
 
     let board = ArrivalBoard::new().unwrap();
+    board.set_scale(bus_scale);
     let board_weak = board.as_weak();
     let (send, recv): (Sender<bool>, Receiver<bool>) = mpsc::channel();
     let handle = std::thread::spawn(move || {
