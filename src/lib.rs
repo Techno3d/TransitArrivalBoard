@@ -43,7 +43,10 @@ impl StationHandler {
             if let Some(tu) = entity.trip_update {
                 for stop in tu.stop_time_update {
                     if stop.stop_id() == self.station_code {
-                        let time = stop.arrival.unwrap().time();
+                        let time = (match stop.arrival {
+                            Some(a) => a,
+                            None => continue,
+                        }).time();
                         let secs: u64 = if u64::try_from(time).unwrap() < SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() { // Does this break once the year gets too high?
                             0
                         } else {
