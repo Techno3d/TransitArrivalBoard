@@ -1,6 +1,8 @@
 use std::fmt::Display;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub enum Lines {
     A, C, E, B, D, F, M, G, J, Z, N, Q, R, W, L, _1, _2, _3, _4, _5, _6, _7, SIR
@@ -23,12 +25,30 @@ impl Lines {
 
     pub fn to_line(route_str: &str) -> Lines {
         match route_str {
-            "4" => Lines::_4,
+            "A" => Lines::A,
+            "C" => Lines::C,
+            "E" => Lines::E,
             "B" => Lines::B,
             "D" => Lines::D,
-            "6" => Lines::_6,
+            "F" => Lines::F,
+            "M" => Lines::M,
+            "G" => Lines::G,
+            "J" => Lines::J,
+            "Z" => Lines::Z,
+            "N" => Lines::N,
+            "Q" => Lines::Q,
+            "R" => Lines::R,
+            "W" => Lines::W,
+            "L" => Lines::L,
             "1" => Lines::_1,
-            _ => Lines::_4,
+            "2" => Lines::_2,
+            "3" => Lines::_3,
+            "4" => Lines::_4,
+            "5" => Lines::_5,
+            "6" => Lines::_6,
+            "7" => Lines::_7,
+            "SIR" => Lines::SIR,
+            _ => Lines::F,
         }
     }
 }

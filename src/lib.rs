@@ -1,12 +1,11 @@
-use std::{cmp::Ordering, collections::HashMap, ops::Sub, rc::Rc, time::{SystemTime, UNIX_EPOCH}};
+use std::{cmp::Ordering, collections::HashMap, ops::Sub};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use lines::Lines;
 use prost::Message;
+use serde::{Deserialize, Serialize};
 use siri_structs::BusData;
-use slint::{Color, VecModel};
 use time::{self, Date, OffsetDateTime, Time, UtcOffset};
-
-slint::include_modules!();
 
 pub mod lines;
 pub mod siri_structs;
@@ -23,6 +22,12 @@ pub struct StationHandler {
     pub walk_time: i32,
     pub delay: i32,
     api_key: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StationJson {
+    pub times: HashMap<Lines, Vec<i32>>,
+    pub walk_time: i32,
 }
 
 impl StationHandler {
@@ -65,19 +70,11 @@ impl StationHandler {
         self.times.truncate(5);
     }
 
-    pub fn serialize(&self) -> StationInfo {
-        let times = self.get_time_map();
-        let mut train_info: Vec<TrainInfo> = vec![];
-        for key in times.keys() {
-            let mut min_away = times.get(key).unwrap().clone(); // Literally has to exist
-            min_away.sort();
-            train_info.push(TrainInfo { 
-                color: slint::Brush::SolidColor(key.to_slint_color()), route_name: key.to_string().into(), 
-                times: Rc::new(VecModel::from(min_away)).into(),
-            })
+    pub fn serialize(&self) -> StationJson {
+        StationJson {
+            times: self.get_time_map(),
+            walk_time: self.walk_time,
         }
-
-        StationInfo { station_name: station_code_to_name(&self.station_code).into(), trains: Rc::new(VecModel::from(train_info)).into(), walk_time: self.walk_time, delay: self.delay }
     }
 
     fn get_time_map(&self) -> HashMap<Lines, Vec<i32>> {
@@ -134,23 +131,6 @@ impl Ord for StationHandler {
     }
 }
 
-impl Lines {
-    fn to_slint_color(&self) -> Color {
-        match self {
-            //Lines::A | Lines::C | Lines::E => ,
-            Lines::B | Lines::D | Lines::F | Lines::M => Color::from_rgb_u8(255, 99, 25), 
-            //Lines::G => ,
-            //Lines::J | Lines::Z => ,
-            //Lines::N | Lines::Q | Lines::R | Lines::W => ,
-            //Lines::L => ,
-            //Lines::_1 | Lines::_2 | Lines::_3 => ,
-            Lines::_4 | Lines::_5 | Lines::_6 => Color::from_rgb_u8(0, 147, 60),
-            //Lines::_7 => ,
-            //Lines::SIR => ,
-            _ => Color::from_rgb_u8(0, 147, 60),
-        }
-    }
-}
 
 fn station_code_to_name(code: &String) -> String {
     // The double deref
@@ -167,6 +147,11 @@ pub struct BusStopHandler {
     api_key: String,
     pub times: HashMap<String, HashMap<String, Vec<i32>>>,
     pub stop_id: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StopJson {
+    pub times: HashMap<String, HashMap<String, Vec<i32>>>,
 }
 
 impl BusStopHandler {
@@ -216,7 +201,11 @@ impl BusStopHandler {
                     "CO-OP CITY BAY PLAZA via ALLERTON AV" => "CO-OP CITY BAY PLAZA",
                     a => a,
                 };
-                let time = visit.monitored_vehicle_journey.monitored_call.expected_arrival_time.unwrap_or("Now".to_owned()); // If it isn't given, bus is at stop waiting to leave
+                let time = visit.monitored_vehicle_journey.monitored_call.expected_arrival_time.unwrap_or(
+                    visit.monitored_vehicle_journey.monitored_call.expected_departure_time.unwrap_or(
+                        "Now".to_owned()
+                        )
+                    ); // If it isn't given, bus is at stop waiting to leave
                 let mut min_away = 0;
                 // Let the cursed code begin
                 // Unwraps should be fine if the MTA doesn't change the time format they are using
@@ -274,30 +263,7 @@ impl BusStopHandler {
         }
     }
 
-    pub fn serialize(&self) -> BusStopInfo {
-        let mut bus_info: Vec<BusInfo> = vec![];
-        for key in self.times.keys() {
-            let mut dests: Vec<(String, Vec<i32>)> = vec![];
-            for dir in self.times.get(key).unwrap().keys() {
-                let mut copyofdata: Vec<i32> = self.times.get(key).unwrap().get(dir).unwrap().to_owned();
-                copyofdata.sort();
-                copyofdata.truncate(3);
-                dests.push((dir.into(), copyofdata));
-            }
-            bus_info.push(BusInfo { 
-                downtown: dests.get(0).unwrap().0.clone().into(),
-                downtown_times: Rc::new(VecModel::from(dests.get(0).unwrap().1.clone())).into(),
-                name: key.into(),
-                uptown: dests.get(1).unwrap_or(&("".to_owned(), vec![])).0.clone().into(),
-                uptown_times: Rc::new(VecModel::from(dests.get(1).unwrap_or(&("".to_owned(), vec![])).1.clone())).into()
-            });
-        } 
-
-        BusStopInfo { busses: Rc::new(VecModel::from(bus_info)).into(), stop_name: match &** self.stop_id.get(0).unwrap() {
-            "100017" => "Paul Av/W 205th Street".into(),
-            "100723" => "W 205 St/Paul Av".into(),
-            "803061" => "W 205 St/Paul Av".into(),
-            _ => "Err".into()
-        } }
+    pub fn serialize(&self) -> StopJson {
+        StopJson { times: self.times.clone() }
     }
 }

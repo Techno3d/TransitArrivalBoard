@@ -1,38 +1,37 @@
 mod lines;
 mod siri_structs;
 
-use std::{rc::Rc, sync::mpsc::{Receiver, Sender}, time::Duration};
-use std::sync::mpsc;
 
-use slint::{ComponentHandle, VecModel};
-use transit_board::{lines::Lines, mercury::MercuryDelays, ArrivalBoard, BusStopHandler, BusStopInfo, StationHandler, StationInfo};
+use std::net::TcpListener;
+use std::time::Duration;
+use std::collections::HashMap;
+use std::thread;
+
+use crossbeam_channel::{unbounded, Receiver, Sender};
+use serde::{Deserialize, Serialize};
+use transit_board::{StationJson, StopJson};
+use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, StationHandler};
+use tungstenite::Message;
 
 fn main() {
     dotenvy::dotenv().unwrap();
     let api_key = std::env::var("NYCTKEY").unwrap();
     let api_key_bus = std::env::var("MTABUSKEY").unwrap();
-    let bus_scale = std::env::var("BUSSCALE").unwrap_or("1.0".to_string());
-    let bus_scale: f32 = bus_scale.parse().unwrap_or(1.0);
+    let mut delay_map: HashMap<Lines, i32> = HashMap::new();
     let mut lehman = StationHandler::new(api_key.to_string(), Lines::_4, "405S".to_string(), 10);
     let mut bedford = StationHandler::new(api_key.to_string(), Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
-    let mut bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()]);
-    let mut bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()]); //, "803061".to_string() // Not needed?
-    lehman.refresh();
-    bedford.refresh();
+    let mut _bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()]);
+    let mut _bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()]); //, "803061".to_string() // Not needed?
 
-    let board = ArrivalBoard::new().unwrap();
-    board.set_scale(bus_scale);
-    let board_weak = board.as_weak();
-    let (send, recv): (Sender<bool>, Receiver<bool>) = mpsc::channel();
-    let handle = std::thread::spawn(move || {
+    let (send, recv): (Sender<InfoJson>, Receiver<InfoJson>) = unbounded();
+
+    let update_thread = thread::spawn(move || {
         loop {
             lehman.refresh();
             bedford.refresh();
-            bx1028.refresh();
-            bx2526.refresh();
-            //grand_central.refresh();
-            
+
+            delay_map.clear();
             // Delays
             let resp2 = minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
                 .with_header("x-api-key", &api_key)
@@ -43,59 +42,62 @@ fn main() {
                 Ok(r) => r,
                 Err(_) => Default::default(),
             };
-            let mut lehman_delays: Vec<i32> = vec![];
-            let mut bedford_delays: Vec<i32> = vec![];
             for entity in delays.entity {
                 for informed in entity.alert.unwrap().informed_entity.unwrap() {
                     if let Some(selector) = informed.transit_realtime_mercury_entity_selector {
                         let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
-                        if decomposed.get(1).unwrap() == &"4" {
-                            lehman_delays.push(match (*decomposed.get(2).unwrap()).parse() {
-                                Ok(x) => x,
-                                Err(_) => 0,
-                            });
-                        }
-                        if decomposed.get(1).unwrap() == &"B" || decomposed.get(1).unwrap() == &"D"  {
-                            bedford_delays.push(match (*decomposed.get(2).unwrap()).parse() {
-                                Ok(x) => x,
-                                Err(_) => 0,
-                            });
+                        let line = Lines::to_line(decomposed.get(1).unwrap());
+                        let severity = match (*decomposed.get(2).unwrap()).parse() {
+                            Ok(x) => x,
+                            Err(_) => 0,
+                        };
+                        if delay_map.contains_key(&line) {
+                            if &severity > delay_map.get(&line).unwrap() {
+                                *delay_map.get_mut(&line).unwrap() = severity;
+                            }
+                        } else {
+                            delay_map.insert(line, severity);
                         }
                     }
                 }
             }
-            lehman_delays.sort();
-            bedford_delays.sort();
-            lehman.delay = *(lehman_delays.last().unwrap_or(&0));
-            bedford.delay = *(bedford_delays.last().unwrap_or(&0));
-
-            let inp = vec![lehman.clone(),bedford.clone()];
-            let businp = vec![bx1028.clone(), bx2526.clone()];
-            //inp.sort(); // Confusing
-            let board_copy = board_weak.clone();
-
-
-
-            slint::invoke_from_event_loop(move || {
-                let inp: Vec<StationInfo> = inp.into_iter().map(|x| x.serialize()).collect();
-                let inp = Rc::new(VecModel::from(inp)).into();
-                board_copy.unwrap().set_inp(inp);
-                //Busses
-                let businp: Vec<BusStopInfo> = businp.into_iter().map(|x| x.serialize()).collect();
-                let businp = Rc::new(VecModel::from(businp));
-                board_copy.unwrap().set_businp(businp.into());
-            }).unwrap();
-            match recv.recv_timeout(Duration::from_secs(60)) {
-                Ok(r) => {
-                    if r { return; }
-                },
+            let data = InfoJson {
+                subway: vec![lehman.serialize(), bedford.serialize()],
+                stop: vec![_bx2526.serialize(), _bx1028.serialize()],
+                delay: delay_map.clone(),
+            };
+            match send.send(data) {
+                Ok(_) => {},
                 Err(_) => {},
             };
+            thread::sleep(Duration::from_secs(60));
         }
     });
-    board.window().set_fullscreen(true);
-    board.run().unwrap();
-    let _ = send.send(true);
-    handle.join().unwrap();
-    //board.set_inp(Rc::new(VecModel::from(inp)).into());
+
+    // Web Sockets
+    let server = TcpListener::bind("0.0.0.0:9001").unwrap();
+    for stream in server.incoming() {
+        let recv_copy = recv.clone();
+        thread::spawn(move || {
+            let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
+            loop {
+                let data = recv_copy.recv().unwrap();
+                let data = serde_json::to_vec(&data).unwrap();
+                let message = Message::Binary(data);
+                match ws.send(message) {
+                    Ok(_) => {},
+                    Err(_) => {},
+                };
+            }
+        });
+    }
+    update_thread.join().unwrap();
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct InfoJson {
+    subway: Vec<StationJson>,
+    stop: Vec<StopJson>,
+    delay: HashMap<Lines, i32>,
 }
