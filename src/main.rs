@@ -82,8 +82,8 @@ fn main() {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
             loop {
                 let data = recv_copy.recv().unwrap();
-                let data = serde_json::to_vec(&data).unwrap();
-                let message = Message::Binary(data);
+                let data = serde_json::to_string(&data).unwrap();
+                let message = Message::Text(data);
                 match ws.send(message) {
                     Ok(_) => {},
                     Err(_) => {},
