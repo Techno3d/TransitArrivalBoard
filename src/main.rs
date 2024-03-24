@@ -86,7 +86,7 @@ fn main() {
                 let message = Message::Text(data);
                 match ws.send(message) {
                     Ok(_) => {},
-                    Err(_) => {},
+                    Err(_) => break,
                 };
             }
         });
@@ -95,7 +95,7 @@ fn main() {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
     subway: Vec<StationJson>,
     stop: Vec<StopJson>,
