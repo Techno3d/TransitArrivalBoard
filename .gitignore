@@ -1,5 +1,10 @@
-# environment variable
+# target
 /target
+
+# out
+out*.*
+
+# environment variable
 .env
 
 # dependencies

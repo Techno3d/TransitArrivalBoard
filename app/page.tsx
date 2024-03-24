@@ -1,56 +1,26 @@
-import Image from "next/image";
-import Bullet4 from "../public/subway/4.svg";
-import BulletB from "../public/subway/B.svg";
-import BulletD from "../public/subway/D.svg";
+import { StationList } from "./components/StationList";
+import { StationTimeline } from "./components/StationTimeline";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen min-w-screen flex-col items-center bg-gradient-to-r from-emerald-400 to-cyan-400 p-[2vh] gap-[2vh]">
-      <span className="z-10 h-[62vh] w-full flex flex-row items-center justify-center gap-[2vh]">
-        <div className="z-10 h-full w-4/6 font-mono text-sm bg-slate-50 rounded-lg justify-center items-center">
-          <div className="h-full flex flex-col justify-center items-center gap-[1%] p-[1%]">
-            <div className="w-full h-[7%] flex flex-row items-center">
-              <h1 className="lg:text-5xl text-base w-full text-black font-black text-center">
-                Bedford Park Blvd (Manhattan-bound)
-              </h1>
-            </div>
-            <div className="w-full h-[30%] flex flex-row items-center">
-              <div className="h-full aspect-square">
-                <Image className="h-full w-full" src={Bullet4} alt={""}></Image>
-              </div>
-              <span className="bg-[#00933c] w-5/6 h-8 rounded-full items-center justify-center">
-                <div className="bg-black w-[10%] h-[400%] justify-center"></div>
-              </span>
-            </div>
-            <div className="w-full h-[30%] flex flex-row items-center">
-              <div className="h-full aspect-square">
-                <Image className="h-full w-full" src={BulletB} alt={""}></Image>
-              </div>
-              <span className="bg-[#ff6319] w-5/6 h-8 rounded-full"></span>
-            </div>
-            <div className="w-full h-[30%] flex flex-row items-center">
-              <div className="h-full aspect-square">
-                <Image className="h-full w-full" src={BulletD} alt={""}></Image>
-              </div>
-              <span className="bg-[#ff6319] w-5/6 h-8 rounded-full"></span>
-            </div>
-          </div>
+    <main className="min-w-screen flex min-h-screen flex-col items-center gap-[2vh] bg-[#007261] p-[2vh] text-center text-base text-white">
+      <span className="flex h-[60vh] w-full flex-row items-center gap-[2vh]">
+        <div className=" h-full w-2/3 rounded-lg bg-slate-50 font-mono text-sm">
+          <StationTimeline></StationTimeline>
         </div>
-        <div className="z-10 h-full w-2/6 font-mono text-sm bg-slate-50 rounded-lg start-end">
-          <div className="h-full flex flex-col justify-center items-center gap-[1%] p-[1%]">
-            {" "}
-            <h1 className="lg:text-5xl text-base w-full text-black font-black text-center">
-              Paul Av/W 205 St
-            </h1>
-            <h1 className="lg:text-5xl text-base w-full text-black font-black text-center">
-              W 205 St/Paul Av
-            </h1>
-          </div>
+        <div className=" h-full w-1/3 rounded-2xl bg-slate-50 font-mono text-sm">
+          <StationList></StationList>
         </div>
       </span>
-      <span className="z-10 h-[32vh] w-full flex items-center justify-center font-mono text-sm bg-slate-50  rounded-lg">
-        HI
-      </span>
+      <span className=" flex h-[25vh] w-full items-center rounded-lg bg-slate-50 font-mono text-sm">HI</span>
+      <div className="flex h-[4vh] flex-row items-center self-start rounded-md bg-white p-4">
+        <p className="w-full text-left text-black lg:text-3xl">
+          With ♥️ from Transit Club{" "}
+          <b>
+            <i>(@Techno3d, @wd7bxscience)</i>
+          </b>
+        </p>
+      </div>
     </main>
   );
 }
