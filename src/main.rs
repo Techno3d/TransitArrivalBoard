@@ -50,7 +50,7 @@ fn main() {
             }
 
             for i in 0..stops.len() {
-                stations.get_mut(i).unwrap().refresh();
+                stops.get_mut(i).unwrap().refresh();
             }
 
             delay_map.clear();
