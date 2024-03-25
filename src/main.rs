@@ -5,10 +5,11 @@ mod siri_structs;
 use std::net::TcpListener;
 use std::time::Duration;
 use std::collections::HashMap;
-use std::thread;
+use std::{fs, thread};
 
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use serde::{Deserialize, Serialize};
+use transit_board::config::Conf;
 use transit_board::{StationJson, StopJson};
 use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, StationHandler};
 use tungstenite::Message;
@@ -17,19 +18,40 @@ fn main() {
     dotenvy::dotenv().unwrap();
     let api_key = std::env::var("NYCTKEY").unwrap();
     let api_key_bus = std::env::var("MTABUSKEY").unwrap();
+    let config = match fs::read_to_string("Config.json") {
+        Ok(a) => a,
+        Err(_) => "none".to_owned(),
+    };
+    let config: Conf = match serde_json::from_str(&config) {
+        Ok(a) => a,
+        Err(_) => Default::default(),
+    };
+    let mut stations = config.get_station_handlers(api_key.clone());
+    let mut stops = config.get_stop_handlers(api_key_bus.clone());
     let mut delay_map: HashMap<Lines, i32> = HashMap::new();
-    let mut lehman = StationHandler::new(api_key.to_string(), Lines::_4, "405S".to_string(), 10);
-    let mut bedford = StationHandler::new(api_key.to_string(), Lines::D, "D03S".to_string(), 14);
+    let lehman = StationHandler::new_no_name(api_key.to_string(), Lines::_5, "405S".to_string(), 10);
+    let bedford = StationHandler::new_no_name(api_key.to_string(), Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
-    let mut _bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()]);
-    let mut _bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()]); //, "803061".to_string() // Not needed?
+    let bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()], "Paul Av/W 205th Street".to_owned());
+    let bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], "W 205th St/Paul Av".to_owned()); //, "803061".to_string() // Not needed?
+    if stations.len() == 0 {
+        stations = vec![lehman, bedford];
+    }
+    if stops.len() == 0 {
+        stops = vec![bx2526, bx1028];
+    }
 
     let (send, recv): (Sender<InfoJson>, Receiver<InfoJson>) = unbounded();
 
     let update_thread = thread::spawn(move || {
         loop {
-            lehman.refresh();
-            bedford.refresh();
+            for i in 0..stations.len() {
+                stations.get_mut(i).unwrap().refresh();
+            }
+
+            for i in 0..stops.len() {
+                stations.get_mut(i).unwrap().refresh();
+            }
 
             delay_map.clear();
             // Delays
@@ -62,8 +84,8 @@ fn main() {
                 }
             }
             let data = InfoJson {
-                subway: vec![lehman.serialize(), bedford.serialize()],
-                stop: vec![_bx2526.serialize(), _bx1028.serialize()],
+                subway: stations.iter().map(|x| x.serialize()).collect(),
+                stop: stops.iter().map(|x| x.serialize()).collect(),
                 delay: delay_map.clone(),
             };
             match send.send(data) {
@@ -101,3 +123,4 @@ struct InfoJson {
     stop: Vec<StopJson>,
     delay: HashMap<Lines, i32>,
 }
+

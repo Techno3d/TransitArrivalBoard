@@ -10,12 +10,14 @@ use time::{self, Date, OffsetDateTime, Time, UtcOffset};
 pub mod lines;
 pub mod siri_structs;
 pub mod mercury;
+pub mod config;
 pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
 
 #[derive(Debug, Clone)]
 pub struct StationHandler {
+    pub name: String,
     pub line: Lines,
     pub station_code: String,
     pub times: Vec<(Lines, u64)>,
@@ -26,13 +28,18 @@ pub struct StationHandler {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StationJson {
+    pub name: String,
     pub times: HashMap<Lines, Vec<i32>>,
     pub walk_time: i32,
 }
 
 impl StationHandler {
-    pub fn new(api_key: String, line: Lines, station_code: String, walk_time: i32) -> Self {
-        Self { api_key, line, station_code, times: vec![], walk_time, delay: 0 }
+    pub fn new_no_name(api_key: String, line: Lines, station_code: String, walk_time: i32) -> Self {
+        Self { name: station_code_to_name(&station_code), api_key, line, station_code, times: vec![], walk_time, delay: 0 }
+    }
+
+    pub fn new(api_key: String, line: Lines, station_code: String, walk_time: i32, name: String) -> Self {
+        Self { name, api_key, line, station_code, times: vec![], walk_time, delay: 0 }
     }
 
     pub fn refresh(&mut self) {
@@ -72,6 +79,7 @@ impl StationHandler {
 
     pub fn serialize(&self) -> StationJson {
         StationJson {
+            name: station_code_to_name(&self.station_code),
             times: self.get_time_map(),
             walk_time: self.walk_time,
         }
@@ -145,18 +153,20 @@ fn station_code_to_name(code: &String) -> String {
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {
     api_key: String,
+    pub name: String,
     pub times: HashMap<String, HashMap<String, Vec<i32>>>,
     pub stop_id: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StopJson {
+    pub name: String,
     pub times: HashMap<String, HashMap<String, Vec<i32>>>,
 }
 
 impl BusStopHandler {
-    pub fn new(api_key: String, stop_id: Vec<String>) -> Self {
-        Self {api_key, stop_id, times: HashMap::new()}
+    pub fn new(api_key: String, stop_id: Vec<String>, name: String) -> Self {
+        Self {api_key, stop_id, name, times: HashMap::new()}
     }
 
     // Support for stops that are broken into dir 1 and dir 2
@@ -264,6 +274,6 @@ impl BusStopHandler {
     }
 
     pub fn serialize(&self) -> StopJson {
-        StopJson { times: self.times.clone() }
+        StopJson { name: self.name.clone(), times: self.times.clone() }
     }
 }
