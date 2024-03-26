@@ -8,7 +8,7 @@ export default function Home() {
         <div className=" h-full w-2/3 rounded-lg bg-slate-50 font-mono text-sm">
           <StationTimeline></StationTimeline>
         </div>
-        <div className=" h-full w-1/3 rounded-2xl bg-slate-50 font-mono text-sm">
+        <div className=" h-full w-1/3 rounded-lg bg-slate-50 font-mono text-sm">
           <StationList></StationList>
         </div>
       </span>

@@ -18,7 +18,7 @@ fn main() {
     dotenvy::dotenv().unwrap();
     let api_key = std::env::var("NYCTKEY").unwrap();
     let api_key_bus = std::env::var("MTABUSKEY").unwrap();
-    let config = match fs::read_to_string("Config.json") {
+    let config = match fs::read_to_string("config.json") {
         Ok(a) => a,
         Err(_) => "none".to_owned(),
     };
