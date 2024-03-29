@@ -3,11 +3,12 @@ mod siri_structs;
 
 
 use std::net::TcpListener;
+use std::sync::{Arc, RwLock};
+use std::thread::JoinHandle;
 use std::time::Duration;
 use std::collections::HashMap;
 use std::{fs, thread};
 
-use crossbeam_channel::{unbounded, Receiver, Sender};
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
 use transit_board::{StationJson, StopJson};
@@ -41,7 +42,10 @@ fn main() {
         stops = vec![bx2526, bx1028];
     }
 
-    let (send, recv): (Sender<InfoJson>, Receiver<InfoJson>) = unbounded();
+    let send_data_clone = Arc::new(RwLock::new(InfoJson::default()));
+    let send_data = send_data_clone.clone();
+    let update_threads = Arc::new(RwLock::new(Vec::<JoinHandle<_>>::new()));
+    let update = update_threads.clone();
 
     let update_thread = thread::spawn(move || {
         loop {
@@ -87,10 +91,14 @@ fn main() {
                 stop: stops.iter().map(|x| x.serialize()).collect(),
                 delay: delay_map.clone(),
             };
-            match send.send(data) {
-                Ok(_) => {},
-                Err(_) => {},
-            };
+            println!("new data");
+            {
+                *send_data.write().unwrap() = data.clone();
+                for handle in &*update.read().unwrap() {
+                    handle.thread().unpark();
+                }
+            }
+            println!("sent");
             thread::sleep(Duration::from_secs(60));
         }
     });
@@ -98,19 +106,23 @@ fn main() {
     // Web Sockets
     let server = TcpListener::bind("0.0.0.0:9001").unwrap();
     for stream in server.incoming() {
-        let recv_copy = recv.clone();
-        thread::spawn(move || {
+        let data_clone = send_data_clone.clone();
+        let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
             loop {
-                let data = recv_copy.recv().unwrap();
-                let data = serde_json::to_string(&data).unwrap();
-                let message = Message::Text(data);
-                match ws.send(message) {
-                    Ok(_) => {},
-                    Err(_) => break,
-                };
+                {
+                    let data = data_clone.read().unwrap();
+                    let data = serde_json::to_string(&*data).unwrap();
+                    let message = Message::Text(data);
+                    match ws.send(message) {
+                        Ok(_) => {},
+                        Err(_) => break,
+                    };
+                }
+                thread::park();
             }
         });
+        update_threads.write().unwrap().push(handle);
     }
     update_thread.join().unwrap();
 }
