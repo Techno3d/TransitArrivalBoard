@@ -23,9 +23,9 @@ struct StopConf {
 }
 
 impl Conf {
-    pub fn get_station_handlers(&self, api_key: String) -> Vec<StationHandler> {
+    pub fn get_station_handlers(&self) -> Vec<StationHandler> {
         self.stations.iter().map(|x| {
-            StationHandler::new(api_key.clone(), Lines::to_line(&x.station_code.chars().next().unwrap().to_string()), x.station_code.clone(), x.walk_time, x.name.clone())
+            StationHandler::new(Lines::to_line(&x.station_code.chars().next().unwrap().to_string()), x.station_code.clone(), x.walk_time, x.name.clone())
         }).collect()
     }
 

@@ -16,7 +16,7 @@ use tungstenite::Message;
 
 fn main() {
     dotenvy::dotenv().unwrap();
-    let api_key = std::env::var("NYCTKEY").unwrap();
+    //let api_key = std::env::var("NYCTKEY").unwrap();
     let api_key_bus = std::env::var("MTABUSKEY").unwrap();
     let config = match fs::read_to_string("config.json") {
         Ok(a) => a,
@@ -26,11 +26,11 @@ fn main() {
         Ok(a) => a,
         Err(_) => Default::default(),
     };
-    let mut stations = config.get_station_handlers(api_key.clone());
+    let mut stations = config.get_station_handlers();
     let mut stops = config.get_stop_handlers(api_key_bus.clone());
     let mut delay_map: HashMap<Lines, i32> = HashMap::new();
-    let lehman = StationHandler::new_no_name(api_key.to_string(), Lines::_5, "405S".to_string(), 10);
-    let bedford = StationHandler::new_no_name(api_key.to_string(), Lines::D, "D03S".to_string(), 14);
+    let lehman = StationHandler::new_no_name(Lines::_5, "405S".to_string(), 10);
+    let bedford = StationHandler::new_no_name(Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
     let bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()], "Paul Av/W 205th Street".to_owned());
     let bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], "W 205th St/Paul Av".to_owned()); //, "803061".to_string() // Not needed?
@@ -56,7 +56,6 @@ fn main() {
             delay_map.clear();
             // Delays
             let resp2 = minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
-                .with_header("x-api-key", &api_key)
                 .send()
                 .unwrap();
             let bytes = resp2.as_bytes();

@@ -23,7 +23,7 @@ pub struct StationHandler {
     pub times: Vec<(Lines, u64)>,
     pub walk_time: i32,
     pub delay: i32,
-    api_key: String,
+    //api_key: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,18 +34,18 @@ pub struct StationJson {
 }
 
 impl StationHandler {
-    pub fn new_no_name(api_key: String, line: Lines, station_code: String, walk_time: i32) -> Self {
-        Self { name: station_code_to_name(&station_code), api_key, line, station_code, times: vec![], walk_time, delay: 0 }
+    pub fn new_no_name(line: Lines, station_code: String, walk_time: i32) -> Self {
+        Self { name: station_code_to_name(&station_code), line, station_code, times: vec![], walk_time, delay: 0 }
     }
 
-    pub fn new(api_key: String, line: Lines, station_code: String, walk_time: i32, name: String) -> Self {
-        Self { name, api_key, line, station_code, times: vec![], walk_time, delay: 0 }
+    pub fn new(line: Lines, station_code: String, walk_time: i32, name: String) -> Self {
+        Self { name, line, station_code, times: vec![], walk_time, delay: 0 }
     }
 
     pub fn refresh(&mut self) {
         self.times.clear();
         let uri = self.line.to_uri();
-        let resp = minreq::get(uri).with_header("x-api-key", &self.api_key).send().unwrap();
+        let resp = minreq::get(uri).send().unwrap();
         let bytes = resp.as_bytes();
         let feed = match gtfsrt::FeedMessage::decode(bytes) { // if no data so abort
             Ok(a) => a,
