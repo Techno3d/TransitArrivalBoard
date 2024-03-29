@@ -91,14 +91,12 @@ fn main() {
                 stop: stops.iter().map(|x| x.serialize()).collect(),
                 delay: delay_map.clone(),
             };
-            println!("new data");
             {
                 *send_data.write().unwrap() = data.clone();
                 for handle in &*update.read().unwrap() {
                     handle.thread().unpark();
                 }
             }
-            println!("sent");
             thread::sleep(Duration::from_secs(60));
         }
     });
