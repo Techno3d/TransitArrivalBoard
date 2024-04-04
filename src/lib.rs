@@ -62,7 +62,7 @@ impl StationHandler {
                         let secs: u64 = if u64::try_from(time).unwrap() < SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() { // Does this break once the year gets too high?
                             0
                         } else {
-                            u64::try_from(time).unwrap() - SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() 
+                            u64::try_from(time).unwrap() - SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
                         };
                         // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
                         // Shouldn't break unless trip id is changed
@@ -121,7 +121,7 @@ impl PartialOrd for StationHandler {
                 break;
             }
         }
-        
+
         Some(selftime.cmp(&othertime))
     }
 }
@@ -179,7 +179,7 @@ impl BusStopHandler {
             self.refresh_single(id, now);
         }
     }
-    
+
     fn refresh_single(&mut self, stopid: &String, now: OffsetDateTime) {
         let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
             .with_param("key", &self.api_key)
@@ -226,7 +226,7 @@ impl BusStopHandler {
                     // be either 5 (est) or 4 (edt)
                     let offset = if thing.next().unwrap().split("-").last().unwrap().contains("5") {
                         5
-                    } else { 
+                    } else {
                         4
                     };
                     let day: Vec<&str> = time.next().unwrap().split("-").collect();
