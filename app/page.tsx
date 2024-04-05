@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import BulletB from "../public/bullets/B.svg";
 import BulletD from "../public/bullets/D.svg";
 import BulletN from "../public/bullets/N.svg";
@@ -6,6 +10,25 @@ import BulletR from "../public/bullets/R.svg";
 import Bullet4 from "../public/bullets/_4.svg";
 
 export default function Home() {
+  const WS_URL = "ws://0.0.0.0:9001";
+  const { lastJsonMessage, readyState } = useWebSocket(WS_URL, {
+    share: false,
+    shouldReconnect: () => true,
+  });
+
+  // Run when the connection state (readyState) changes
+  useEffect(() => {
+    console.log("Connection state changed");
+    if (readyState === ReadyState.OPEN) {
+      console.log("Open!");
+    }
+  }, [readyState]);
+
+  // Run when a new WebSocket message is received (lastJsonMessage)
+  useEffect(() => {
+    console.log(`Got a new message: ${lastJsonMessage}`);
+  }, [lastJsonMessage]);
+  2;
   return (
     <div className="grid min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
       <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-lg bg-black p-2">
@@ -20,8 +43,8 @@ export default function Home() {
               <div className="flex h-full w-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
                 <div className="h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
                   <div className="flex h-full w-full flex-col p-4">
-                    <div className="flex w-full basis-2/5 flex-row items-center px-8">
-                      <h1 className="text-7xl font-bold text-black">New Lots Av</h1>
+                    <div className="flex w-full basis-2/5 flex-row items-center overflow-hidden px-8">
+                      <h1 className="text-nowrap text-7xl font-bold text-black">Utica Av</h1>
                     </div>
                     <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
                       <div className="aspect-square h-full p-4">
@@ -40,7 +63,7 @@ export default function Home() {
                       <Image className="w-full" src={Bullet4} alt={""}></Image>
                     </div>
                   </div>
-                  <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
+                  <div className="flex basis-3/5 flex-row items-center gap-4">
                     <div className="flex items-baseline">
                       <h1 className="text-9xl font-bold text-black">12</h1>
                       <h1 className="text-5xl font-semibold text-black">min</h1>
@@ -54,7 +77,7 @@ export default function Home() {
                     <Image className="w-full" src={Bullet4} alt={""}></Image>
                   </div>
                 </div>
-                <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
+                <div className="flex basis-3/5 flex-row items-center gap-4">
                   <div className="flex items-baseline">
                     <h1 className="text-9xl font-bold text-black">14</h1>
                     <h1 className="text-5xl font-semibold text-black">min</h1>
@@ -75,8 +98,8 @@ export default function Home() {
               <div className="flex h-full w-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
                 <div className="h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
                   <div className="flex h-full w-full flex-col p-4">
-                    <div className="flex w-full basis-2/5 flex-row items-center px-8">
-                      <h1 className="text-7xl font-bold text-black">Coney Island</h1>
+                    <div className="flex w-full basis-2/5 flex-row items-center overflow-hidden px-8">
+                      <h1 className="text-nowrap text-7xl font-bold text-black">Coney Island</h1>
                     </div>
                     <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
                       <div className="aspect-square h-full p-4">
@@ -95,7 +118,7 @@ export default function Home() {
                       <Image className="w-full" src={BulletB} alt={""}></Image>
                     </div>
                   </div>
-                  <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
+                  <div className="flex basis-3/5 flex-row items-center gap-4">
                     <div className="flex items-baseline">
                       <h1 className="text-9xl font-bold text-black">11</h1>
                       <h1 className="text-5xl font-semibold text-black">min</h1>
@@ -109,7 +132,7 @@ export default function Home() {
                     <Image className="w-full" src={BulletD} alt={""}></Image>
                   </div>
                 </div>
-                <div className="flex basis-3/5 flex-row items-center gap-4 px-4">
+                <div className="flex basis-3/5 flex-row items-center gap-4">
                   <div className="flex items-baseline">
                     <h1 className="text-9xl font-bold text-black">17</h1>
                     <h1 className="text-5xl font-semibold text-black">min</h1>
