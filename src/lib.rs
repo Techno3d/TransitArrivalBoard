@@ -20,7 +20,7 @@ pub struct StationHandler {
     pub name: String,
     pub line: Lines,
     pub station_code: String,
-    pub times: Vec<(Lines, u64)>,
+    pub times: Vec<(Lines, String, u64)>,
     pub walk_time: i32,
     pub delay: i32,
     //api_key: String,
@@ -29,7 +29,7 @@ pub struct StationHandler {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StationJson {
     pub name: String,
-    pub times: HashMap<Lines, Vec<i32>>,
+    pub times: HashMap<Lines, HashMap<String, Vec<i32>>>,
     pub walk_time: i32,
 }
 
@@ -53,9 +53,9 @@ impl StationHandler {
         };
         for entity in feed.entity {
             if let Some(tu) = entity.trip_update {
-                for stop in tu.stop_time_update {
+                for stop in tu.stop_time_update.iter() {
                     if stop.stop_id() == self.station_code {
-                        let time = (match stop.arrival {
+                        let time = (match &stop.arrival {
                             Some(a) => a,
                             None => continue,
                         }).time();
@@ -67,9 +67,14 @@ impl StationHandler {
                         // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
                         // Shouldn't break unless trip id is changed
                         let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
-                        let parsed_route = parsed_tid.split("..").next().unwrap();
+                        let mut tid_split = parsed_tid.split("..");
+                        let parsed_route = tid_split.next().unwrap();
                         let route = Lines::to_line(parsed_route);
-                        self.times.push((route, secs/60));
+                        let terminus = match tu.stop_time_update.last() {
+                            Some(a) => a.stop_id().to_owned(),
+                            None => "".to_owned(),
+                        };
+                        self.times.push((route, terminus, secs/60));
                     }
                 }
             }
@@ -85,60 +90,22 @@ impl StationHandler {
         }
     }
 
-    fn get_time_map(&self) -> HashMap<Lines, Vec<i32>> {
-        let mut map: HashMap<Lines, Vec<i32>> = HashMap::new();
-        for (line, time) in self.times.clone() {
+    fn get_time_map(&self) -> HashMap<Lines, HashMap<String, Vec<i32>>> {
+        let mut map: HashMap<Lines, HashMap<String, Vec<i32>>> = HashMap::new();
+        for (line, terminus, time) in self.times.clone() {
             if map.contains_key(&line) {
-                map.get_mut(&line).unwrap().push(time.try_into().unwrap());
+                if map.get_mut(&line).unwrap().contains_key(&terminus) {
+                    map.get_mut(&line).unwrap().get_mut(&terminus).unwrap().push(time.try_into().unwrap());
+                } else {
+                    map.get_mut(&line).unwrap().insert(terminus, vec![time.try_into().unwrap()]);
+                }
             } else {
-                map.insert(line, vec![time.try_into().unwrap()]);
+                map.insert(line, HashMap::from([(terminus, vec![time.try_into().unwrap()])]));
             }
         }
         map
     }
 }
-
-impl PartialOrd for StationHandler {
-    // Can break for multiline stations
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let mut selftime = match self.times.get(0) {
-            Some(a) => a.1,
-            None => return Some(Ordering::Greater),
-        };
-        for (_, time) in self.times.iter() {
-            if time > &self.walk_time.try_into().unwrap() {
-                selftime = *time;
-                break;
-            }
-        }
-        let mut othertime = match other.times.get(0) {
-            Some(a) => a.1,
-            None => return Some(Ordering::Less),
-        };
-        for (_, time) in other.times.iter() {
-            if time > &other.walk_time.try_into().unwrap() {
-                othertime = *time;
-                break;
-            }
-        }
-
-        Some(selftime.cmp(&othertime))
-    }
-}
-
-impl PartialEq for StationHandler {
-    fn eq(&self, other: &Self) -> bool {
-        self.station_code == other.station_code && self.line == other.line
-    }
-}
-
-impl Eq for StationHandler {}
-impl Ord for StationHandler {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
 
 fn station_code_to_name(code: &String) -> String {
     // The double deref
