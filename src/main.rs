@@ -29,7 +29,7 @@ fn main() {
     };
     let mut stations = config.get_station_handlers();
     let mut stops = config.get_stop_handlers(api_key_bus.clone());
-    let mut delay_map: HashMap<Lines, i32> = HashMap::new();
+    let mut delay_map: HashMap<Lines, (i32, String)> = HashMap::new();
     let lehman = StationHandler::new_no_name(Lines::_5, "405S".to_string(), 10);
     let bedford = StationHandler::new_no_name(Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
@@ -68,8 +68,9 @@ fn main() {
                 Err(_) => Default::default(),
             };
             for entity in delays.entity {
-                for informed in entity.alert.unwrap().informed_entity.unwrap() {
-                    if let Some(selector) = informed.transit_realtime_mercury_entity_selector {
+                let alert = entity.alert.unwrap();
+                for informed in alert.informed_entity.unwrap().iter() {
+                    if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
                         let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
                         let line = Lines::to_line(decomposed.get(1).unwrap());
                         let severity = match (*decomposed.get(2).unwrap()).parse() {
@@ -77,11 +78,14 @@ fn main() {
                             Err(_) => 0,
                         };
                         if delay_map.contains_key(&line) {
-                            if &severity > delay_map.get(&line).unwrap() {
-                                *delay_map.get_mut(&line).unwrap() = severity;
+                            if severity > delay_map.get(&line).unwrap().0 {
+                                delay_map.get_mut(&line).unwrap().0 = severity;
                             }
                         } else {
-                            delay_map.insert(line, severity);
+                            delay_map.insert(line, (severity, match alert.description_text {
+                                Some(ref a) => a.translation.get(0).unwrap().text.clone().unwrap(),
+                                None => "".to_owned(),
+                            }));
                         }
                     }
                 }
@@ -130,6 +134,6 @@ fn main() {
 struct InfoJson {
     subway: Vec<StationJson>,
     stop: Vec<StopJson>,
-    delay: HashMap<Lines, i32>,
+    delay: HashMap<Lines, (i32, String)>,
 }
 

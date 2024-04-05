@@ -65,7 +65,7 @@ pub struct HeaderText {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct TranslateHolder {
-    translation: Vec<Translation>,
+    pub translation: Vec<Translation>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
@@ -73,7 +73,6 @@ pub struct Translation {
     pub text: Option<String>,
     pub language: Option<String>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct MercuryAlert {
