@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -93,7 +93,7 @@ pub struct MonitoredCall {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct SituationExchangeDelivery {
-    pub situations: Situations
+    pub situations: Situations,
 }
 
 #[derive(Serialize, Deserialize)]

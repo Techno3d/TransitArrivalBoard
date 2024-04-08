@@ -1,5 +1,5 @@
-use std::{cmp::Ordering, collections::HashMap, ops::Sub};
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::{collections::HashMap, ops::Sub};
 
 use lines::Lines;
 use prost::Message;
@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 use siri_structs::BusData;
 use time::{self, Date, OffsetDateTime, Time, UtcOffset};
 
-pub mod lines;
-pub mod siri_structs;
-pub mod mercury;
 pub mod config;
+pub mod lines;
+pub mod mercury;
+pub mod siri_structs;
 pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
@@ -35,11 +35,25 @@ pub struct StationJson {
 
 impl StationHandler {
     pub fn new_no_name(line: Lines, station_code: String, walk_time: i32) -> Self {
-        Self { name: station_code_to_name(&station_code), line, station_code, times: vec![], walk_time, delay: 0 }
+        Self {
+            name: station_code_to_name(&station_code),
+            line,
+            station_code,
+            times: vec![],
+            walk_time,
+            delay: 0,
+        }
     }
 
     pub fn new(line: Lines, station_code: String, walk_time: i32, name: String) -> Self {
-        Self { name, line, station_code, times: vec![], walk_time, delay: 0 }
+        Self {
+            name,
+            line,
+            station_code,
+            times: vec![],
+            walk_time,
+            delay: 0,
+        }
     }
 
     pub fn refresh(&mut self) {
@@ -47,7 +61,8 @@ impl StationHandler {
         let uri = self.line.to_uri();
         let resp = minreq::get(uri).send().unwrap();
         let bytes = resp.as_bytes();
-        let feed = match gtfsrt::FeedMessage::decode(bytes) { // if no data so abort
+        let feed = match gtfsrt::FeedMessage::decode(bytes) {
+            // if no data so abort
             Ok(a) => a,
             Err(_) => return,
         };
@@ -58,11 +73,22 @@ impl StationHandler {
                         let time = (match &stop.arrival {
                             Some(a) => a,
                             None => continue,
-                        }).time();
-                        let secs: u64 = if u64::try_from(time).unwrap() < SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs() { // Does this break once the year gets too high?
+                        })
+                        .time();
+                        let secs: u64 = if u64::try_from(time).unwrap()
+                            < SystemTime::now()
+                                .duration_since(UNIX_EPOCH)
+                                .unwrap()
+                                .as_secs()
+                        {
+                            // Does this break once the year gets too high?
                             0
                         } else {
-                            u64::try_from(time).unwrap() - SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
+                            u64::try_from(time).unwrap()
+                                - SystemTime::now()
+                                    .duration_since(UNIX_EPOCH)
+                                    .unwrap()
+                                    .as_secs()
                         };
                         // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
                         // Shouldn't break unless trip id is changed
@@ -74,7 +100,7 @@ impl StationHandler {
                             Some(a) => a.stop_id().to_owned(),
                             None => "".to_owned(),
                         };
-                        self.times.push((route, terminus, secs/60));
+                        self.times.push((route, terminus, secs / 60));
                     }
                 }
             }
@@ -95,12 +121,21 @@ impl StationHandler {
         for (line, terminus, time) in self.times.clone() {
             if map.contains_key(&line) {
                 if map.get_mut(&line).unwrap().contains_key(&terminus) {
-                    map.get_mut(&line).unwrap().get_mut(&terminus).unwrap().push(time.try_into().unwrap());
+                    map.get_mut(&line)
+                        .unwrap()
+                        .get_mut(&terminus)
+                        .unwrap()
+                        .push(time.try_into().unwrap());
                 } else {
-                    map.get_mut(&line).unwrap().insert(terminus, vec![time.try_into().unwrap()]);
+                    map.get_mut(&line)
+                        .unwrap()
+                        .insert(terminus, vec![time.try_into().unwrap()]);
                 }
             } else {
-                map.insert(line, HashMap::from([(terminus, vec![time.try_into().unwrap()])]));
+                map.insert(
+                    line,
+                    HashMap::from([(terminus, vec![time.try_into().unwrap()])]),
+                );
             }
         }
         map
@@ -133,14 +168,24 @@ pub struct StopJson {
 
 impl BusStopHandler {
     pub fn new(api_key: String, stop_id: Vec<String>, name: String) -> Self {
-        Self {api_key, stop_id, name, times: HashMap::new()}
+        Self {
+            api_key,
+            stop_id,
+            name,
+            times: HashMap::new(),
+        }
     }
 
     // Support for stops that are broken into dir 1 and dir 2
     pub fn refresh(&mut self) {
         self.times.clear();
         let ids = self.stop_id.clone();
-        let time_now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs().try_into().unwrap();
+        let time_now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+            .try_into()
+            .unwrap();
         let now = OffsetDateTime::from_unix_timestamp(time_now).unwrap();
         for id in ids.iter() {
             self.refresh_single(id, now);
@@ -153,10 +198,11 @@ impl BusStopHandler {
             .with_param("version", "2")
             .with_param("OperatorRef", "MTA")
             .with_param("MonitoringRef", stopid)
-            .send() {
-                Ok(a) => a,
-                Err(_) => return, // No data
-            };
+            .send()
+        {
+            Ok(a) => a,
+            Err(_) => return, // No data
+        };
         let data: BusData = serde_json::from_slice(resp.as_bytes()).unwrap();
         let temp = match data.siri.service_delivery {
             Some(a) => a,
@@ -169,8 +215,17 @@ impl BusStopHandler {
             };
             for visit in monitored_visit {
                 //let route_name = visit.monitored_vehicle_journey.line_ref.split("_").last().unwrap();
-                let route_name = visit.monitored_vehicle_journey.published_line_name.get(0).unwrap();
-                let dest = visit.monitored_vehicle_journey.destination_name.get(0).unwrap().trim();
+                let route_name = visit
+                    .monitored_vehicle_journey
+                    .published_line_name
+                    .get(0)
+                    .unwrap();
+                let dest = visit
+                    .monitored_vehicle_journey
+                    .destination_name
+                    .get(0)
+                    .unwrap()
+                    .trim();
                 let dest = match dest {
                     "CO-OP CITY EARHART LANE via GUNHILL" => "CO-OP CITY",
                     "FORDHAM CENTER 192 ST via GUNHILL" => "FORDHAM CENTER",
@@ -178,10 +233,16 @@ impl BusStopHandler {
                     "CO-OP CITY BAY PLAZA via ALLERTON AV" => "CO-OP CITY BAY PLAZA",
                     a => a,
                 };
-                let time = visit.monitored_vehicle_journey.monitored_call.expected_arrival_time.unwrap_or(
-                    visit.monitored_vehicle_journey.monitored_call.expected_departure_time.unwrap_or(
-                        "Now".to_owned()
-                        )
+                let time = visit
+                    .monitored_vehicle_journey
+                    .monitored_call
+                    .expected_arrival_time
+                    .unwrap_or(
+                        visit
+                            .monitored_vehicle_journey
+                            .monitored_call
+                            .expected_departure_time
+                            .unwrap_or("Now".to_owned()),
                     ); // If it isn't given, bus is at stop waiting to leave
                 let mut min_away = 0;
                 // Let the cursed code begin
@@ -191,7 +252,14 @@ impl BusStopHandler {
                     let mut time = thing.next().unwrap().split("T");
                     // It is a limitation to hardcode this, but MTA is in eastern time so it will
                     // be either 5 (est) or 4 (edt)
-                    let offset = if thing.next().unwrap().split("-").last().unwrap().contains("5") {
+                    let offset = if thing
+                        .next()
+                        .unwrap()
+                        .split("-")
+                        .last()
+                        .unwrap()
+                        .contains("5")
+                    {
                         5
                     } else {
                         4
@@ -216,24 +284,38 @@ impl BusStopHandler {
                             12 => time::Month::December,
                             _ => time::Month::January,
                         },
-                        day.get(2).unwrap().parse().unwrap()
-                        ).unwrap();
+                        day.get(2).unwrap().parse().unwrap(),
+                    )
+                    .unwrap();
                     // I am sorry for this crime of a line
-                    let time = Time::from_hms(secs.next().unwrap().parse().unwrap(), secs.next().unwrap().parse().unwrap(), secs.next().unwrap().parse().unwrap()).unwrap();
+                    let time = Time::from_hms(
+                        secs.next().unwrap().parse().unwrap(),
+                        secs.next().unwrap().parse().unwrap(),
+                        secs.next().unwrap().parse().unwrap(),
+                    )
+                    .unwrap();
                     let mut datetime = OffsetDateTime::new_in_offset(date, time, UtcOffset::UTC);
                     datetime = datetime.saturating_add(time::Duration::hours(offset));
                     min_away = datetime.sub(now).whole_minutes();
                 }
                 // This feels like an abomination, probably because it is
-                if !self.times.contains_key(route_name)  {
+                if !self.times.contains_key(route_name) {
                     let mut map = HashMap::new();
                     map.insert(dest.to_owned(), vec![min_away.try_into().unwrap()]);
                     self.times.insert(route_name.to_owned(), map);
                 } else {
                     if self.times.get(route_name).unwrap().contains_key(dest) {
-                        self.times.get_mut(route_name).unwrap().get_mut(dest).unwrap().push(min_away.try_into().unwrap());
+                        self.times
+                            .get_mut(route_name)
+                            .unwrap()
+                            .get_mut(dest)
+                            .unwrap()
+                            .push(min_away.try_into().unwrap());
                     } else {
-                        self.times.get_mut(route_name).unwrap().insert(dest.to_owned(), vec![min_away.try_into().unwrap()]);
+                        self.times
+                            .get_mut(route_name)
+                            .unwrap()
+                            .insert(dest.to_owned(), vec![min_away.try_into().unwrap()]);
                     }
                 }
             }
@@ -241,6 +323,9 @@ impl BusStopHandler {
     }
 
     pub fn serialize(&self) -> StopJson {
-        StopJson { name: self.name.clone(), times: self.times.clone() }
+        StopJson {
+            name: self.name.clone(),
+            times: self.times.clone(),
+        }
     }
 }

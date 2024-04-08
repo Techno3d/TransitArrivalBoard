@@ -5,20 +5,52 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, PartialEq, Eq, Clone, Hash, Serialize, Deserialize)]
 #[allow(dead_code)]
 pub enum Lines {
-    A, C, E, B, D, F, M, G, J, Z, N, Q, R, W, L, _1, _2, _3, _4, _5, _6, _7, SIR,
+    A,
+    C,
+    E,
+    B,
+    D,
+    F,
+    M,
+    G,
+    J,
+    Z,
+    N,
+    Q,
+    R,
+    W,
+    L,
+    _1,
+    _2,
+    _3,
+    _4,
+    _5,
+    _6,
+    _7,
+    SIR,
 }
 
 #[allow(dead_code)]
 impl Lines {
     pub fn to_uri(&self) -> &str {
         match self {
-            Lines::A | Lines::C | Lines::E => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
-            Lines::B | Lines::D | Lines::F | Lines::M => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm", 
+            Lines::A | Lines::C | Lines::E => {
+                "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace"
+            }
+            Lines::B | Lines::D | Lines::F | Lines::M => {
+                "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm"
+            }
             Lines::G => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",
-            Lines::J | Lines::Z => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",
-            Lines::N | Lines::Q | Lines::R | Lines::W => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",
+            Lines::J | Lines::Z => {
+                "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz"
+            }
+            Lines::N | Lines::Q | Lines::R | Lines::W => {
+                "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw"
+            }
             Lines::L => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",
-            Lines::_1 | Lines::_2 | Lines::_3 | Lines::_4 | Lines::_5 | Lines::_6 | Lines::_7 => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
+            Lines::_1 | Lines::_2 | Lines::_3 | Lines::_4 | Lines::_5 | Lines::_6 | Lines::_7 => {
+                "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs"
+            }
             Lines::SIR => "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-si",
         }
     }

@@ -1,18 +1,17 @@
 mod lines;
 mod siri_structs;
 
-
+use std::collections::HashMap;
 use std::net::TcpListener;
 use std::sync::{Arc, RwLock};
 use std::thread::JoinHandle;
 use std::time::Duration;
-use std::collections::HashMap;
 use std::{fs, thread};
 
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
-use transit_board::{StationJson, StopJson};
 use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, StationHandler};
+use transit_board::{StationJson, StopJson};
 use tungstenite::Message;
 
 fn main() {
@@ -33,8 +32,16 @@ fn main() {
     let lehman = StationHandler::new_no_name(Lines::_5, "405S".to_string(), 10);
     let bedford = StationHandler::new_no_name(Lines::D, "D03S".to_string(), 14);
     //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
-    let bx1028 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100017".to_string(), "103400".to_string()], "Paul Av/W 205th Street".to_owned());
-    let bx2526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], "W 205th St/Paul Av".to_owned()); //, "803061".to_string() // Not needed?
+    let bx1028 = BusStopHandler::new(
+        api_key_bus.to_owned(),
+        vec!["100017".to_string(), "103400".to_string()],
+        "Paul Av/W 205th Street".to_owned(),
+    );
+    let bx2526 = BusStopHandler::new(
+        api_key_bus.to_owned(),
+        vec!["100723".to_string()],
+        "W 205th St/Paul Av".to_owned(),
+    ); //, "803061".to_string() // Not needed?
     if stations.len() == 0 {
         stations = vec![lehman, bedford];
     }
@@ -82,10 +89,18 @@ fn main() {
                                 delay_map.get_mut(&line).unwrap().0 = severity;
                             }
                         } else {
-                            delay_map.insert(line, (severity, match alert.description_text {
-                                Some(ref a) => a.translation.get(0).unwrap().text.clone().unwrap(),
-                                None => "".to_owned(),
-                            }));
+                            delay_map.insert(
+                                line,
+                                (
+                                    severity,
+                                    match alert.description_text {
+                                        Some(ref a) => {
+                                            a.translation.get(0).unwrap().text.clone().unwrap()
+                                        }
+                                        None => "".to_owned(),
+                                    },
+                                ),
+                            );
                         }
                     }
                 }
@@ -117,7 +132,7 @@ fn main() {
                     let data = serde_json::to_string(&*data).unwrap();
                     let message = Message::Text(data);
                     match ws.send(message) {
-                        Ok(_) => {},
+                        Ok(_) => {}
                         Err(_) => break,
                     };
                 }
@@ -129,11 +144,9 @@ fn main() {
     update_thread.join().unwrap();
 }
 
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
     subway: Vec<StationJson>,
     stop: Vec<StopJson>,
     delay: HashMap<Lines, (i32, String)>,
 }
-

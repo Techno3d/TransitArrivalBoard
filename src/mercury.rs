@@ -40,7 +40,6 @@ pub struct Periods {
     pub end: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct InformedEntity {
     pub agency_id: Option<String>,
@@ -50,18 +49,15 @@ pub struct InformedEntity {
     pub stop_id: Option<String>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct MercurySelector {
     pub sort_order: String,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct HeaderText {
     pub translation: Option<Vec<Translation>>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct TranslateHolder {
