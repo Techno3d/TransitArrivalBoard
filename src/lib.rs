@@ -1,7 +1,6 @@
 use std::ops::Sub;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use lines::Lines;
 use prost::Message;
 use serde::{Deserialize, Serialize};
 use siri_structs::BusData;
@@ -15,16 +14,29 @@ pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Vehicle {
+    pub route_id: String,
+    pub destination_stop_id: String,
+    pub minutes_until_arrival: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Disruption {
+    pub priority: i32,
+    pub header_text: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct SubwayStopHandler {
     pub stop_id: String,
-    pub trips: Vec<(Lines, String, u64)>,
+    pub trips: Vec<Vehicle>,
     pub walk_time: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubwayStopJson {
-    pub trips: Vec<(Lines, String, u64)>,
+    pub trips: Vec<Vehicle>,
     pub walk_time: i32,
 }
 
@@ -85,12 +97,15 @@ impl SubwayStopHandler {
                             let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
                             let mut tid_split = parsed_tid.split("..");
                             let parsed_route = tid_split.next().unwrap();
-                            let route = Lines::to_line(parsed_route);
                             let terminus = match tu.stop_time_update.last() {
                                 Some(a) => a.stop_id().to_owned(),
                                 None => "".to_owned(),
                             };
-                            self.trips.push((route, terminus, secs / 60));
+                            self.trips.push(Vehicle {
+                                route_id: parsed_route.to_string(),
+                                destination_stop_id: terminus,
+                                minutes_until_arrival: secs as i32 / 60,
+                            });
                         }
                     }
                 }
@@ -111,13 +126,13 @@ impl SubwayStopHandler {
 pub struct BusStopHandler {
     api_key: String,
     pub stop_id: Vec<String>,
-    pub trips: Vec<(String, String, i32)>,
+    pub trips: Vec<Vehicle>,
     pub walk_time: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusStopJson {
-    pub trips: Vec<(String, String, i32)>,
+    pub trips: Vec<Vehicle>,
     pub walk_time: i32,
 }
 
@@ -246,11 +261,11 @@ impl BusStopHandler {
                     min_away = datetime.sub(now).whole_minutes();
                 }
 
-                self.trips.push((
-                    route_name.to_owned(),
-                    dest.unwrap().to_owned(),
-                    min_away.try_into().unwrap(),
-                ));
+                self.trips.push(Vehicle {
+                    route_id: route_name.to_owned(),
+                    destination_stop_id: dest.unwrap().to_owned(),
+                    minutes_until_arrival: min_away.try_into().unwrap(),
+                });
             }
         }
     }

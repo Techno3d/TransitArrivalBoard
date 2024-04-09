@@ -11,7 +11,7 @@ use std::{fs, thread};
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
 use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, SubwayStopHandler};
-use transit_board::{BusStopJson, SubwayStopJson};
+use transit_board::{BusStopJson, Disruption, SubwayStopJson};
 use tungstenite::Message;
 
 fn main() {
@@ -31,7 +31,7 @@ fn main() {
 
     let mut subway_map: HashMap<String, SubwayStopJson> = HashMap::new();
     let mut bus_map: HashMap<String, BusStopJson> = HashMap::new();
-    let mut service_alerts_map: HashMap<Lines, (i32, String)> = HashMap::new();
+    let mut service_alerts_map: HashMap<Lines, Disruption> = HashMap::new();
 
     let jerome = SubwayStopHandler::new("405S".to_string(), 10);
     let concourse = SubwayStopHandler::new("D03S".to_string(), 14);
@@ -101,21 +101,28 @@ fn main() {
                             Err(_) => 0,
                         };
                         if service_alerts_map.contains_key(&line) {
-                            if severity > service_alerts_map.get(&line).unwrap().0 {
-                                service_alerts_map.get_mut(&line).unwrap().0 = severity;
+                            if severity > service_alerts_map.get(&line).unwrap().priority {
+                                service_alerts_map.get_mut(&line).unwrap().priority = severity;
                             }
                         } else {
                             service_alerts_map.insert(
                                 line,
-                                (
-                                    severity,
-                                    match alert.description_text {
-                                        Some(ref a) => {
-                                            a.translation.get(0).unwrap().text.clone().unwrap()
-                                        }
+                                Disruption {
+                                    priority: severity,
+                                    header_text: match alert.header_text {
+                                        Some(ref a) => a
+                                            .translation
+                                            .as_ref()
+                                            .unwrap()
+                                            .get(0)
+                                            .unwrap()
+                                            .text
+                                            .as_ref()
+                                            .unwrap()
+                                            .clone(),
                                         None => "".to_owned(),
                                     },
-                                ),
+                                },
                             );
                         }
                     }
@@ -164,5 +171,5 @@ fn main() {
 struct InfoJson {
     subway: HashMap<String, SubwayStopJson>,
     bus: HashMap<String, BusStopJson>,
-    service_alerts: HashMap<Lines, (i32, String)>,
+    service_alerts: HashMap<Lines, Disruption>,
 }

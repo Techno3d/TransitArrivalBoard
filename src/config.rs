@@ -4,19 +4,19 @@ use crate::{BusStopHandler, SubwayStopHandler};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Conf {
-    subway: Vec<StationConf>,
-    bus: Vec<StopConf>,
+    subway: Vec<SubwayConf>,
+    bus: Vec<BusConf>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-struct StationConf {
+struct SubwayConf {
     name: String,
     stop_id: String,
     walk_time: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-struct StopConf {
+struct BusConf {
     pub name: String,
     pub stop_ids: Vec<String>,
 }
