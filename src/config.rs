@@ -1,17 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{lines::Lines, BusStopHandler, StationHandler};
+use crate::{BusStopHandler, SubwayStopHandler};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Conf {
-    stations: Vec<StationConf>,
-    stops: Vec<StopConf>,
+    subway: Vec<StationConf>,
+    bus: Vec<StopConf>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 struct StationConf {
     name: String,
-    station_code: String,
+    stop_id: String,
     walk_time: i32,
 }
 
@@ -22,24 +22,17 @@ struct StopConf {
 }
 
 impl Conf {
-    pub fn get_station_handlers(&self) -> Vec<StationHandler> {
-        self.stations
+    pub fn get_subway_handlers(&self) -> Vec<SubwayStopHandler> {
+        self.subway
             .iter()
-            .map(|x| {
-                StationHandler::new(
-                    Lines::to_line(&x.station_code.chars().next().unwrap().to_string()),
-                    x.station_code.clone(),
-                    x.walk_time,
-                    x.name.clone(),
-                )
-            })
+            .map(|x| SubwayStopHandler::new(x.stop_id.clone(), x.walk_time))
             .collect()
     }
 
-    pub fn get_stop_handlers(&self, api_key: String) -> Vec<BusStopHandler> {
-        self.stops
+    pub fn get_bus_handlers(&self, api_key: String) -> Vec<BusStopHandler> {
+        self.bus
             .iter()
-            .map(|x| BusStopHandler::new(api_key.clone(), x.stop_ids.clone(), x.name.clone()))
+            .map(|x| BusStopHandler::new(api_key.clone(), x.stop_ids.clone(), 0))
             .collect()
     }
 }

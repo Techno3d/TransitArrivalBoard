@@ -1,5 +1,5 @@
+use std::ops::Sub;
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::{collections::HashMap, ops::Sub};
 
 use lines::Lines;
 use prost::Message;
@@ -16,169 +16,124 @@ pub mod gtfsrt {
 }
 
 #[derive(Debug, Clone)]
-pub struct StationHandler {
-    pub name: String,
-    pub line: Lines,
-    pub station_code: String,
-    pub times: Vec<(Lines, String, u64)>,
+pub struct SubwayStopHandler {
+    pub stop_id: String,
+    pub trips: Vec<(Lines, String, u64)>,
     pub walk_time: i32,
-    pub delay: i32,
-    //api_key: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StationJson {
-    pub name: String,
-    pub times: HashMap<Lines, HashMap<String, Vec<i32>>>,
+pub struct SubwayStopJson {
+    pub trips: Vec<(Lines, String, u64)>,
     pub walk_time: i32,
 }
 
-impl StationHandler {
-    pub fn new_no_name(line: Lines, station_code: String, walk_time: i32) -> Self {
+impl SubwayStopHandler {
+    pub fn new(stop_id: String, walk_time: i32) -> Self {
         Self {
-            name: station_code_to_name(&station_code),
-            line,
-            station_code,
-            times: vec![],
+            stop_id,
+            trips: vec![],
             walk_time,
-            delay: 0,
-        }
-    }
-
-    pub fn new(line: Lines, station_code: String, walk_time: i32, name: String) -> Self {
-        Self {
-            name,
-            line,
-            station_code,
-            times: vec![],
-            walk_time,
-            delay: 0,
         }
     }
 
     pub fn refresh(&mut self) {
-        self.times.clear();
-        let uri = self.line.to_uri();
-        let resp = minreq::get(uri).send().unwrap();
-        let bytes = resp.as_bytes();
-        let feed = match gtfsrt::FeedMessage::decode(bytes) {
-            // if no data so abort
-            Ok(a) => a,
-            Err(_) => return,
-        };
-        for entity in feed.entity {
-            if let Some(tu) = entity.trip_update {
-                for stop in tu.stop_time_update.iter() {
-                    if stop.stop_id() == self.station_code {
-                        let time = (match &stop.arrival {
-                            Some(a) => a,
-                            None => continue,
-                        })
-                        .time();
-                        let secs: u64 = if u64::try_from(time).unwrap()
-                            < SystemTime::now()
-                                .duration_since(UNIX_EPOCH)
-                                .unwrap()
-                                .as_secs()
-                        {
-                            // Does this break once the year gets too high?
-                            0
-                        } else {
-                            u64::try_from(time).unwrap()
-                                - SystemTime::now()
+        self.trips.clear();
+        let feed_uris = [
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
+        ];
+        for uri in feed_uris {
+            let resp = minreq::get(uri).send().unwrap();
+            let bytes = resp.as_bytes();
+            let feed = match gtfsrt::FeedMessage::decode(bytes) {
+                // if no data so abort
+                Ok(a) => a,
+                Err(_) => return,
+            };
+            for entity in feed.entity {
+                if let Some(tu) = entity.trip_update {
+                    for stop in tu.stop_time_update.iter() {
+                        if stop.stop_id() == self.stop_id {
+                            let time = (match &stop.arrival {
+                                Some(a) => a,
+                                None => continue,
+                            })
+                            .time();
+                            let secs: u64 = if u64::try_from(time).unwrap()
+                                < SystemTime::now()
                                     .duration_since(UNIX_EPOCH)
                                     .unwrap()
                                     .as_secs()
-                        };
-                        // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
-                        // Shouldn't break unless trip id is changed
-                        let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
-                        let mut tid_split = parsed_tid.split("..");
-                        let parsed_route = tid_split.next().unwrap();
-                        let route = Lines::to_line(parsed_route);
-                        let terminus = match tu.stop_time_update.last() {
-                            Some(a) => a.stop_id().to_owned(),
-                            None => "".to_owned(),
-                        };
-                        self.times.push((route, terminus, secs / 60));
+                            {
+                                // Does this break once the year gets too high?
+                                0
+                            } else {
+                                u64::try_from(time).unwrap()
+                                    - SystemTime::now()
+                                        .duration_since(UNIX_EPOCH)
+                                        .unwrap()
+                                        .as_secs()
+                            };
+                            // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
+                            // Shouldn't break unless trip id is changed
+                            let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
+                            let mut tid_split = parsed_tid.split("..");
+                            let parsed_route = tid_split.next().unwrap();
+                            let route = Lines::to_line(parsed_route);
+                            let terminus = match tu.stop_time_update.last() {
+                                Some(a) => a.stop_id().to_owned(),
+                                None => "".to_owned(),
+                            };
+                            self.trips.push((route, terminus, secs / 60));
+                        }
                     }
                 }
             }
         }
-        self.times.truncate(5);
+        self.trips.truncate(5);
     }
 
-    pub fn serialize(&self) -> StationJson {
-        StationJson {
-            name: station_code_to_name(&self.station_code),
-            times: self.get_time_map(),
+    pub fn serialize(&self) -> SubwayStopJson {
+        SubwayStopJson {
+            trips: self.trips.clone(),
             walk_time: self.walk_time,
         }
-    }
-
-    fn get_time_map(&self) -> HashMap<Lines, HashMap<String, Vec<i32>>> {
-        let mut map: HashMap<Lines, HashMap<String, Vec<i32>>> = HashMap::new();
-        for (line, terminus, time) in self.times.clone() {
-            if map.contains_key(&line) {
-                if map.get_mut(&line).unwrap().contains_key(&terminus) {
-                    map.get_mut(&line)
-                        .unwrap()
-                        .get_mut(&terminus)
-                        .unwrap()
-                        .push(time.try_into().unwrap());
-                } else {
-                    map.get_mut(&line)
-                        .unwrap()
-                        .insert(terminus, vec![time.try_into().unwrap()]);
-                }
-            } else {
-                map.insert(
-                    line,
-                    HashMap::from([(terminus, vec![time.try_into().unwrap()])]),
-                );
-            }
-        }
-        map
-    }
-}
-
-fn station_code_to_name(code: &String) -> String {
-    // The double deref
-    match &**code {
-        "405S" | "405N" | "405" => "Bedford Park Blvd - Lehman College (4)".to_owned(),
-        "D03S" | "D03N" | "D03" => "Bedford Park Blvd (BD)".to_owned(),
-        "631S" => "Grand Central - 42ST".to_owned(),
-        _ => "Err".to_owned(),
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {
     api_key: String,
-    pub name: String,
-    pub times: HashMap<String, HashMap<String, Vec<i32>>>,
     pub stop_id: Vec<String>,
+    pub trips: Vec<(String, String, i32)>,
+    pub walk_time: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StopJson {
-    pub name: String,
-    pub times: HashMap<String, HashMap<String, Vec<i32>>>,
+pub struct BusStopJson {
+    pub trips: Vec<(String, String, i32)>,
+    pub walk_time: i32,
 }
 
 impl BusStopHandler {
-    pub fn new(api_key: String, stop_id: Vec<String>, name: String) -> Self {
+    pub fn new(api_key: String, stop_id: Vec<String>, walk_time: i32) -> Self {
         Self {
             api_key,
             stop_id,
-            name,
-            times: HashMap::new(),
+            trips: vec![],
+            walk_time,
         }
     }
 
     // Support for stops that are broken into dir 1 and dir 2
     pub fn refresh(&mut self) {
-        self.times.clear();
+        self.trips.clear();
         let ids = self.stop_id.clone();
         let time_now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -222,17 +177,9 @@ impl BusStopHandler {
                     .unwrap();
                 let dest = visit
                     .monitored_vehicle_journey
-                    .destination_name
-                    .get(0)
-                    .unwrap()
-                    .trim();
-                let dest = match dest {
-                    "CO-OP CITY EARHART LANE via GUNHILL" => "CO-OP CITY",
-                    "FORDHAM CENTER 192 ST via GUNHILL" => "FORDHAM CENTER",
-                    "CO-OP CITY EARHART LANE via ALLERTON AV" => "CO-OP CITY",
-                    "CO-OP CITY BAY PLAZA via ALLERTON AV" => "CO-OP CITY BAY PLAZA",
-                    a => a,
-                };
+                    .destination_ref
+                    .split("_")
+                    .last();
                 let time = visit
                     .monitored_vehicle_journey
                     .monitored_call
@@ -298,34 +245,20 @@ impl BusStopHandler {
                     datetime = datetime.saturating_add(time::Duration::hours(offset));
                     min_away = datetime.sub(now).whole_minutes();
                 }
-                // This feels like an abomination, probably because it is
-                if !self.times.contains_key(route_name) {
-                    let mut map = HashMap::new();
-                    map.insert(dest.to_owned(), vec![min_away.try_into().unwrap()]);
-                    self.times.insert(route_name.to_owned(), map);
-                } else {
-                    if self.times.get(route_name).unwrap().contains_key(dest) {
-                        self.times
-                            .get_mut(route_name)
-                            .unwrap()
-                            .get_mut(dest)
-                            .unwrap()
-                            .push(min_away.try_into().unwrap());
-                    } else {
-                        self.times
-                            .get_mut(route_name)
-                            .unwrap()
-                            .insert(dest.to_owned(), vec![min_away.try_into().unwrap()]);
-                    }
-                }
+
+                self.trips.push((
+                    route_name.to_owned(),
+                    dest.unwrap().to_owned(),
+                    min_away.try_into().unwrap(),
+                ));
             }
         }
     }
 
-    pub fn serialize(&self) -> StopJson {
-        StopJson {
-            name: self.name.clone(),
-            times: self.times.clone(),
+    pub fn serialize(&self) -> BusStopJson {
+        BusStopJson {
+            trips: self.trips.clone(),
+            walk_time: 0,
         }
     }
 }

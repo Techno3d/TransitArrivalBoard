@@ -10,8 +10,8 @@ use std::{fs, thread};
 
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
-use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, StationHandler};
-use transit_board::{StationJson, StopJson};
+use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, SubwayStopHandler};
+use transit_board::{BusStopJson, SubwayStopJson};
 use tungstenite::Message;
 
 fn main() {
@@ -26,27 +26,26 @@ fn main() {
         Ok(a) => a,
         Err(_) => Default::default(),
     };
-    let mut stations = config.get_station_handlers();
-    let mut stops = config.get_stop_handlers(api_key_bus.clone());
-    let mut delay_map: HashMap<Lines, (i32, String)> = HashMap::new();
-    let lehman = StationHandler::new_no_name(Lines::_5, "405S".to_string(), 10);
-    let bedford = StationHandler::new_no_name(Lines::D, "D03S".to_string(), 14);
-    //let mut grand_central = StationHandler::new(api_key.to_string(), Lines::_6, "631S".to_string(), 5);
+    let mut subway = config.get_subway_handlers();
+    let mut bus = config.get_bus_handlers(api_key_bus.clone());
+
+    let mut subway_map: HashMap<String, SubwayStopJson> = HashMap::new();
+    let mut bus_map: HashMap<String, BusStopJson> = HashMap::new();
+    let mut service_alerts_map: HashMap<Lines, (i32, String)> = HashMap::new();
+
+    let jerome = SubwayStopHandler::new("405S".to_string(), 10);
+    let concourse = SubwayStopHandler::new("D03S".to_string(), 14);
     let bx1028 = BusStopHandler::new(
         api_key_bus.to_owned(),
         vec!["100017".to_string(), "103400".to_string()],
-        "Paul Av/W 205th Street".to_owned(),
+        0,
     );
-    let bx2526 = BusStopHandler::new(
-        api_key_bus.to_owned(),
-        vec!["100723".to_string()],
-        "W 205th St/Paul Av".to_owned(),
-    ); //, "803061".to_string() // Not needed?
-    if stations.len() == 0 {
-        stations = vec![lehman, bedford];
+    let bx222526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], 0);
+    if subway.len() == 0 {
+        subway = vec![jerome, concourse];
     }
-    if stops.len() == 0 {
-        stops = vec![bx2526, bx1028];
+    if bus.len() == 0 {
+        bus = vec![bx222526, bx1028];
     }
 
     let send_data_clone = Arc::new(RwLock::new(InfoJson::default()));
@@ -56,15 +55,32 @@ fn main() {
 
     let update_thread = thread::spawn(move || {
         loop {
-            for i in 0..stations.len() {
-                stations.get_mut(i).unwrap().refresh();
+            subway_map.clear();
+            bus_map.clear();
+            service_alerts_map.clear();
+
+            for i in 0..subway.len() {
+                subway.get_mut(i).unwrap().refresh();
+                subway_map.insert(
+                    subway.get(i).unwrap().stop_id.to_owned(),
+                    subway.get(i).unwrap().serialize(),
+                );
             }
 
-            for i in 0..stops.len() {
-                stops.get_mut(i).unwrap().refresh();
+            for i in 0..bus.len() {
+                bus.get_mut(i).unwrap().refresh();
+                bus_map.insert(
+                    bus.get(i)
+                        .unwrap()
+                        .stop_id
+                        .iter()
+                        .next()
+                        .unwrap()
+                        .to_string(),
+                    bus.get(i).unwrap().serialize(),
+                );
             }
 
-            delay_map.clear();
             // Delays
             let resp2 = minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
                 .send()
@@ -84,12 +100,12 @@ fn main() {
                             Ok(x) => x,
                             Err(_) => 0,
                         };
-                        if delay_map.contains_key(&line) {
-                            if severity > delay_map.get(&line).unwrap().0 {
-                                delay_map.get_mut(&line).unwrap().0 = severity;
+                        if service_alerts_map.contains_key(&line) {
+                            if severity > service_alerts_map.get(&line).unwrap().0 {
+                                service_alerts_map.get_mut(&line).unwrap().0 = severity;
                             }
                         } else {
-                            delay_map.insert(
+                            service_alerts_map.insert(
                                 line,
                                 (
                                     severity,
@@ -106,9 +122,9 @@ fn main() {
                 }
             }
             let data = InfoJson {
-                subway: stations.iter().map(|x| x.serialize()).collect(),
-                stop: stops.iter().map(|x| x.serialize()).collect(),
-                delay: delay_map.clone(),
+                subway: subway_map.clone(),
+                bus: bus_map.clone(),
+                service_alerts: service_alerts_map.clone(),
             };
             {
                 *send_data.write().unwrap() = data.clone();
@@ -146,7 +162,7 @@ fn main() {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
-    subway: Vec<StationJson>,
-    stop: Vec<StopJson>,
-    delay: HashMap<Lines, (i32, String)>,
+    subway: HashMap<String, SubwayStopJson>,
+    bus: HashMap<String, BusStopJson>,
+    service_alerts: HashMap<Lines, (i32, String)>,
 }
