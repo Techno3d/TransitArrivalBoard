@@ -1,6 +1,7 @@
 use std::ops::Sub;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use gtfs_structures::{self, Gtfs};
 use prost::Message;
 use serde::{Deserialize, Serialize};
 use siri_structs::BusData;
@@ -16,13 +17,14 @@ pub mod gtfsrt {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Vehicle {
-    pub route_id: String,
-    pub destination_stop_id: String,
+    pub route: String,
+    pub destination: String,
     pub minutes_until_arrival: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Disruption {
+    pub route_id: String,
     pub priority: i32,
     pub header_text: String,
 }
@@ -51,6 +53,14 @@ impl SubwayStopHandler {
 
     pub fn refresh(&mut self) {
         self.trips.clear();
+
+        let gtfs = match Gtfs::from_url(
+            "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
+        ) {
+            Ok(a) => a,
+            Err(_) => return,
+        };
+
         let feed_uris = [
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
@@ -60,6 +70,7 @@ impl SubwayStopHandler {
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
         ];
+
         for uri in feed_uris {
             let resp = minreq::get(uri).send().unwrap();
             let bytes = resp.as_bytes();
@@ -97,13 +108,21 @@ impl SubwayStopHandler {
                             let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
                             let mut tid_split = parsed_tid.split("..");
                             let parsed_route = tid_split.next().unwrap();
-                            let terminus = match tu.stop_time_update.last() {
-                                Some(a) => a.stop_id().to_owned(),
-                                None => "".to_owned(),
+                            let parsed_destination = tu.stop_time_update.last().unwrap().stop_id();
+
+                            let gtfs_route = match gtfs.get_route(parsed_route) {
+                                Ok(a) => a.short_name.as_ref().unwrap(),
+                                Err(_) => return,
                             };
+
+                            let gtfs_destination = match gtfs.get_stop(parsed_destination) {
+                                Ok(a) => a.name.as_ref().unwrap(),
+                                Err(_) => return,
+                            };
+
                             self.trips.push(Vehicle {
-                                route_id: parsed_route.to_string(),
-                                destination_stop_id: terminus,
+                                route: gtfs_route.to_owned(),
+                                destination: gtfs_destination.to_owned(),
                                 minutes_until_arrival: secs as i32 / 60,
                             });
                         }
@@ -173,7 +192,10 @@ impl BusStopHandler {
             Ok(a) => a,
             Err(_) => return, // No data
         };
-        let data: BusData = serde_json::from_slice(resp.as_bytes()).unwrap();
+        let data: BusData = match serde_json::from_slice(resp.as_bytes()) {
+            Ok(a) => a,
+            Err(_) => return,
+        };
         let temp = match data.siri.service_delivery {
             Some(a) => a,
             None => return,
@@ -184,7 +206,6 @@ impl BusStopHandler {
                 None => return,
             };
             for visit in monitored_visit {
-                //let route_name = visit.monitored_vehicle_journey.line_ref.split("_").last().unwrap();
                 let route_name = visit
                     .monitored_vehicle_journey
                     .published_line_name
@@ -192,9 +213,12 @@ impl BusStopHandler {
                     .unwrap();
                 let dest = visit
                     .monitored_vehicle_journey
-                    .destination_ref
-                    .split("_")
-                    .last();
+                    .destination_name
+                    .get(0)
+                    .unwrap()
+                    .split(" via ")
+                    .next()
+                    .unwrap();
                 let time = visit
                     .monitored_vehicle_journey
                     .monitored_call
@@ -262,8 +286,8 @@ impl BusStopHandler {
                 }
 
                 self.trips.push(Vehicle {
-                    route_id: route_name.to_owned(),
-                    destination_stop_id: dest.unwrap().to_owned(),
+                    route: route_name.to_owned(),
+                    destination: dest.to_owned(),
                     minutes_until_arrival: min_away.try_into().unwrap(),
                 });
             }

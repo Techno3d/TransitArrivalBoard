@@ -1,4 +1,3 @@
-mod lines;
 mod siri_structs;
 
 use std::collections::HashMap;
@@ -10,7 +9,7 @@ use std::{fs, thread};
 
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
-use transit_board::{lines::Lines, mercury::MercuryDelays, BusStopHandler, SubwayStopHandler};
+use transit_board::{mercury::MercuryDelays, BusStopHandler, SubwayStopHandler};
 use transit_board::{BusStopJson, Disruption, SubwayStopJson};
 use tungstenite::Message;
 
@@ -31,7 +30,7 @@ fn main() {
 
     let mut subway_map: HashMap<String, SubwayStopJson> = HashMap::new();
     let mut bus_map: HashMap<String, BusStopJson> = HashMap::new();
-    let mut service_alerts_map: HashMap<Lines, Disruption> = HashMap::new();
+    let mut service_alerts_map: Vec<Disruption> = vec![];
 
     let jerome = SubwayStopHandler::new("405S".to_string(), 10);
     let concourse = SubwayStopHandler::new("D03S".to_string(), 14);
@@ -95,36 +94,32 @@ fn main() {
                 for informed in alert.informed_entity.unwrap().iter() {
                     if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
                         let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
-                        let line = Lines::to_line(decomposed.get(1).unwrap());
+                        let line = decomposed.get(1).unwrap();
                         let severity = match (*decomposed.get(2).unwrap()).parse() {
                             Ok(x) => x,
                             Err(_) => 0,
                         };
-                        if service_alerts_map.contains_key(&line) {
-                            if severity > service_alerts_map.get(&line).unwrap().priority {
-                                service_alerts_map.get_mut(&line).unwrap().priority = severity;
-                            }
-                        } else {
-                            service_alerts_map.insert(
-                                line,
-                                Disruption {
-                                    priority: severity,
-                                    header_text: match alert.header_text {
-                                        Some(ref a) => a
-                                            .translation
-                                            .as_ref()
-                                            .unwrap()
-                                            .get(0)
-                                            .unwrap()
-                                            .text
-                                            .as_ref()
-                                            .unwrap()
-                                            .clone(),
-                                        None => "".to_owned(),
-                                    },
+                        if severity >= 26 {
+                            service_alerts_map.push(
+                            Disruption {
+                                route_id: line.to_string(),
+                                priority: severity,
+                                header_text: match alert.header_text {
+                                    Some(ref a) => a
+                                        .translation
+                                        .as_ref()
+                                        .unwrap()
+                                        .get(0)
+                                        .unwrap()
+                                        .text
+                                        .as_ref()
+                                        .unwrap()
+                                        .clone(),
+                                    None => "".to_owned(),
                                 },
-                            );
-                        }
+                            },
+                        );}
+
                     }
                 }
             }
@@ -171,5 +166,5 @@ fn main() {
 struct InfoJson {
     subway: HashMap<String, SubwayStopJson>,
     bus: HashMap<String, BusStopJson>,
-    service_alerts: HashMap<Lines, Disruption>,
+    service_alerts: Vec<Disruption>,
 }
