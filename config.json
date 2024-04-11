@@ -1,19 +1,19 @@
 {
   "stations": [
     {
-      "name": "Bedford Park Blvd",
+      "name": "Bedford Park Blvd / Jerome Av",
       "station_code": "405S",
       "walk_time": 10
     },
     {
-      "name": "Bedford Park Blvd",
+      "name": "Bedford Park Blvd / Grand Concourse",
       "station_code": "D03S",
       "walk_time": 14
     }
   ],
   "stops": [
     {
-      "name": "Paul Av/W 205th Street",
+      "name": "Paul Av/W 205th St",
       "stop_ids": ["100017", "103400"]
     },
     {
