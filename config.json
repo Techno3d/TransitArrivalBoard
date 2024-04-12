@@ -1,24 +1,26 @@
 {
-  "stations": [
+  "subway": [
     {
-      "name": "Bedford Park Blvd / Jerome Av",
-      "station_code": "405S",
-      "walk_time": 10
+      "stop_ids": ["405S"],
+      "walk_time": 10,
+      "use_array_format": true
     },
     {
-      "name": "Bedford Park Blvd / Grand Concourse",
-      "station_code": "D03S",
-      "walk_time": 14
+      "stop_ids": ["D03S"],
+      "walk_time": 14,
+      "use_array_format": true
     }
   ],
-  "stops": [
+  "bus": [
     {
-      "name": "Paul Av/W 205th St",
-      "stop_ids": ["100017", "103400"]
+      "stop_ids": ["100017", "103400"],
+      "walk_time": 3,
+      "use_array_format": false
     },
     {
-      "name": "W 205th St/Paul Av",
-      "stop_ids": ["100723"]
+      "stop_ids": ["100723"],
+      "walk_time": 3,
+      "use_array_format": false
     }
   ]
 }

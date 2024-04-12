@@ -1,5 +1,6 @@
 mod siri_structs;
 
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::net::TcpListener;
 use std::sync::{Arc, RwLock};
@@ -7,10 +8,11 @@ use std::thread::JoinHandle;
 use std::time::Duration;
 use std::{fs, thread};
 
+use gtfs_structures::Gtfs;
 use serde::{Deserialize, Serialize};
 use transit_board::config::Conf;
-use transit_board::{mercury::MercuryDelays, BusStopHandler, SubwayStopHandler};
-use transit_board::{BusStopJson, Disruption, SubwayStopJson};
+use transit_board::mercury::MercuryDelays;
+use transit_board::{BusStopHandler, BusStopJson, Disruption, SubwayStopHandler, SubwayStopJson};
 use tungstenite::Message;
 
 fn main() {
@@ -32,14 +34,16 @@ fn main() {
     let mut bus_map: HashMap<String, BusStopJson> = HashMap::new();
     let mut service_alerts_map: Vec<Disruption> = vec![];
 
-    let jerome = SubwayStopHandler::new("405S".to_string(), 10);
-    let concourse = SubwayStopHandler::new("D03S".to_string(), 14);
+    let jerome = SubwayStopHandler::new(vec!["405S".to_string()], 10, true);
+    let concourse = SubwayStopHandler::new(vec!["D03S".to_string()], 14, true);
     let bx1028 = BusStopHandler::new(
         api_key_bus.to_owned(),
         vec!["100017".to_string(), "103400".to_string()],
-        0,
+        3,
+        false,
     );
-    let bx222526 = BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], 0);
+    let bx222526 =
+        BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], 3, false);
     if subway.len() == 0 {
         subway = vec![jerome, concourse];
     }
@@ -52,6 +56,13 @@ fn main() {
     let update_threads = Arc::new(RwLock::new(Vec::<JoinHandle<_>>::new()));
     let update = update_threads.clone();
 
+    let gtfs = match Gtfs::from_url(
+        "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
+    ) {
+        Ok(a) => a,
+        Err(_) => return,
+    };
+
     let update_thread = thread::spawn(move || {
         loop {
             subway_map.clear();
@@ -61,7 +72,14 @@ fn main() {
             for i in 0..subway.len() {
                 subway.get_mut(i).unwrap().refresh();
                 subway_map.insert(
-                    subway.get(i).unwrap().stop_id.to_owned(),
+                    subway
+                        .get(i)
+                        .unwrap()
+                        .stop_ids
+                        .iter()
+                        .next()
+                        .unwrap()
+                        .to_owned(),
                     subway.get(i).unwrap().serialize(),
                 );
             }
@@ -71,7 +89,7 @@ fn main() {
                 bus_map.insert(
                     bus.get(i)
                         .unwrap()
-                        .stop_id
+                        .stop_ids
                         .iter()
                         .next()
                         .unwrap()
@@ -94,35 +112,45 @@ fn main() {
                 for informed in alert.informed_entity.unwrap().iter() {
                     if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
                         let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
-                        let line = decomposed.get(1).unwrap();
+                        let line = informed.route_id.as_ref().unwrap();
+                        let gtfs_route = match gtfs.get_route(&line) {
+                            Ok(a) => a.short_name.as_ref().unwrap(),
+                            Err(_) => return,
+                        };
                         let severity = match (*decomposed.get(2).unwrap()).parse() {
                             Ok(x) => x,
                             Err(_) => 0,
                         };
-                        if severity >= 26 {
-                            service_alerts_map.push(
-                            Disruption {
-                                route_id: line.to_string(),
-                                priority: severity,
-                                header_text: match alert.header_text {
-                                    Some(ref a) => a
-                                        .translation
-                                        .as_ref()
-                                        .unwrap()
-                                        .get(0)
-                                        .unwrap()
-                                        .text
-                                        .as_ref()
-                                        .unwrap()
-                                        .clone(),
-                                    None => "".to_owned(),
-                                },
-                            },
-                        );}
 
+                        service_alerts_map.push(Disruption {
+                            route: gtfs_route.to_string(),
+                            priority: severity,
+                            header: match alert.header_text {
+                                Some(ref a) => a
+                                    .translation
+                                    .as_ref()
+                                    .unwrap()
+                                    .get(0)
+                                    .unwrap()
+                                    .text
+                                    .as_ref()
+                                    .unwrap()
+                                    .clone(),
+                                None => "".to_owned(),
+                            },
+                        });
                     }
+                    service_alerts_map.sort_by(|x, y| {
+                        if x.priority > y.priority {
+                            return Ordering::Greater;
+                        } else if x.priority < y.priority {
+                            return Ordering::Less;
+                        }
+                        return Ordering::Equal;
+                    });
                 }
             }
+
             let data = InfoJson {
                 subway: subway_map.clone(),
                 bus: bus_map.clone(),
@@ -134,7 +162,7 @@ fn main() {
                     handle.thread().unpark();
                 }
             }
-            thread::sleep(Duration::from_secs(60));
+            thread::sleep(Duration::from_secs(10));
         }
     });
 

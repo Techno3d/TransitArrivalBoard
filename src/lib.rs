@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::ops::Sub;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -24,30 +26,35 @@ pub struct Vehicle {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Disruption {
-    pub route_id: String,
+    pub route: String,
     pub priority: i32,
-    pub header_text: String,
+    pub header: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct SubwayStopHandler {
-    pub stop_id: String,
-    pub trips: Vec<Vehicle>,
+    pub stop_ids: Vec<String>,
     pub walk_time: i32,
+    pub use_array_format: bool,
+    pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SubwayStopJson {
     pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
     pub walk_time: i32,
 }
 
 impl SubwayStopHandler {
-    pub fn new(stop_id: String, walk_time: i32) -> Self {
+    pub fn new(stop_ids: Vec<String>, walk_time: i32, use_array_format: bool) -> Self {
         Self {
-            stop_id,
-            trips: vec![],
+            stop_ids,
             walk_time,
+            use_array_format,
+            trips: vec![],
+            routes: HashMap::new(),
         }
     }
 
@@ -82,7 +89,7 @@ impl SubwayStopHandler {
             for entity in feed.entity {
                 if let Some(tu) = entity.trip_update {
                     for stop in tu.stop_time_update.iter() {
-                        if stop.stop_id() == self.stop_id {
+                        if self.stop_ids.contains(&stop.stop_id().to_string()) {
                             let time = (match &stop.arrival {
                                 Some(a) => a,
                                 None => continue,
@@ -125,17 +132,44 @@ impl SubwayStopHandler {
                                 destination: gtfs_destination.to_owned(),
                                 minutes_until_arrival: secs as i32 / 60,
                             });
+
+                            if !self.routes.contains_key(parsed_route) {
+                                self.routes.insert(parsed_route.to_owned(), HashMap::new());
+                            }
+
+                            if !self
+                                .routes
+                                .get(parsed_route)
+                                .unwrap()
+                                .contains_key(parsed_destination)
+                            {
+                                self.routes
+                                    .get_mut(parsed_route)
+                                    .unwrap()
+                                    .insert(parsed_destination.to_owned(), Vec::new());
+                            };
+
+                            self.routes
+                                .get_mut(parsed_route)
+                                .unwrap()
+                                .get_mut(parsed_destination)
+                                .unwrap()
+                                .push(Vehicle {
+                                    route: gtfs_route.to_owned(),
+                                    destination: gtfs_destination.to_owned(),
+                                    minutes_until_arrival: secs as i32 / 60,
+                                });
                         }
                     }
                 }
             }
         }
-        self.trips.truncate(5);
     }
 
     pub fn serialize(&self) -> SubwayStopJson {
         SubwayStopJson {
-            trips: self.trips.clone(),
+            trips: self.trips.to_owned(),
+            routes: self.routes.to_owned(),
             walk_time: self.walk_time,
         }
     }
@@ -144,31 +178,41 @@ impl SubwayStopHandler {
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {
     api_key: String,
-    pub stop_id: Vec<String>,
-    pub trips: Vec<Vehicle>,
+    pub stop_ids: Vec<String>,
     pub walk_time: i32,
+    pub use_array_format: bool,
+    pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BusStopJson {
     pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
     pub walk_time: i32,
 }
 
 impl BusStopHandler {
-    pub fn new(api_key: String, stop_id: Vec<String>, walk_time: i32) -> Self {
+    pub fn new(
+        api_key: String,
+        stop_ids: Vec<String>,
+        walk_time: i32,
+        use_array_format: bool,
+    ) -> Self {
         Self {
             api_key,
-            stop_id,
-            trips: vec![],
+            stop_ids,
             walk_time,
+            use_array_format,
+            trips: vec![],
+            routes: HashMap::new(),
         }
     }
 
     // Support for stops that are broken into dir 1 and dir 2
     pub fn refresh(&mut self) {
         self.trips.clear();
-        let ids = self.stop_id.clone();
+        let ids = self.stop_ids.to_owned();
         let time_now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -179,6 +223,15 @@ impl BusStopHandler {
         for id in ids.iter() {
             self.refresh_single(id, now);
         }
+
+        self.trips.sort_by(|x, y| {
+            if x.minutes_until_arrival > y.minutes_until_arrival {
+                return Ordering::Greater;
+            } else if x.minutes_until_arrival < y.minutes_until_arrival {
+                return Ordering::Less;
+            }
+            return Ordering::Equal;
+        });
     }
 
     fn refresh_single(&mut self, stopid: &String, now: OffsetDateTime) {
@@ -211,13 +264,25 @@ impl BusStopHandler {
                     .published_line_name
                     .get(0)
                     .unwrap();
-                let dest = visit
+                let route_id = visit
+                    .monitored_vehicle_journey
+                    .line_ref
+                    .split("_")
+                    .last()
+                    .unwrap();
+                let destination_name = visit
                     .monitored_vehicle_journey
                     .destination_name
                     .get(0)
                     .unwrap()
                     .split(" via ")
                     .next()
+                    .unwrap();
+                let destination_ref = visit
+                    .monitored_vehicle_journey
+                    .destination_ref
+                    .split("_")
+                    .last()
                     .unwrap();
                 let time = visit
                     .monitored_vehicle_journey
@@ -287,16 +352,44 @@ impl BusStopHandler {
 
                 self.trips.push(Vehicle {
                     route: route_name.to_owned(),
-                    destination: dest.to_owned(),
+                    destination: destination_name.to_owned(),
                     minutes_until_arrival: min_away.try_into().unwrap(),
                 });
+
+                if !self.routes.contains_key(route_id) {
+                    self.routes.insert(route_id.to_owned(), HashMap::new());
+                }
+
+                if !self
+                    .routes
+                    .get(route_id)
+                    .unwrap()
+                    .contains_key(destination_ref)
+                {
+                    self.routes
+                        .get_mut(route_id)
+                        .unwrap()
+                        .insert(destination_ref.to_owned(), Vec::new());
+                };
+
+                self.routes
+                    .get_mut(route_id)
+                    .unwrap()
+                    .get_mut(destination_ref)
+                    .unwrap()
+                    .push(Vehicle {
+                        route: route_name.to_owned(),
+                        destination: destination_name.to_owned(),
+                        minutes_until_arrival: min_away.try_into().unwrap(),
+                    });
             }
         }
     }
 
     pub fn serialize(&self) -> BusStopJson {
         BusStopJson {
-            trips: self.trips.clone(),
+            trips: self.trips.to_owned(),
+            routes: self.routes.to_owned(),
             walk_time: 0,
         }
     }
