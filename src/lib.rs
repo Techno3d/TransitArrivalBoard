@@ -4,6 +4,7 @@ use std::ops::Sub;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use gtfs_structures::{self, Gtfs};
+use mercury::MercuryDelays;
 use prost::Message;
 use serde::{Deserialize, Serialize};
 use siri_structs::BusData;
@@ -15,6 +16,29 @@ pub mod mercury;
 pub mod siri_structs;
 pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
+}
+
+#[derive(Debug, Clone)]
+pub struct SubwayStopHandler {
+    pub stop_ids: Vec<String>,
+    pub walk_time: i32,
+    pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BusStopHandler {
+    api_key: String,
+    pub stop_ids: Vec<String>,
+    pub walk_time: i32,
+    pub trips: Vec<Vehicle>,
+    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceAlertHandler {
+    pub severity_limit: i32,
+    pub subway: Vec<Disruption>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,28 +55,18 @@ pub struct Disruption {
     pub header: String,
 }
 
-#[derive(Debug, Clone)]
-pub struct SubwayStopHandler {
-    pub stop_ids: Vec<String>,
-    pub walk_time: i32,
-    pub use_array_format: bool,
-    pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SubwayStopJson {
+pub struct Stop {
     pub trips: Vec<Vehicle>,
     pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
     pub walk_time: i32,
 }
 
 impl SubwayStopHandler {
-    pub fn new(stop_ids: Vec<String>, walk_time: i32, use_array_format: bool) -> Self {
+    pub fn new(stop_ids: Vec<String>, walk_time: i32) -> Self {
         Self {
             stop_ids,
             walk_time,
-            use_array_format,
             trips: vec![],
             routes: HashMap::new(),
         }
@@ -166,8 +180,8 @@ impl SubwayStopHandler {
         }
     }
 
-    pub fn serialize(&self) -> SubwayStopJson {
-        SubwayStopJson {
+    pub fn serialize(&self) -> Stop {
+        Stop {
             trips: self.trips.to_owned(),
             routes: self.routes.to_owned(),
             walk_time: self.walk_time,
@@ -175,35 +189,12 @@ impl SubwayStopHandler {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct BusStopHandler {
-    api_key: String,
-    pub stop_ids: Vec<String>,
-    pub walk_time: i32,
-    pub use_array_format: bool,
-    pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BusStopJson {
-    pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
-    pub walk_time: i32,
-}
-
 impl BusStopHandler {
-    pub fn new(
-        api_key: String,
-        stop_ids: Vec<String>,
-        walk_time: i32,
-        use_array_format: bool,
-    ) -> Self {
+    pub fn new(api_key: String, stop_ids: Vec<String>, walk_time: i32) -> Self {
         Self {
             api_key,
             stop_ids,
             walk_time,
-            use_array_format,
             trips: vec![],
             routes: HashMap::new(),
         }
@@ -386,11 +377,83 @@ impl BusStopHandler {
         }
     }
 
-    pub fn serialize(&self) -> BusStopJson {
-        BusStopJson {
+    pub fn serialize(&self) -> Stop {
+        Stop {
             trips: self.trips.to_owned(),
             routes: self.routes.to_owned(),
             walk_time: 0,
+        }
+    }
+}
+
+impl ServiceAlertHandler {
+    pub fn new(severity_limit: i32) -> Self {
+        Self {
+            severity_limit,
+            subway: Vec::new(),
+        }
+    }
+
+    pub fn refresh(&mut self) {
+        let gtfs = match Gtfs::from_url(
+            "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
+        ) {
+            Ok(a) => a,
+            Err(_) => return,
+        };
+        let resp2 = minreq::get(
+            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json",
+        )
+        .send()
+        .unwrap();
+        let bytes = resp2.as_bytes();
+        let delays: MercuryDelays = match serde_json::from_slice(bytes) {
+            Ok(r) => r,
+            Err(_) => Default::default(),
+        };
+        for entity in delays.entity {
+            let alert = entity.alert.unwrap();
+            for informed in alert.informed_entity.unwrap().iter() {
+                if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
+                    let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
+                    let line = informed.route_id.as_ref().unwrap();
+                    let gtfs_route = match gtfs.get_route(&line) {
+                        Ok(a) => a.short_name.as_ref().unwrap(),
+                        Err(_) => return,
+                    };
+                    let severity = match (*decomposed.get(2).unwrap()).parse() {
+                        Ok(x) => x,
+                        Err(_) => 0,
+                    };
+
+                    self.subway.push(Disruption {
+                        route: gtfs_route.to_string(),
+                        priority: severity,
+                        header: match alert.header_text {
+                            Some(ref a) => a
+                                .translation
+                                .as_ref()
+                                .unwrap()
+                                .get(0)
+                                .unwrap()
+                                .text
+                                .as_ref()
+                                .unwrap()
+                                .clone(),
+                            None => "".to_owned(),
+                        },
+                    });
+                }
+
+                self.subway.sort_by(|x, y| {
+                    if x.priority > y.priority {
+                        return Ordering::Greater;
+                    } else if x.priority < y.priority {
+                        return Ordering::Less;
+                    }
+                    return Ordering::Equal;
+                });
+            }
         }
     }
 }
