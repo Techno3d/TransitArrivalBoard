@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::ops::Sub;
+use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use gtfs_structures::{self, Gtfs};
@@ -28,7 +29,7 @@ pub struct SubwayStopHandler {
 
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {
-    api_key: String,
+    api_key: Arc<String>,
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
     pub trips: Vec<Vehicle>,
@@ -190,7 +191,7 @@ impl SubwayStopHandler {
 }
 
 impl BusStopHandler {
-    pub fn new(api_key: String, stop_ids: Vec<String>, walk_time: i32) -> Self {
+    pub fn new(api_key: Arc<String>, stop_ids: Vec<String>, walk_time: i32) -> Self {
         Self {
             api_key,
             stop_ids,
@@ -218,16 +219,17 @@ impl BusStopHandler {
         self.trips.sort_by(|x, y| {
             if x.minutes_until_arrival > y.minutes_until_arrival {
                 return Ordering::Greater;
-            } else if x.minutes_until_arrival < y.minutes_until_arrival {
+            }
+            if x.minutes_until_arrival < y.minutes_until_arrival {
                 return Ordering::Less;
             }
-            return Ordering::Equal;
+            Ordering::Equal
         });
     }
 
     fn refresh_single(&mut self, stopid: &String, now: OffsetDateTime) {
         let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
-            .with_param("key", &self.api_key)
+            .with_param("key", &*self.api_key)
             .with_param("version", "2")
             .with_param("OperatorRef", "MTA")
             .with_param("MonitoringRef", stopid)
@@ -448,10 +450,11 @@ impl ServiceAlertHandler {
                 self.subway.sort_by(|x, y| {
                     if x.priority > y.priority {
                         return Ordering::Greater;
-                    } else if x.priority < y.priority {
+                    }
+                    if x.priority < y.priority {
                         return Ordering::Less;
                     }
-                    return Ordering::Equal;
+                    Ordering::Equal
                 });
             }
         }

@@ -2,6 +2,7 @@ mod siri_structs;
 
 use std::collections::HashMap;
 use std::net::TcpListener;
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
@@ -11,18 +12,20 @@ use transit_board::{BusStopHandler, Disruption, Stop, SubwayStopHandler};
 use tungstenite::Message;
 
 fn main() {
+    dotenvy::dotenv().unwrap();
+    let api_key_bus = Arc::new(std::env::var("MTABUSKEY").unwrap());
+
     let server = TcpListener::bind("0.0.0.0:9001").unwrap();
 
     for stream in server.incoming() {
+        let api_key_bus = api_key_bus.clone();
         let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
-            dotenvy::dotenv().unwrap();
-            let api_key_bus = std::env::var("MTABUSKEY").unwrap();
 
             let config: Conf = match ws.read() {
-                Ok(c) => {serde_json::from_str(c.to_text().unwrap().as_ref()).unwrap()},
-                Err(_) => {Conf::new(vec![], vec![], ServiceAlertsConf::new(12))},
+                Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()).unwrap(),
+                Err(_) => Conf::new(vec![], vec![], ServiceAlertsConf::new(12)),
             };
 
             let mut subway = config.get_subway_handlers();
@@ -51,6 +54,9 @@ fn main() {
             }
 
             loop {
+                if !ws.can_write() {
+                    break;
+                }
                 subway_map.clear();
                 bus_map.clear();
                 service_alerts_vec.clear();
@@ -100,7 +106,8 @@ fn main() {
                     Err(_) => break,
                 };
 
-                thread::sleep(Duration::from_secs(5));
+                println!("finished");
+                thread::sleep(Duration::from_secs(30));
             }
         });
 
