@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 use transit_board::config::{Conf, ServiceAlertsConf};
 use transit_board::feed_data::FeedData;
 use transit_board::{delay::Disruption, Stop};
+use tungstenite::protocol::frame::coding::CloseCode;
+use tungstenite::protocol::CloseFrame;
 use tungstenite::Message;
 
 fn main() {
@@ -23,9 +25,16 @@ fn main() {
         let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
-            let config: Conf = match ws.read() {
-                Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()).unwrap(),
-                Err(_) => Conf::new(vec![], vec![], ServiceAlertsConf::new(12)),
+            let config: Result<Conf, serde_json::Error> = match ws.read() {
+                Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()),
+                Err(_) => Ok(Conf::new(vec![], vec![], ServiceAlertsConf::new(12))),
+            };
+            let config: Conf = match config {
+                Ok(a) => a,
+                Err(_) => {
+                    _ =  ws.close(Some(CloseFrame { code: CloseCode::Error, reason: "The config that was sent is malformed".into() }));
+                    return;
+                }, // Just close connection on incorrect data
             };
 
             let data = Arc::new(RwLock::new(FeedData::default()));
