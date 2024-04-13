@@ -1,8 +1,8 @@
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{bus_stop_handler::BusStopHandler, delay::ServiceAlertHandler, subway_stop_handler::SubwayStopHandler};
+use crate::{bus_stop_handler::BusStopHandler, delay::ServiceAlertHandler, feed_data::{self, FeedData}, subway_stop_handler::SubwayStopHandler};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Conf {
@@ -43,10 +43,10 @@ impl Conf {
         }
     }
 
-    pub fn get_subway_handlers(&self) -> Vec<SubwayStopHandler> {
+    pub fn get_subway_handlers(&self, feed_data: Arc<RwLock<FeedData>>) -> Vec<SubwayStopHandler> {
         self.subway
             .iter()
-            .map(|x| SubwayStopHandler::new(x.stop_ids.clone(), x.walk_time))
+            .map(|x| SubwayStopHandler::new(x.stop_ids.clone(), x.walk_time, feed_data.clone()))
             .collect()
     }
 
@@ -57,7 +57,7 @@ impl Conf {
             .collect()
     }
 
-    pub fn get_service_alerts_handler(&self) -> ServiceAlertHandler {
-        ServiceAlertHandler::new(self.service_alerts.severity_limit)
+    pub fn get_service_alerts_handler(&self, feed_data: Arc<RwLock<FeedData>>) -> ServiceAlertHandler {
+        ServiceAlertHandler::new(self.service_alerts.severity_limit, feed_data)
     }
 }

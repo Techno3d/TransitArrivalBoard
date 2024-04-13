@@ -2,13 +2,14 @@ mod siri_structs;
 
 use std::collections::HashMap;
 use std::net::TcpListener;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use transit_board::config::{Conf, ServiceAlertsConf};
-use transit_board::{bus_stop_handler::BusStopHandler, delay::Disruption, Stop, subway_stop_handler::SubwayStopHandler};
+use transit_board::feed_data::FeedData;
+use transit_board::{delay::Disruption, Stop};
 use tungstenite::Message;
 
 fn main() {
@@ -22,36 +23,21 @@ fn main() {
         let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
-
             let config: Conf = match ws.read() {
                 Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()).unwrap(),
                 Err(_) => Conf::new(vec![], vec![], ServiceAlertsConf::new(12)),
             };
 
-            let mut subway = config.get_subway_handlers();
+            let data = Arc::new(RwLock::new(FeedData::default()));
+            data.write().unwrap().refresh_static_gtfs();
+
+            let mut subway = config.get_subway_handlers(data.clone());
             let mut bus = config.get_bus_handlers(api_key_bus.clone());
-            let mut service_alerts = config.get_service_alerts_handler();
+            let mut service_alerts = config.get_service_alerts_handler(data.clone());
 
             let mut subway_map: HashMap<String, Stop> = HashMap::new();
             let mut bus_map: HashMap<String, Stop> = HashMap::new();
             let mut service_alerts_vec: Vec<Disruption> = Vec::new();
-
-            let jerome = SubwayStopHandler::new(vec!["405S".to_string()], 10);
-            let concourse = SubwayStopHandler::new(vec!["D03S".to_string()], 14);
-            let bx1028 = BusStopHandler::new(
-                api_key_bus.to_owned(),
-                vec!["100017".to_string(), "103400".to_string()],
-                3,
-            );
-            let bx222526 =
-                BusStopHandler::new(api_key_bus.to_owned(), vec!["100723".to_string()], 3);
-
-            if subway.len() == 0 {
-                subway = vec![jerome, concourse];
-            }
-            if bus.len() == 0 {
-                bus = vec![bx222526, bx1028];
-            }
 
             loop {
                 if !ws.can_write() {
@@ -60,6 +46,7 @@ fn main() {
                 subway_map.clear();
                 bus_map.clear();
                 service_alerts_vec.clear();
+                data.write().unwrap().refresh_feeds();
                 for i in 0..subway.len() {
                     subway.get_mut(i).unwrap().refresh();
                     subway_map.insert(
@@ -106,7 +93,6 @@ fn main() {
                     Err(_) => break,
                 };
 
-                println!("finished");
                 thread::sleep(Duration::from_secs(30));
             }
         });
