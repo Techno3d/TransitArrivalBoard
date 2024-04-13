@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{BusStopHandler, ServiceAlertHandler, SubwayStopHandler};
@@ -23,7 +25,7 @@ pub struct ServiceAlertsConf {
 impl ServiceAlertsConf {
     pub fn new(severity_limit: i32) -> Self {
         Self {
-            severity_limit: severity_limit,
+            severity_limit,
         }
     }
 }
@@ -48,7 +50,7 @@ impl Conf {
             .collect()
     }
 
-    pub fn get_bus_handlers(&self, api_key: String) -> Vec<BusStopHandler> {
+    pub fn get_bus_handlers(&self, api_key: Arc<String>) -> Vec<BusStopHandler> {
         self.bus
             .iter()
             .map(|x| BusStopHandler::new(api_key.clone(), x.stop_ids.clone(), 0))
@@ -56,6 +58,6 @@ impl Conf {
     }
 
     pub fn get_service_alerts_handler(&self) -> ServiceAlertHandler {
-        return ServiceAlertHandler::new(self.service_alerts.severity_limit);
+        ServiceAlertHandler::new(self.service_alerts.severity_limit)
     }
 }
