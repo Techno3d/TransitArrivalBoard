@@ -1,3 +1,5 @@
+use std::io::Cursor;
+
 use gtfs_structures::Gtfs;
 use prost::Message;
 
@@ -54,9 +56,9 @@ impl FeedData {
 
     /// Use sparingly, the static only updates a few times a year and is a big file
     pub fn refresh_static_gtfs(&mut self) {
-        let gtfs = match Gtfs::from_url(
-            "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
-        ) {
+        let resp = minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip").send().unwrap();
+        let bytes = resp.as_bytes();
+        let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
             Ok(a) => a,
             Err(_) => return,
         };
