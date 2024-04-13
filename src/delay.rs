@@ -1,9 +1,8 @@
 use std::{cmp::Ordering, sync::{Arc, RwLock}};
 
-use gtfs_structures::Gtfs;
 use serde::{Deserialize, Serialize};
 
-use crate::{feed_data::FeedData, mercury::MercuryDelays};
+use crate::feed_data::FeedData;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ServiceAlertHandler {

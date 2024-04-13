@@ -2,7 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use serde::{Deserialize, Serialize};
 
-use crate::{bus_stop_handler::BusStopHandler, delay::ServiceAlertHandler, feed_data::{self, FeedData}, subway_stop_handler::SubwayStopHandler};
+use crate::{bus_stop_handler::BusStopHandler, delay::ServiceAlertHandler, feed_data::FeedData, subway_stop_handler::SubwayStopHandler};
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Conf {
