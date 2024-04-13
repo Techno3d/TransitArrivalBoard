@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use transit_board::config::{Conf, ServiceAlertsConf};
-use transit_board::{BusStopHandler, Disruption, Stop, SubwayStopHandler};
+use transit_board::{bus_stop_handler::BusStopHandler, delay::Disruption, Stop, subway_stop_handler::SubwayStopHandler};
 use tungstenite::Message;
 
 fn main() {
