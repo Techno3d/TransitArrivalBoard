@@ -1,58 +1,33 @@
-use std::{collections::HashMap, time::{SystemTime, UNIX_EPOCH}};
+use std::{collections::HashMap, sync::{Arc, RwLock}, time::{SystemTime, UNIX_EPOCH}};
 
-use gtfs_structures::Gtfs;
-use prost::Message;
+use crate::{feed_data::FeedData, Stop, Vehicle};
 
-use crate::{gtfsrt, Stop, Vehicle};
-
-#[derive(Debug, Clone)]
 pub struct SubwayStopHandler {
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
     pub trips: Vec<Vehicle>,
     pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+    feed_data: Arc<RwLock<FeedData>>,
 }
 
 impl SubwayStopHandler {
-    pub fn new(stop_ids: Vec<String>, walk_time: i32) -> Self {
+    pub fn new(stop_ids: Vec<String>, walk_time: i32, feed_data: Arc<RwLock<FeedData>>) -> Self {
         Self {
             stop_ids,
             walk_time,
             trips: vec![],
             routes: HashMap::new(),
+            feed_data,
         }
     }
 
     pub fn refresh(&mut self) {
         self.trips.clear();
 
-        let gtfs = match Gtfs::from_url(
-            "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
-        ) {
-            Ok(a) => a,
-            Err(_) => return,
-        };
-
-        let feed_uris = [
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-g",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-jz",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l",
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
-        ];
-
-        for uri in feed_uris {
-            let resp = minreq::get(uri).send().unwrap();
-            let bytes = resp.as_bytes();
-            let feed = match gtfsrt::FeedMessage::decode(bytes) {
-                // if no data so abort
-                Ok(a) => a,
-                Err(_) => return,
-            };
-            for entity in feed.entity {
-                if let Some(tu) = entity.trip_update {
+        let data = self.feed_data.read().unwrap();
+        for feed in data.subway_feed.iter() {
+            for entity in &feed.entity {
+                if let Some(tu) = &entity.trip_update {
                     for stop in tu.stop_time_update.iter() {
                         if self.stop_ids.contains(&stop.stop_id().to_string()) {
                             let time = (match &stop.arrival {
@@ -81,12 +56,12 @@ impl SubwayStopHandler {
                             let parsed_route = tid_split.next().unwrap();
                             let parsed_destination = tu.stop_time_update.last().unwrap().stop_id();
 
-                            let gtfs_route = match gtfs.get_route(parsed_route) {
+                            let gtfs_route = match data.static_gtfs.get_route(parsed_route) {
                                 Ok(a) => a.short_name.as_ref().unwrap(),
                                 Err(_) => return,
                             };
 
-                            let gtfs_destination = match gtfs.get_stop(parsed_destination) {
+                            let gtfs_destination = match data.static_gtfs.get_stop(parsed_destination) {
                                 Ok(a) => a.name.as_ref().unwrap(),
                                 Err(_) => return,
                             };

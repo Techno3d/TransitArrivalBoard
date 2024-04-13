@@ -1,14 +1,16 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, sync::{Arc, RwLock}};
 
 use gtfs_structures::Gtfs;
 use serde::{Deserialize, Serialize};
 
-use crate::mercury::MercuryDelays;
+use crate::{feed_data::FeedData, mercury::MercuryDelays};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct ServiceAlertHandler {
     pub severity_limit: i32,
     pub subway: Vec<Disruption>,
+    #[serde(skip)]
+    feed_data: Arc<RwLock<FeedData>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -19,37 +21,23 @@ pub struct Disruption {
 }
 
 impl ServiceAlertHandler {
-    pub fn new(severity_limit: i32) -> Self {
+    pub fn new(severity_limit: i32, data: Arc<RwLock<FeedData>>) -> Self {
         Self {
             severity_limit,
             subway: Vec::new(),
+            feed_data: data,
         }
     }
 
     pub fn refresh(&mut self) {
-        let gtfs = match Gtfs::from_url(
-            "http://web.mta.info/developers/data/nyct/subway/google_transit.zip",
-        ) {
-            Ok(a) => a,
-            Err(_) => return,
-        };
-        let resp2 = minreq::get(
-            "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json",
-        )
-        .send()
-        .unwrap();
-        let bytes = resp2.as_bytes();
-        let delays: MercuryDelays = match serde_json::from_slice(bytes) {
-            Ok(r) => r,
-            Err(_) => Default::default(),
-        };
-        for entity in delays.entity {
-            let alert = entity.alert.unwrap();
-            for informed in alert.informed_entity.unwrap().iter() {
+        let data = self.feed_data.read().unwrap();
+        for entity in &data.delays_feed.entity {
+            let alert = entity.alert.as_ref().unwrap();
+            for informed in alert.informed_entity.as_ref().unwrap().iter() {
                 if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
                     let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
                     let line = informed.route_id.as_ref().unwrap();
-                    let gtfs_route = match gtfs.get_route(&line) {
+                    let gtfs_route = match data.static_gtfs.get_route(&line) {
                         Ok(a) => a.short_name.as_ref().unwrap(),
                         Err(_) => return,
                     };
