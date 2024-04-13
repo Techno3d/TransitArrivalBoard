@@ -9,6 +9,33 @@ import PlatformCountdown from "./components/Countdown";
 
 export default function Home() {
   const ws = new WebSocket("ws://0.0.0.0:9001");
+  ws.addEventListener("open", () => {
+    ws.send(`{
+        "subway": [
+            {
+                "stop_ids": ["405S"],
+                "walk_time": 10
+            },
+            {
+                "stop_ids": ["D03S"],
+                "walk_time": 14
+            }
+        ],
+        "bus": [
+            {
+                "stop_ids": ["100017", "103400"],
+                "walk_time": 3
+            },
+            {
+                "stop_ids": ["100723"],
+                "walk_time": 3
+            }
+        ],
+        "service_alerts": {
+            "severity_limit": 12          
+        }
+    }`);
+  });
   ws.addEventListener("message", (event) => {
     console.log(event.data);
   });
