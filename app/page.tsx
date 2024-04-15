@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { Bullet } from "./components/Bullet";
 import { Countdown } from "./components/Countdown";
+import { List } from "./components/List";
 
 export default function Home() {
   /*
@@ -50,6 +52,59 @@ export default function Home() {
     };
   });
   */
+  let paul = {
+    Bx10: {
+      Norwood: [
+        { color: "#ffffff", route: "Bx10", minutes_until_arrival: 5, destination: "NORWOOD 205 ST STA" },
+        { color: "#ffffff", route: "Bx10", minutes_until_arrival: 7, destination: "NORWOOD 205 ST STA" },
+      ],
+      Riverdale: [
+        { color: "#ffffff", route: "Bx10", minutes_until_arrival: 9, destination: "RIVERDALE 263 ST" },
+        { color: "#ffffff", route: "Bx10", minutes_until_arrival: 20, destination: "RIVERDALE 263 ST" },
+      ],
+    },
+    Bx28: {
+      Fordham: [
+        { color: "#ffffff", route: "Bx28", minutes_until_arrival: 1, destination: "FORDHAM CENTER 192 ST" },
+        { color: "#ffffff", route: "Bx28", minutes_until_arrival: 14, destination: "FORDHAM CENTER 192 ST" },
+      ],
+      "Co-op City": [
+        {
+          color: "#ffffff",
+          route: "Bx28",
+          minutes_until_arrival: 3,
+          destination: "CO-OP CITY EARHART LANE",
+        },
+        { color: "#ffffff", route: "Bx28", minutes_until_arrival: 8, destination: "CO-OP CITY EARHART LANE" },
+      ],
+    },
+  };
+
+  let w205st = {
+    Bx22: {
+      Norwood: [
+        { color: "#ffffff", route: "Bx22", minutes_until_arrival: 6, destination: "CASTLE HILL ZEREGA AV" },
+        { color: "#ffffff", route: "Bx22", minutes_until_arrival: 23, destination: "CASTLE HILL ZEREGA AV" },
+      ],
+    },
+    Bx25: {
+      Norwood: [
+        {
+          color: "#ffffff",
+          route: "Bx25",
+          minutes_until_arrival: 2,
+          destination: "CO-OP CITY BAY PLAZA",
+        },
+        { color: "#ffffff", route: "Bx25", minutes_until_arrival: 31, destination: "CO-OP CITY BAY PLAZA" },
+      ],
+    },
+    Bx26: {
+      Norwood: [
+        { color: "#ffffff", route: "Bx26", minutes_until_arrival: 11, destination: "CO-OP CITY EARHART LANE" },
+        { color: "#ffffff", route: "Bx26", minutes_until_arrival: 15, destination: "CO-OP CITY EARHART LANE" },
+      ],
+    },
+  };
 
   return (
     <div className="grid min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
@@ -76,7 +131,7 @@ export default function Home() {
           <h1 className="mx-2 text-base font-black text-white lg:text-4xl">Service Disruptions</h1>
         </div>
         <div className="flex w-full grow flex-row rounded-lg bg-slate-100 p-2">
-          <h1 className="line-clamp-4 text-5xl font-bold leading-[1.275]">
+          <h1 className="line-clamp-3 text-5xl font-bold leading-[1.275]">
             <div className="mx-1 inline-flex">
               <Bullet route={"1"} color={"#EE352E"} size={48} />
             </div>
@@ -89,130 +144,48 @@ export default function Home() {
             {" trains are suspended in both directions while we address a derailment near 96 St."}
           </h1>
         </div>
+        <div className="flex h-14 flex-row items-center rounded-lg bg-slate-800">
+          <h1 className="mx-2 text-base font-bold text-white lg:text-3xl">
+            {"Made with ❤️ by "}
+            <span className="inline-flex items-baseline">
+              <Image
+                src="https://cdn.discordapp.com/icons/1031746725817368676/ac3bfe2c8dd9b89729974f3c5888f99c"
+                alt=""
+                className="mx-1 self-center rounded-full"
+                height={32}
+                width={32}
+              />
+              <span>Transit Club</span>
+            </span>
+            {" ("}
+            <span className="inline-flex items-baseline">
+              <Image
+                src="https://avatars.githubusercontent.com/u/76977073?"
+                alt=""
+                className="mx-1 self-center rounded-full"
+                height={32}
+                width={32}
+              />
+              <span>Shadman</span>
+              {", "}
+            </span>
+            <span className="inline-flex items-baseline">
+              <Image
+                src="https://avatars.githubusercontent.com/u/95447323?"
+                alt=""
+                className="mx-1 self-center rounded-full"
+                height={32}
+                width={32}
+              />
+              <span>David</span>
+            </span>
+            {")"}
+          </h1>
+        </div>
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <div className="flex h-14 w-full flex-row items-center rounded-lg bg-emerald-700 px-2">
-          <h1 className="text-base font-black text-white lg:text-3xl">Paul Av / W 205 St</h1>
-        </div>
-        <div className="flex w-full grow flex-col items-center gap-2 text-white">
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx10</h1>
-                <h1 className="lg:text-3xl">Norwood</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">5</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">7</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx10</h1>
-                <h1 className="lg:text-3xl">Riverdale</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">9</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">20</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx28</h1>
-                <h1 className="lg:text-3xl">Fordham</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">13</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">27</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx28</h1>
-                <h1 className="lg:text-3xl">Co-op City</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">3</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">8</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-        </div>
-        <div className="flex h-14 w-full flex-row items-center rounded-lg bg-emerald-700 px-2">
-          <h1 className="text-base font-black text-white lg:text-3xl">W 205 St / Paul Av</h1>
-        </div>
-        <div className="flex w-full grow flex-col items-center gap-2 text-white">
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx22</h1>
-                <h1 className="lg:text-3xl">Castle Hill</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">6</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">23</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx25</h1>
-                <h1 className="lg:text-3xl">Co-op City</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">2</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">31</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-          <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500">
-            <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
-              <div className="flex h-full w-3/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">Bx26</h1>
-                <h1 className="lg:text-3xl">Co-op City</h1>
-              </div>
-              <div className="flex h-full w-1/4 flex-col items-center justify-center">
-                <h1 className="font-black lg:text-7xl">11</h1>
-                <h1 className="lg:text-3xl">min</h1>
-              </div>
-            </div>
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-7xl">15</h1>
-              <h1 className="lg:text-3xl">min</h1>
-            </div>
-          </div>
-        </div>
+        <List name={"Paul Av / W 205 St"} routes={paul}></List>
+        <List name={"W 205 St / Paul Av"} routes={w205st}></List>
       </div>
     </div>
   );
