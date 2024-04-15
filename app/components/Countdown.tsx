@@ -26,9 +26,11 @@ export function Countdown(props: { name: string; vehicles: Array<Vehicle> }) {
         <div className="flex h-full w-full flex-row rounded-lg bg-slate-300">
           <div className="flex h-full w-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
             <div className="h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
-              <div className="flex h-full w-full flex-col gap-2 p-8">
+              <div className="flex h-full w-full flex-col gap-2 px-8 py-4">
                 <div className="flex w-full basis-2/5 flex-row items-center">
-                  <h1 className="text-nowrap text-7xl font-bold text-black">{vehicles[0].destination}</h1>
+                  <h1 className="h-3/4 overflow-hidden text-ellipsis text-nowrap align-middle text-6xl font-bold text-black">
+                    {vehicles[0].destination}
+                  </h1>
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
                   <Bullet route={vehicles[0].route} color={vehicles[0].color} size={112} />

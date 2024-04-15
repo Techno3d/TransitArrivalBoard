@@ -112,15 +112,15 @@ export default function Home() {
         <Countdown
           name={"Bedford Park Blvd / Jerome Av"}
           vehicles={[
-            { route: "6", destination: "Brooklyn Bridge", minutes_until_arrival: 4, color: "#00933C" },
+            { route: "4", destination: "Crown Hts-Utica Av", minutes_until_arrival: 4, color: "#00933C" },
             { route: "4", destination: "Utica Av", minutes_until_arrival: 12, color: "#00933C" },
-            { route: "4", destination: "Bowling Green", minutes_until_arrival: 19, color: "#00933C" },
+            { route: "4", destination: "Utica Av", minutes_until_arrival: 19, color: "#00933C" },
           ]}
         ></Countdown>
         <Countdown
           name={"Bedford Park Blvd / Grand Concourse"}
           vehicles={[
-            { route: "F", destination: "Kings Hwy", minutes_until_arrival: 6, color: "#FF6319" },
+            { route: "F", destination: "Coney Island-Stillwell Av", minutes_until_arrival: 6, color: "#FF6319" },
             { route: "D", destination: "Coney Island", minutes_until_arrival: 11, color: "#FF6319" },
             { route: "D", destination: "Coney Island", minutes_until_arrival: 23, color: "#FF6319" },
           ]}
