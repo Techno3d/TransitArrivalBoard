@@ -4,18 +4,18 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use crate::{feed_data::FeedData, Stop, Vehicle};
+use crate::{feed_handler::FeedHandler, Stop, Vehicle};
 
 pub struct SubwayStopHandler {
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
     pub trips: Vec<Vehicle>,
     pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
-    feed_data: Arc<RwLock<FeedData>>,
+    feed_data: Arc<RwLock<FeedHandler>>,
 }
 
 impl SubwayStopHandler {
-    pub fn new(stop_ids: Vec<String>, walk_time: i32, feed_data: Arc<RwLock<FeedData>>) -> Self {
+    pub fn new(stop_ids: Vec<String>, walk_time: i32, feed_data: Arc<RwLock<FeedHandler>>) -> Self {
         Self {
             stop_ids,
             walk_time,
@@ -29,17 +29,17 @@ impl SubwayStopHandler {
         self.trips.clear();
 
         let data = self.feed_data.read().unwrap();
-        for feed in data.subway_feed.iter() {
-            for entity in &feed.entity {
-                if let Some(tu) = &entity.trip_update {
-                    for stop in tu.stop_time_update.iter() {
+        for message in data.subway_feed.iter() {
+            for entity in &message.entity {
+                if let Some(trip_update) = &entity.trip_update {
+                    for stop in trip_update.stop_time_update.iter() {
                         if self.stop_ids.contains(&stop.stop_id().to_string()) {
-                            let time = (match &stop.arrival {
+                            let arrival_time = (match &stop.arrival {
                                 Some(a) => a,
                                 None => continue,
                             })
                             .time();
-                            let secs: u64 = if u64::try_from(time).unwrap()
+                            let duration_secs: u64 = if u64::try_from(arrival_time).unwrap()
                                 < SystemTime::now()
                                     .duration_since(UNIX_EPOCH)
                                     .unwrap()
@@ -48,7 +48,7 @@ impl SubwayStopHandler {
                                 // Does this break once the year gets too high?
                                 0
                             } else {
-                                u64::try_from(time).unwrap()
+                                u64::try_from(arrival_time).unwrap()
                                     - SystemTime::now()
                                         .duration_since(UNIX_EPOCH)
                                         .unwrap()
@@ -56,53 +56,54 @@ impl SubwayStopHandler {
                             };
                             // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
                             // Shouldn't break unless trip id is changed
-                            let parsed_tid = tu.trip.trip_id().split("_").last().unwrap();
-                            let mut tid_split = parsed_tid.split("..");
-                            let parsed_route = tid_split.next().unwrap();
-                            let parsed_destination = tu.stop_time_update.last().unwrap().stop_id();
+                            let trip_id = trip_update.trip.trip_id().split("_").last().unwrap();
+                            let mut trip_id = trip_id.split("..");
+                            let route_id = trip_id.next().unwrap();
+                            let destination_id =
+                                trip_update.stop_time_update.last().unwrap().stop_id();
 
-                            let gtfs_route = match data.static_gtfs.get_route(parsed_route) {
+                            let route_name = match data.gtfs_static_feed.get_route(route_id) {
                                 Ok(a) => a.short_name.as_ref().unwrap(),
                                 Err(_) => return,
                             };
 
-                            let gtfs_destination =
-                                match data.static_gtfs.get_stop(parsed_destination) {
+                            let destination_name =
+                                match data.gtfs_static_feed.get_stop(destination_id) {
                                     Ok(a) => a.name.as_ref().unwrap(),
                                     Err(_) => return,
                                 };
 
                             self.trips.push(Vehicle {
-                                route: gtfs_route.to_owned(),
-                                destination: gtfs_destination.to_owned(),
-                                minutes_until_arrival: secs as i32 / 60,
+                                route: route_name.to_owned(),
+                                destination: destination_name.to_owned(),
+                                minutes_until_arrival: duration_secs as i32 / 60,
                             });
 
-                            if !self.routes.contains_key(parsed_route) {
-                                self.routes.insert(parsed_route.to_owned(), HashMap::new());
+                            if !self.routes.contains_key(route_id) {
+                                self.routes.insert(route_id.to_owned(), HashMap::new());
                             }
 
                             if !self
                                 .routes
-                                .get(parsed_route)
+                                .get(route_id)
                                 .unwrap()
-                                .contains_key(parsed_destination)
+                                .contains_key(destination_id)
                             {
                                 self.routes
-                                    .get_mut(parsed_route)
+                                    .get_mut(route_id)
                                     .unwrap()
-                                    .insert(parsed_destination.to_owned(), Vec::new());
+                                    .insert(destination_id.to_owned(), Vec::new());
                             };
 
                             self.routes
-                                .get_mut(parsed_route)
+                                .get_mut(route_id)
                                 .unwrap()
-                                .get_mut(parsed_destination)
+                                .get_mut(destination_id)
                                 .unwrap()
                                 .push(Vehicle {
-                                    route: gtfs_route.to_owned(),
-                                    destination: gtfs_destination.to_owned(),
-                                    minutes_until_arrival: secs as i32 / 60,
+                                    route: route_name.to_owned(),
+                                    destination: destination_name.to_owned(),
+                                    minutes_until_arrival: duration_secs as i32 / 60,
                                 });
                         }
                     }

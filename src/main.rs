@@ -7,9 +7,9 @@ use std::thread;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
-use transit_board::config::{Conf, ServiceAlertsConf};
-use transit_board::feed_data::FeedData;
-use transit_board::{delay::Disruption, Stop};
+use transit_board::config::Config;
+use transit_board::feed_handler::FeedHandler;
+use transit_board::{Disruption, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
 use tungstenite::protocol::CloseFrame;
 use tungstenite::Message;
@@ -25,11 +25,11 @@ fn main() {
         let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
-            let config: Result<Conf, serde_json::Error> = match ws.read() {
+            let config: Result<Config, serde_json::Error> = match ws.read() {
                 Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()),
-                Err(_) => Ok(Conf::new(vec![], vec![], ServiceAlertsConf::new(1))),
+                Err(_) => Ok(Config::new(vec![], vec![])),
             };
-            let config: Conf = match config {
+            let config: Config = match config {
                 Ok(a) => a,
                 Err(_) => {
                     _ = ws.close(Some(CloseFrame {
@@ -40,7 +40,7 @@ fn main() {
                 } // Just close connection on incorrect data
             };
 
-            let data = Arc::new(RwLock::new(FeedData::default()));
+            let data = Arc::new(RwLock::new(FeedHandler::default()));
             data.write().unwrap().refresh_static_gtfs();
 
             let mut subway = config.get_subway_handlers(data.clone());
@@ -58,6 +58,7 @@ fn main() {
                 subway_map.clear();
                 bus_map.clear();
                 service_alerts_vec.clear();
+
                 data.write().unwrap().refresh_feeds();
                 for i in 0..subway.len() {
                     subway.get_mut(i).unwrap().refresh();

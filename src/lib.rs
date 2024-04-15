@@ -4,10 +4,9 @@ use serde::{Deserialize, Serialize};
 
 pub mod bus_stop_handler;
 pub mod config;
-pub mod delay;
-pub mod feed_data;
-pub mod lines;
-pub mod mercury;
+pub mod feed_handler;
+pub mod mercury_structs;
+pub mod service_alert_handler;
 pub mod siri_structs;
 pub mod subway_stop_handler;
 pub mod gtfsrt {
@@ -26,4 +25,11 @@ pub struct Stop {
     pub trips: Vec<Vehicle>,
     pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
     pub walk_time: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Disruption {
+    pub route: String,
+    pub priority: i32,
+    pub header: String,
 }

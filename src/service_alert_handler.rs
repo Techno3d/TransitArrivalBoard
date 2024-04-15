@@ -5,27 +5,18 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::feed_data::FeedData;
+use crate::{feed_handler::FeedHandler, Disruption};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ServiceAlertHandler {
-    pub severity_limit: i32,
     pub subway: Vec<Disruption>,
     #[serde(skip)]
-    feed_data: Arc<RwLock<FeedData>>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Disruption {
-    pub route: String,
-    pub priority: i32,
-    pub header: String,
+    feed_data: Arc<RwLock<FeedHandler>>,
 }
 
 impl ServiceAlertHandler {
-    pub fn new(severity_limit: i32, data: Arc<RwLock<FeedData>>) -> Self {
+    pub fn new(data: Arc<RwLock<FeedHandler>>) -> Self {
         Self {
-            severity_limit,
             subway: Vec::new(),
             feed_data: data,
         }
@@ -33,13 +24,13 @@ impl ServiceAlertHandler {
 
     pub fn refresh(&mut self) {
         let data = self.feed_data.read().unwrap();
-        for entity in &data.delays_feed.entity {
+        for entity in &data.service_alerts_feed.entity {
             let alert = entity.alert.as_ref().unwrap();
             for informed in alert.informed_entity.as_ref().unwrap().iter() {
                 if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
                     let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
                     let line = informed.route_id.as_ref().unwrap();
-                    let gtfs_route = match data.static_gtfs.get_route(&line) {
+                    let gtfs_route = match data.gtfs_static_feed.get_route(&line) {
                         Ok(a) => a.short_name.as_ref().unwrap(),
                         Err(_) => return,
                     };

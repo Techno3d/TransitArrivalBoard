@@ -3,48 +3,31 @@ use std::sync::{Arc, RwLock};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    bus_stop_handler::BusStopHandler, delay::ServiceAlertHandler, feed_data::FeedData,
-    subway_stop_handler::SubwayStopHandler,
+    bus_stop_handler::BusStopHandler, feed_handler::FeedHandler,
+    service_alert_handler::ServiceAlertHandler, subway_stop_handler::SubwayStopHandler,
 };
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct Conf {
-    subway: Vec<StopConf>,
-    bus: Vec<StopConf>,
-    service_alerts: ServiceAlertsConf,
+pub struct Config {
+    subway: Vec<StopConfig>,
+    bus: Vec<StopConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct StopConf {
+pub struct StopConfig {
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
 }
 
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct ServiceAlertsConf {
-    pub severity_limit: i32,
-}
-
-impl ServiceAlertsConf {
-    pub fn new(severity_limit: i32) -> Self {
-        Self { severity_limit }
-    }
-}
-
-impl Conf {
-    pub fn new(
-        subway: Vec<StopConf>,
-        bus: Vec<StopConf>,
-        service_alerts: ServiceAlertsConf,
-    ) -> Self {
-        Self {
-            subway,
-            bus,
-            service_alerts,
-        }
+impl Config {
+    pub fn new(subway: Vec<StopConfig>, bus: Vec<StopConfig>) -> Self {
+        Self { subway, bus }
     }
 
-    pub fn get_subway_handlers(&self, feed_data: Arc<RwLock<FeedData>>) -> Vec<SubwayStopHandler> {
+    pub fn get_subway_handlers(
+        &self,
+        feed_data: Arc<RwLock<FeedHandler>>,
+    ) -> Vec<SubwayStopHandler> {
         self.subway
             .iter()
             .map(|x| SubwayStopHandler::new(x.stop_ids.clone(), x.walk_time, feed_data.clone()))
@@ -60,8 +43,8 @@ impl Conf {
 
     pub fn get_service_alerts_handler(
         &self,
-        feed_data: Arc<RwLock<FeedData>>,
+        feed_data: Arc<RwLock<FeedHandler>>,
     ) -> ServiceAlertHandler {
-        ServiceAlertHandler::new(self.service_alerts.severity_limit, feed_data)
+        ServiceAlertHandler::new(feed_data)
     }
 }

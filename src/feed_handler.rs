@@ -3,19 +3,19 @@ use std::io::Cursor;
 use gtfs_structures::Gtfs;
 use prost::Message;
 
-use crate::{gtfsrt, mercury::MercuryDelays};
+use crate::{gtfsrt, mercury_structs::MercuryDelays};
 
 // No bus because bus api can be queried per stop
 #[derive(Default)]
-pub struct FeedData {
+pub struct FeedHandler {
     pub subway_feed: Vec<gtfsrt::FeedMessage>,
-    pub delays_feed: MercuryDelays,
-    pub static_gtfs: Gtfs,
+    pub service_alerts_feed: MercuryDelays,
+    pub gtfs_static_feed: Gtfs,
 }
 
-impl FeedData {
+impl FeedHandler {
     pub fn new() -> Self {
-        FeedData {
+        FeedHandler {
             ..Default::default()
         }
     }
@@ -53,7 +53,7 @@ impl FeedData {
             Ok(r) => r,
             Err(_) => Default::default(),
         };
-        self.delays_feed = delays;
+        self.service_alerts_feed = delays;
     }
 
     /// Use sparingly, the static only updates a few times a year and is a big file
@@ -67,6 +67,6 @@ impl FeedData {
             Ok(a) => a,
             Err(_) => return,
         };
-        self.static_gtfs = gtfs;
+        self.gtfs_static_feed = gtfs;
     }
 }
