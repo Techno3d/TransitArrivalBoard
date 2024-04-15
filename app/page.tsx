@@ -31,7 +31,7 @@ export default function Home() {
             }
         ],
         "service_alerts": {
-            "severity_limit": 12          
+            "severity_limit": 12
         }
     }`);
   });
@@ -166,7 +166,7 @@ export default function Home() {
                 height={32}
                 width={32}
               />
-              <span>Shadman</span>
+              <span>Shadman Syed</span>
               {", "}
             </span>
             <span className="inline-flex items-baseline">
@@ -177,7 +177,7 @@ export default function Home() {
                 height={32}
                 width={32}
               />
-              <span>David</span>
+              <span>David Wang</span>
             </span>
             {")"}
           </h1>
