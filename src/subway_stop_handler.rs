@@ -1,4 +1,8 @@
-use std::{collections::HashMap, sync::{Arc, RwLock}, time::{SystemTime, UNIX_EPOCH}};
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use crate::{feed_data::FeedData, Stop, Vehicle};
 
@@ -35,7 +39,8 @@ impl SubwayStopHandler {
                                 None => continue,
                             })
                             .time();
-                            let secs: u64 = if u64::try_from(time).unwrap() < SystemTime::now()
+                            let secs: u64 = if u64::try_from(time).unwrap()
+                                < SystemTime::now()
                                     .duration_since(UNIX_EPOCH)
                                     .unwrap()
                                     .as_secs()
@@ -61,10 +66,11 @@ impl SubwayStopHandler {
                                 Err(_) => return,
                             };
 
-                            let gtfs_destination = match data.static_gtfs.get_stop(parsed_destination) {
-                                Ok(a) => a.name.as_ref().unwrap(),
-                                Err(_) => return,
-                            };
+                            let gtfs_destination =
+                                match data.static_gtfs.get_stop(parsed_destination) {
+                                    Ok(a) => a.name.as_ref().unwrap(),
+                                    Err(_) => return,
+                                };
 
                             self.trips.push(Vehicle {
                                 route: gtfs_route.to_owned(),

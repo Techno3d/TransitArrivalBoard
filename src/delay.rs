@@ -1,4 +1,7 @@
-use std::{cmp::Ordering, sync::{Arc, RwLock}};
+use std::{
+    cmp::Ordering,
+    sync::{Arc, RwLock},
+};
 
 use serde::{Deserialize, Serialize};
 

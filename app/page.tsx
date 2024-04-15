@@ -1,20 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-import PlatformCountdown from "./components/Countdown";
-
-export function Bullet() {
-  return (
-    <div
-      className="flex aspect-square h-5/6 flex-row items-center justify-center rounded-full align-middle"
-      style={{ backgroundColor: `#EE352E` }}
-    >
-      <h1 className="items-center justify-center align-middle text-4xl text-white">{"1"}</h1>
-    </div>
-  );
-}
+import { Bullet } from "./components/Bullet";
+import { Countdown } from "./components/Countdown";
 
 export default function Home() {
+  /*
   const ws = new WebSocket("ws://0.0.0.0:9001");
   ws.addEventListener("open", () => {
     ws.send(`{
@@ -59,61 +49,48 @@ export default function Home() {
       ws.close();
     };
   });
+  */
 
   return (
     <div className="grid min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
       <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <div className="flex w-full basis-1/2 flex-col gap-2">
-          <PlatformCountdown
-            name={"Bedford Park Blvd / Jerome Av"}
-            vehicles={[
-              { route: "3", destination: "New Lots Av", minutes_until_arrival: 4, color: "#EE352E" },
-              { route: "4", destination: "Utica Av", minutes_until_arrival: 12, color: "#00933C" },
-              { route: "4", destination: "Bowling Green", minutes_until_arrival: 19, color: "#00933C" },
-            ]}
-          ></PlatformCountdown>
-        </div>
-        <div className="flex w-full basis-1/2 flex-col gap-2">
-          <PlatformCountdown
-            name={"Bedford Park Blvd / Grand Concourse"}
-            vehicles={[
-              { route: "B", destination: "Brighton Beach", minutes_until_arrival: 6, color: "#FF6319" },
-              { route: "D", destination: "Coney Island", minutes_until_arrival: 11, color: "#FF6319" },
-              { route: "D", destination: "Coney Island", minutes_until_arrival: 23, color: "#FF6319" },
-            ]}
-          ></PlatformCountdown>
-        </div>
+        <Countdown
+          name={"Bedford Park Blvd / Jerome Av"}
+          vehicles={[
+            { route: "6", destination: "Brooklyn Bridge", minutes_until_arrival: 4, color: "#00933C" },
+            { route: "4", destination: "Utica Av", minutes_until_arrival: 12, color: "#00933C" },
+            { route: "4", destination: "Bowling Green", minutes_until_arrival: 19, color: "#00933C" },
+          ]}
+        ></Countdown>
+        <Countdown
+          name={"Bedford Park Blvd / Grand Concourse"}
+          vehicles={[
+            { route: "F", destination: "Kings Hwy", minutes_until_arrival: 6, color: "#FF6319" },
+            { route: "D", destination: "Coney Island", minutes_until_arrival: 11, color: "#FF6319" },
+            { route: "D", destination: "Coney Island", minutes_until_arrival: 23, color: "#FF6319" },
+          ]}
+        ></Countdown>
       </div>
-      <div className="col-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <div className="flex h-20 flex-row items-center rounded-lg bg-red-600 px-2">
-          <h1 className="text-base font-black text-white lg:text-5xl">Service Disruptions</h1>
+      <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
+        <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
+          <h1 className="mx-2 text-base font-black text-white lg:text-4xl">Service Disruptions</h1>
         </div>
-        <div className="flex w-full grow flex-row items-center justify-center rounded-lg bg-slate-100 p-4">
-          <h1 className="h-full text-6xl font-bold">
-            {"Southbound "}
-            <div
-              className="mx-2 inline-flex aspect-square h-[70px] flex-row items-center justify-center rounded-full align-middle"
-              style={{ backgroundColor: `#EE352E` }}
-            >
-              <h1 className="items-center justify-center align-middle text-[44px] text-white">{"1"}</h1>
+        <div className="flex w-full grow flex-row rounded-lg bg-slate-100 p-2">
+          <h1 className="line-clamp-4 text-5xl font-bold leading-[1.275]">
+            <div className="mx-1 inline-flex">
+              <Bullet route={"1"} color={"#EE352E"} size={48} />
             </div>
-            <div
-              className="mx-2 inline-flex aspect-square h-[70px] flex-row items-center justify-center rounded-full  align-middle"
-              style={{ backgroundColor: `#EE352E` }}
-            >
-              <h1 className="items-center justify-center align-middle text-[44px] text-white">{"2"}</h1>
+            <div className="mx-1 inline-flex">
+              <Bullet route={"2"} color={"#EE352E"} size={48} />
             </div>
-            <div
-              className="mx-2 inline-flex aspect-square h-[70px] flex-row items-center justify-center rounded-full  align-middle"
-              style={{ backgroundColor: `#EE352E` }}
-            >
-              <h1 className="items-center justify-center align-middle text-[44px] text-white">{"3"}</h1>
+            <div className="mx-1 inline-flex">
+              <Bullet route={"3"} color={"#EE352E"} size={48} />
             </div>
-            {" trains are moving at slower speeds near 231 St while we address signal malfunction near that station."}
+            {" trains are suspended in both directions while we address a derailment near 96 St."}
           </h1>
         </div>
       </div>
-      <div className="row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
+      <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
         <div className="flex h-14 w-full flex-row items-center rounded-lg bg-emerald-700 px-2">
           <h1 className="text-base font-black text-white lg:text-3xl">Paul Av / W 205 St</h1>
         </div>

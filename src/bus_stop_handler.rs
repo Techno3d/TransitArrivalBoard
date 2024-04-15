@@ -1,7 +1,13 @@
 use time::{Date, OffsetDateTime, Time, UtcOffset};
 
 use crate::{siri_structs::BusData, Stop, Vehicle};
-use std::{cmp::Ordering, collections::HashMap, ops::Sub, sync::Arc, time::{SystemTime, UNIX_EPOCH}};
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    ops::Sub,
+    sync::Arc,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {

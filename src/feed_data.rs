@@ -8,14 +8,16 @@ use crate::{gtfsrt, mercury::MercuryDelays};
 // No bus because bus api can be queried per stop
 #[derive(Default)]
 pub struct FeedData {
-    pub subway_feed: Vec<gtfsrt::FeedMessage>,   
+    pub subway_feed: Vec<gtfsrt::FeedMessage>,
     pub delays_feed: MercuryDelays,
     pub static_gtfs: Gtfs,
 }
 
 impl FeedData {
     pub fn new() -> Self {
-        FeedData { ..Default::default() }
+        FeedData {
+            ..Default::default()
+        }
     }
 
     pub fn refresh_feeds(&mut self) {
@@ -56,7 +58,10 @@ impl FeedData {
 
     /// Use sparingly, the static only updates a few times a year and is a big file
     pub fn refresh_static_gtfs(&mut self) {
-        let resp = minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip").send().unwrap();
+        let resp =
+            minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip")
+                .send()
+                .unwrap();
         let bytes = resp.as_bytes();
         let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
             Ok(a) => a,

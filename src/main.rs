@@ -27,14 +27,17 @@ fn main() {
 
             let config: Result<Conf, serde_json::Error> = match ws.read() {
                 Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()),
-                Err(_) => Ok(Conf::new(vec![], vec![], ServiceAlertsConf::new(12))),
+                Err(_) => Ok(Conf::new(vec![], vec![], ServiceAlertsConf::new(1))),
             };
             let config: Conf = match config {
                 Ok(a) => a,
                 Err(_) => {
-                    _ =  ws.close(Some(CloseFrame { code: CloseCode::Error, reason: "The config that was sent is malformed".into() }));
+                    _ = ws.close(Some(CloseFrame {
+                        code: CloseCode::Error,
+                        reason: "The config that was sent is malformed".into(),
+                    }));
                     return;
-                }, // Just close connection on incorrect data
+                } // Just close connection on incorrect data
             };
 
             let data = Arc::new(RwLock::new(FeedData::default()));

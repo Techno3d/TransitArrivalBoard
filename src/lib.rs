@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+pub mod bus_stop_handler;
 pub mod config;
+pub mod delay;
+pub mod feed_data;
 pub mod lines;
 pub mod mercury;
 pub mod siri_structs;
 pub mod subway_stop_handler;
-pub mod bus_stop_handler;
-pub mod delay;
-pub mod feed_data;
 pub mod gtfsrt {
     include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
