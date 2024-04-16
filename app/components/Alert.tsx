@@ -1,26 +1,23 @@
 import Image from "next/image";
 import React from "react";
+import Logo from "../../public/logo.png";
 import { Bullet } from "./Bullet";
 import { Title } from "./Title";
 
-export function Alert(props: { name: string; header: string; routes: { [key: string]: { color: string } } }) {
+export function Alert(props: { name: string; header: string; routes: { [key: string]: { [key: string]: string } } }) {
   let name = props.name;
-  let header = props.header;
+  let header = props.header.split(/(\[.*?\])/);
   let routes = props.routes;
-  let parsed_header = header.split(/(\[.*?\])/);
-
-  let temp = new Array<any>();
-
-  parsed_header.map((text) => {
+  let header_mapped = header.map((text, index) => {
+    if (text.length === 0) return;
     if (text.charAt(0) === "[" && text.charAt(text.length - 1) === "]") {
-      temp.push(
-        <div className="mx-1 inline-flex -translate-y-[6px]" key={1}>
-          <Bullet route={text.charAt(1)} color={routes[text.charAt(1)].color} size={48} />
-        </div>,
+      return (
+        <div className="mx-1 inline-flex -translate-y-1" key={index}>
+          <Bullet route={text.charAt(1)} color={routes[text.charAt(1)].route_color} size={36} />
+        </div>
       );
-    } else {
-      temp.push(text);
     }
+    return text;
   });
 
   return (
@@ -28,20 +25,18 @@ export function Alert(props: { name: string; header: string; routes: { [key: str
       <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
         <Title name={name}></Title>
       </div>
-      <div className="flex w-full grow flex-row rounded-lg bg-slate-100 p-2">
-        <h1 className="line-clamp-4 text-5xl font-bold">{temp}</h1>
+      <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
+        {props.header ? (
+          <h1 className="line-clamp-3 text-4xl font-semibold leading-relaxed">{header_mapped}</h1>
+        ) : (
+          <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No service disruptions</h1>
+        )}
       </div>
       <div className="flex h-14 flex-row items-center rounded-lg bg-slate-800">
         <h1 className="mx-2 text-base font-bold text-white lg:text-3xl">
           {"Made with ❤️ by "}
           <span className="inline-flex items-baseline">
-            <Image
-              src="https://cdn.discordapp.com/icons/1031746725817368676/ac3bfe2c8dd9b89729974f3c5888f99c"
-              alt=""
-              className="mx-1 self-center rounded-full"
-              height={32}
-              width={32}
-            />
+            <Image src={Logo} alt="" className="mx-1 self-center rounded-full" height={32} width={32} />
             <span>Transit Club</span>
           </span>
           {" ("}

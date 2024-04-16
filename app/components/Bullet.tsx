@@ -6,7 +6,7 @@ export function Bullet(props: { route: string; color: string; size: number }) {
     <span
       className="flex aspect-square items-center justify-center rounded-full"
       style={{
-        backgroundColor: `${color}`,
+        backgroundColor: `#${color}`,
         height: `${size}px`,
       }}
     >

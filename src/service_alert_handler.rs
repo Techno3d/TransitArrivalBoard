@@ -52,7 +52,7 @@ impl ServiceAlertHandler {
                                 .text
                                 .as_ref()
                                 .unwrap()
-                                .clone(),
+                                .to_owned(),
                             None => "".to_owned(),
                         },
                     });

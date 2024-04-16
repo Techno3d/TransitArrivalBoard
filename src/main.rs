@@ -6,6 +6,7 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
 
+use gtfs_structures::Route;
 use serde::{Deserialize, Serialize};
 use transit_board::config::Config;
 use transit_board::feed_handler::FeedHandler;
@@ -21,13 +22,13 @@ fn main() {
     let server = TcpListener::bind("0.0.0.0:9001").unwrap();
 
     for stream in server.incoming() {
-        let api_key_bus = api_key_bus.clone();
+        let api_key_bus = api_key_bus.to_owned();
         let handle = thread::spawn(move || {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
             let config: Result<Config, serde_json::Error> = match ws.read() {
                 Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()),
-                Err(_) => Ok(Config::new(vec![], vec![])),
+                Err(_) => Ok(Config::new(Vec::new(), Vec::new())),
             };
             let config: Config = match config {
                 Ok(a) => a,
@@ -43,23 +44,20 @@ fn main() {
             let data = Arc::new(RwLock::new(FeedHandler::default()));
             data.write().unwrap().refresh_static_gtfs();
 
-            let mut subway = config.get_subway_handlers(data.clone());
-            let mut bus = config.get_bus_handlers(api_key_bus.clone());
-            let mut service_alerts = config.get_service_alerts_handler(data.clone());
-
-            let mut subway_map: HashMap<String, Stop> = HashMap::new();
-            let mut bus_map: HashMap<String, Stop> = HashMap::new();
-            let mut service_alerts_vec: Vec<Disruption> = Vec::new();
+            let mut subway = config.get_subway_handlers(data.to_owned());
+            let mut bus = config.get_bus_handlers(api_key_bus.to_owned());
+            let mut service_alerts = config.get_service_alerts_handler(data.to_owned());
 
             loop {
                 if !ws.can_write() {
                     break;
                 }
-                subway_map.clear();
-                bus_map.clear();
-                service_alerts_vec.clear();
+
+                let mut subway_map: HashMap<String, Stop> = HashMap::new();
+                let mut bus_map: HashMap<String, Stop> = HashMap::new();
 
                 data.write().unwrap().refresh_feeds();
+
                 for i in 0..subway.len() {
                     subway.get_mut(i).unwrap().refresh();
                     subway_map.insert(
@@ -90,12 +88,12 @@ fn main() {
                 }
 
                 service_alerts.refresh();
-                let service_alerts_vec = service_alerts.subway.to_owned();
 
                 let data = InfoJson {
-                    subway: subway_map.clone(),
-                    bus: bus_map.clone(),
-                    service_alerts: service_alerts_vec.clone(),
+                    subway: subway_map.to_owned(),
+                    bus: bus_map.to_owned(),
+                    service_alerts: service_alerts.subway.to_owned(),
+                    routes: data.read().unwrap().gtfs_static_feed.routes.to_owned(),
                 };
 
                 let data = serde_json::to_string(&data).unwrap();
@@ -106,7 +104,7 @@ fn main() {
                     Err(_) => break,
                 };
 
-                thread::sleep(Duration::from_secs(30));
+                thread::sleep(Duration::from_secs(5));
             }
         });
 
@@ -119,4 +117,5 @@ struct InfoJson {
     subway: HashMap<String, Stop>,
     bus: HashMap<String, Stop>,
     service_alerts: Vec<Disruption>,
+    routes: HashMap<String, Route>,
 }

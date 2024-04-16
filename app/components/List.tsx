@@ -2,9 +2,9 @@ import React, { ReactNode } from "react";
 import { Vehicle } from "../types";
 import { Title } from "./Title";
 
-export function List(props: { name: string; routes: { [key: string]: { [key: string]: Array<Vehicle> } } }) {
+export function List(props: { name: string; vehicles: { [key: string]: { [key: string]: Array<Vehicle> } } }) {
   let name = props.name;
-  let routes = props.routes;
+  let routes = props.vehicles;
   let displays: Array<ReactNode> = [];
 
   let i = 0;
@@ -23,12 +23,15 @@ export function List(props: { name: string; routes: { [key: string]: { [key: str
               <h1 className="font-semibold lg:text-2xl">min</h1>
             </div>
           </div>
-          {vehicles[1] ? (
-            <div className="flex h-full w-1/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-6xl">{vehicles[1].minutes_until_arrival}</h1>
-              <h1 className="font-semibold lg:text-2xl ">min</h1>
-            </div>
-          ) : undefined}
+
+          <div className="flex h-full w-1/4 flex-col items-center justify-center">
+            {vehicles[1] ? (
+              <React.Fragment>
+                <h1 className="font-black lg:text-6xl">{vehicles[1].minutes_until_arrival}</h1>
+                <h1 className="font-semibold lg:text-2xl ">min</h1>
+              </React.Fragment>
+            ) : undefined}
+          </div>
         </div>,
       );
       i++;

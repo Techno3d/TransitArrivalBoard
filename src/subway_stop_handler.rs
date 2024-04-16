@@ -19,14 +19,15 @@ impl SubwayStopHandler {
         Self {
             stop_ids,
             walk_time,
-            trips: vec![],
+            trips: Vec::new(),
             routes: HashMap::new(),
             feed_data,
         }
     }
 
     pub fn refresh(&mut self) {
-        self.trips.clear();
+        self.trips = Vec::new();
+        self.routes = HashMap::new();
 
         let data = self.feed_data.read().unwrap();
         for message in data.subway_feed.iter() {

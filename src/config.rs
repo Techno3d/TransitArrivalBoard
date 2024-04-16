@@ -30,14 +30,16 @@ impl Config {
     ) -> Vec<SubwayStopHandler> {
         self.subway
             .iter()
-            .map(|x| SubwayStopHandler::new(x.stop_ids.clone(), x.walk_time, feed_data.clone()))
+            .map(|x| {
+                SubwayStopHandler::new(x.stop_ids.to_owned(), x.walk_time, feed_data.to_owned())
+            })
             .collect()
     }
 
     pub fn get_bus_handlers(&self, api_key: Arc<String>) -> Vec<BusStopHandler> {
         self.bus
             .iter()
-            .map(|x| BusStopHandler::new(api_key.clone(), x.stop_ids.clone(), 0))
+            .map(|x| BusStopHandler::new(api_key.to_owned(), x.stop_ids.to_owned(), 0))
             .collect()
     }
 

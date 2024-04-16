@@ -5,10 +5,6 @@ module.exports = {
         protocol: "https",
         hostname: "avatars.githubusercontent.com",
       },
-      {
-        protocol: "https",
-        hostname: "cdn.discordapp.com",
-      },
     ],
   },
 };
