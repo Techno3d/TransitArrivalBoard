@@ -4,13 +4,13 @@ export function Bullet(props: { route: string; color: string; size: number }) {
   let size = props.size;
   return (
     <span
-      className="inline-flex aspect-square items-center justify-center rounded-full"
+      className="flex aspect-square items-center justify-center rounded-full"
       style={{
         backgroundColor: `${color}`,
         height: `${size}px`,
       }}
     >
-      <h1 className="text-center align-middle font-bold text-white" style={{ fontSize: `${size * 0.65}px` }}>
+      <h1 className="text-center font-bold text-white" style={{ fontSize: `${size * 0.65}px` }}>
         {route}
       </h1>
     </span>

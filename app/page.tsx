@@ -1,7 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { Bullet } from "./components/Bullet";
+import { Alert } from "./components/Alert";
 import { Countdown } from "./components/Countdown";
 import { List } from "./components/List";
 
@@ -52,6 +51,7 @@ export default function Home() {
     };
   });
   */
+
   let paul = {
     Bx10: {
       Norwood: [
@@ -127,61 +127,13 @@ export default function Home() {
         ></Countdown>
       </div>
       <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
-          <h1 className="mx-2 text-base font-black text-white lg:text-4xl">Service Disruptions</h1>
-        </div>
-        <div className="flex w-full grow flex-row rounded-lg bg-slate-100 p-2">
-          <h1 className="line-clamp-3 text-5xl font-bold leading-[1.275]">
-            <div className="mx-1 inline-flex">
-              <Bullet route={"1"} color={"#EE352E"} size={48} />
-            </div>
-            <div className="mx-1 inline-flex">
-              <Bullet route={"2"} color={"#EE352E"} size={48} />
-            </div>
-            <div className="mx-1 inline-flex">
-              <Bullet route={"3"} color={"#EE352E"} size={48} />
-            </div>
-            {" trains are suspended in both directions while we address a derailment near 96 St."}
-          </h1>
-        </div>
-        <div className="flex h-14 flex-row items-center rounded-lg bg-slate-800">
-          <h1 className="mx-2 text-base font-bold text-white lg:text-3xl">
-            {"Made with ❤️ by "}
-            <span className="inline-flex items-baseline">
-              <Image
-                src="https://cdn.discordapp.com/icons/1031746725817368676/ac3bfe2c8dd9b89729974f3c5888f99c"
-                alt=""
-                className="mx-1 self-center rounded-full"
-                height={32}
-                width={32}
-              />
-              <span>Transit Club</span>
-            </span>
-            {" ("}
-            <span className="inline-flex items-baseline">
-              <Image
-                src="https://avatars.githubusercontent.com/u/76977073?"
-                alt=""
-                className="mx-1 self-center rounded-full"
-                height={32}
-                width={32}
-              />
-              <span>Shadman Syed</span>
-              {", "}
-            </span>
-            <span className="inline-flex items-baseline">
-              <Image
-                src="https://avatars.githubusercontent.com/u/95447323?"
-                alt=""
-                className="mx-1 self-center rounded-full"
-                height={32}
-                width={32}
-              />
-              <span>David Wang</span>
-            </span>
-            {")"}
-          </h1>
-        </div>
+        <Alert
+          name={"Service Disruptions"}
+          header={
+            "Northbound [4][5] trains are running with delays after EMS responded to someone in need of medical assistance on a train at 125 St. Take the [6] train at this time."
+          }
+          routes={{ "4": { color: "#00933C" }, "5": { color: "#00933C" }, "6": { color: "#00933C" } }}
+        />
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
         <List name={"Paul Av / W 205 St"} routes={paul}></List>
