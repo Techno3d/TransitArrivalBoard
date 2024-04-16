@@ -32,6 +32,8 @@ impl FeedHandler {
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
         ];
 
+        self.subway_feed.clear();
+
         for uri in feed_uris {
             let resp = minreq::get(uri).send().unwrap();
             let bytes = resp.as_bytes();
