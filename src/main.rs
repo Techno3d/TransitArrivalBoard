@@ -48,13 +48,16 @@ fn main() {
             let mut bus = config.get_bus_handlers(api_key_bus.to_owned());
             let mut service_alerts = config.get_service_alerts_handler(data.to_owned());
 
+            let mut subway_map: BTreeMap<String, Stop> = BTreeMap::new();
+            let mut bus_map: BTreeMap<String, Stop> = BTreeMap::new();
+
             loop {
                 if !ws.can_write() {
                     break;
                 }
 
-                let mut subway_map: BTreeMap<String, Stop> = BTreeMap::new();
-                let mut bus_map: BTreeMap<String, Stop> = BTreeMap::new();
+                subway_map.clear();
+                bus_map.clear();
 
                 data.write().unwrap().refresh_feeds();
 

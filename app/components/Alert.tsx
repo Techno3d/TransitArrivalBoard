@@ -10,37 +10,36 @@ export function Alert(props: {
   routes: { [key: string]: { [key: string]: string } };
 }) {
   const [index, setIndex] = useState(0);
-  const [length, setLength] = useState(0);
 
   let name = props.name;
   let headers = props.headers;
   let routes = props.routes;
 
   useEffect(() => {
-    setLength(headers.length);
-
-    if (length === 0) {
-      setIndex(0);
-    }
-
-    const loop = setInterval(() => setIndex((i) => (((i + 1) % length) + length) % length), 5000);
+    const loop = setInterval(() => {
+      if (headers.length === 0) {
+        setIndex(0);
+        return;
+      }
+      setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
+    }, 5000);
 
     return () => {
       clearInterval(loop);
     };
-  }, [length, index, headers.length]);
+  }, [headers, headers.length, index]);
 
   return (
     <React.Fragment>
       <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
-        {length !== 0 ? (
+        {headers.length > 0 ? (
           <Title name={name + " (" + (index + 1) + "/" + headers.length + ")"}></Title>
         ) : (
           <Title name={name}></Title>
         )}
       </div>
 
-      {length !== 0 ? (
+      {headers.length > 0 ? (
         <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
           <h1 className="line-clamp-3 text-4xl font-semibold leading-relaxed">
             {headers[index].split(/(\[.*?\])/).map((text) => {

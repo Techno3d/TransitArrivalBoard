@@ -32,7 +32,7 @@ impl FeedHandler {
             "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs",
         ];
 
-        self.subway_feed = Vec::new();
+        self.subway_feed.clear();
         self.service_alerts_feed = Default::default();
 
         for uri in feed_uris {

@@ -31,8 +31,8 @@ impl BusStopHandler {
 
     // Support for stops that are broken into dir 1 and dir 2
     pub fn refresh(&mut self) {
-        self.trips = Vec::new();
-        self.routes = BTreeMap::new();
+        self.trips.clear();
+        self.routes.clear();
 
         let ids = self.stop_ids.to_owned();
         let time_now = SystemTime::now()

@@ -27,8 +27,8 @@ impl SubwayStopHandler {
     }
 
     pub fn refresh(&mut self) {
-        self.trips = Vec::new();
-        self.routes = BTreeMap::new();
+        self.trips.clear();
+        self.routes.clear();
 
         let data = self.feed_data.read().unwrap();
         for message in data.subway_feed.iter() {
