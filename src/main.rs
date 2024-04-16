@@ -1,6 +1,6 @@
 mod siri_structs;
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::net::TcpListener;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -53,8 +53,8 @@ fn main() {
                     break;
                 }
 
-                let mut subway_map: HashMap<String, Stop> = HashMap::new();
-                let mut bus_map: HashMap<String, Stop> = HashMap::new();
+                let mut subway_map: BTreeMap<String, Stop> = BTreeMap::new();
+                let mut bus_map: BTreeMap<String, Stop> = BTreeMap::new();
 
                 data.write().unwrap().refresh_feeds();
 
@@ -104,7 +104,7 @@ fn main() {
                     Err(_) => break,
                 };
 
-                thread::sleep(Duration::from_secs(5));
+                thread::sleep(Duration::from_secs(30));
             }
         });
 
@@ -114,8 +114,8 @@ fn main() {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
-    subway: HashMap<String, Stop>,
-    bus: HashMap<String, Stop>,
+    subway: BTreeMap<String, Stop>,
+    bus: BTreeMap<String, Stop>,
     service_alerts: Vec<Disruption>,
     routes: HashMap<String, Route>,
 }

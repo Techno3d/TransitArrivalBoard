@@ -58,7 +58,7 @@ export default function Home() {
       console.log(concourseData);
       setConcourseTimes(concourseData);
 
-      const serviceData: string = message["service_alerts"][5]["header"];
+      const serviceData: string = message["service_alerts"][message["service_alerts"].length - 1]["header"];
       console.log(serviceData);
       setServiceAlerts(serviceData);
 

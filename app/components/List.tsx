@@ -7,12 +7,10 @@ export function List(props: { name: string; vehicles: { [key: string]: { [key: s
   let routes = props.vehicles;
   let displays: Array<ReactNode> = [];
 
-  let i = 0;
-
   Object.values(routes).forEach((destinations) => {
-    Object.values(destinations).map((vehicles) => {
+    Object.values(destinations).forEach((vehicles, index) => {
       displays.push(
-        <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500" key={i}>
+        <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500" key={index}>
           <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
             <div className="flex h-full w-3/4 flex-col items-center justify-center">
               <h1 className="font-black lg:text-6xl">{vehicles[0].route}</h1>
@@ -34,7 +32,6 @@ export function List(props: { name: string; vehicles: { [key: string]: { [key: s
           </div>
         </div>,
       );
-      i++;
     });
   });
 

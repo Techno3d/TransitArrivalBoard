@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -23,7 +23,7 @@ pub struct Vehicle {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stop {
     pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+    pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
     pub walk_time: i32,
 }
 

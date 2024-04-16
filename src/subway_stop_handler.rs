@@ -1,5 +1,6 @@
 use std::{
-    collections::HashMap,
+    cmp::Ordering,
+    collections::BTreeMap,
     sync::{Arc, RwLock},
     time::{SystemTime, UNIX_EPOCH},
 };
@@ -10,7 +11,7 @@ pub struct SubwayStopHandler {
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
     pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+    pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
     feed_data: Arc<RwLock<FeedHandler>>,
 }
 
@@ -20,14 +21,14 @@ impl SubwayStopHandler {
             stop_ids,
             walk_time,
             trips: Vec::new(),
-            routes: HashMap::new(),
+            routes: BTreeMap::new(),
             feed_data,
         }
     }
 
     pub fn refresh(&mut self) {
         self.trips = Vec::new();
-        self.routes = HashMap::new();
+        self.routes = BTreeMap::new();
 
         let data = self.feed_data.read().unwrap();
         for message in data.subway_feed.iter() {
@@ -81,7 +82,7 @@ impl SubwayStopHandler {
                             });
 
                             if !self.routes.contains_key(route_id) {
-                                self.routes.insert(route_id.to_owned(), HashMap::new());
+                                self.routes.insert(route_id.to_owned(), BTreeMap::new());
                             }
 
                             if !self
@@ -111,6 +112,16 @@ impl SubwayStopHandler {
                 }
             }
         }
+
+        self.trips.sort_by(|x, y| {
+            if x.minutes_until_arrival > y.minutes_until_arrival {
+                return Ordering::Greater;
+            }
+            if x.minutes_until_arrival < y.minutes_until_arrival {
+                return Ordering::Less;
+            }
+            Ordering::Equal
+        });
     }
 
     pub fn serialize(&self) -> Stop {

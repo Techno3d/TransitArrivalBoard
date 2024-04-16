@@ -25,13 +25,17 @@ export function Alert(props: { name: string; header: string; routes: { [key: str
       <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
         <Title name={name}></Title>
       </div>
-      <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
-        {props.header ? (
+
+      {props.header ? (
+        <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
           <h1 className="line-clamp-3 text-4xl font-semibold leading-relaxed">{header_mapped}</h1>
-        ) : (
+        </div>
+      ) : (
+        <div className="flex w-full grow flex-row items-center rounded-lg bg-slate-100">
           <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No service disruptions</h1>
-        )}
-      </div>
+        </div>
+      )}
+
       <div className="flex h-14 flex-row items-center rounded-lg bg-slate-800">
         <h1 className="mx-2 text-base font-bold text-white lg:text-3xl">
           {"Made with ❤️ by "}

@@ -3,7 +3,7 @@ use time::{Date, OffsetDateTime, Time, UtcOffset};
 use crate::{siri_structs::BusData, Stop, Vehicle};
 use std::{
     cmp::Ordering,
-    collections::HashMap,
+    collections::BTreeMap,
     ops::Sub,
     sync::Arc,
     time::{SystemTime, UNIX_EPOCH},
@@ -15,7 +15,7 @@ pub struct BusStopHandler {
     pub stop_ids: Vec<String>,
     pub walk_time: i32,
     pub trips: Vec<Vehicle>,
-    pub routes: HashMap<String, HashMap<String, Vec<Vehicle>>>,
+    pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
 }
 
 impl BusStopHandler {
@@ -25,14 +25,14 @@ impl BusStopHandler {
             stop_ids,
             walk_time,
             trips: Vec::new(),
-            routes: HashMap::new(),
+            routes: BTreeMap::new(),
         }
     }
 
     // Support for stops that are broken into dir 1 and dir 2
     pub fn refresh(&mut self) {
         self.trips = Vec::new();
-        self.routes = HashMap::new();
+        self.routes = BTreeMap::new();
 
         let ids = self.stop_ids.to_owned();
         let time_now = SystemTime::now()
@@ -180,7 +180,7 @@ impl BusStopHandler {
                 });
 
                 if !self.routes.contains_key(route_id) {
-                    self.routes.insert(route_id.to_owned(), HashMap::new());
+                    self.routes.insert(route_id.to_owned(), BTreeMap::new());
                 }
 
                 if !self
