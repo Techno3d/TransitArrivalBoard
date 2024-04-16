@@ -23,6 +23,7 @@ impl ServiceAlertHandler {
     }
 
     pub fn refresh(&mut self) {
+        self.subway.clear();
         let data = self.feed_data.read().unwrap();
         for entity in &data.service_alerts_feed.entity {
             let alert = entity.alert.as_ref().unwrap();
