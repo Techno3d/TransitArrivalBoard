@@ -1,15 +1,16 @@
 # Transit Arrival Board
 
-A hobby project that uses the MTA bus and subway APIs to get realtime transit info about public transit near Bronx Science
+A hobby project that uses the MTA's GTFS static and realtime feeds to get realtime transit info about public transit near our high school, The Bronx High School of Science.
 
-Code quality is not the best but I made do with what I knew.
+## Build Instructions
 
-## How to build
+### API Keys
 
-You need to make a .env file.
+Get a BusTime API key from the MTA [here](http://www.bustime.mta.info/wiki/Developers/Index) and add it to a `.env` file with the following key:
+`MTABUSKEY=""`
 
-MTABUSKEY=your-bus-api-key
+### Dependencies
 
-The MTA bus api key can be gotten at the mta bustime developer page [here](http://www.bustime.mta.info/wiki/Developers/Index)
-
-You will also need the protoc compiler added to your path, which can be found in the protobuf repository.
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Node.js](https://nodejs.org/en/download)
+- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
