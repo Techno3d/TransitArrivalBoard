@@ -9,10 +9,10 @@ import { Vehicle } from "./types";
 export default function Home() {
   const [jeromeTimes, setJeromeTimes] = useState<Array<Vehicle>>([]);
   const [concourseTimes, setConcourseTimes] = useState<Array<Vehicle>>([]);
-  const [serviceAlerts, setServiceAlerts] = useState<string>("");
+  const [serviceAlerts, setServiceAlerts] = useState<Array<string>>([]);
   const [routes, setRoutes] = useState<{ [key: string]: { [key: string]: string } }>({});
   const [paulTimes, setPaulTimes] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
-  const [w205stTimes, setW205StTimes] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
+  const [w205Times, setW205Times] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
@@ -41,38 +41,41 @@ export default function Home() {
     };
 
     ws.onopen = () => {
-      console.log("WebSocket opened.");
+      console.log("Websocket opened.");
       ws.send(JSON.stringify(config));
     };
 
     ws.onmessage = (event) => {
       console.log("Message recieved.");
       const message = JSON.parse(event.data);
-      console.log(message);
 
       const jeromeData: Vehicle[] = message["subway"]["405S"]["trips"];
-      console.log(jeromeData);
       setJeromeTimes(jeromeData);
 
       const concourseData: Vehicle[] = message["subway"]["D03S"]["trips"];
-      console.log(concourseData);
       setConcourseTimes(concourseData);
 
-      const serviceData: string = message["service_alerts"][message["service_alerts"].length - 1]["header"];
-      console.log(serviceData);
-      setServiceAlerts(serviceData);
+      const delayData: Array<string> = [];
+
+      const serviceData: Array<{ route: string; priority: number; header: string }> = message["service_alerts"];
+      serviceData
+        .slice()
+        .reverse()
+        .forEach((alert) => {
+          if (delayData.indexOf(alert.header) !== -1) return;
+          if (alert.priority < 22) return;
+          delayData.push(alert.header);
+        });
+      setServiceAlerts(delayData);
 
       const routeData: { [key: string]: { [key: string]: string } } = message["routes"];
-      console.log(routeData);
       setRoutes(routeData);
 
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100017"]["routes"];
-      console.log(paulData);
       setPaulTimes(paulData);
 
       const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100723"]["routes"];
-      console.log(w205stData);
-      setW205StTimes(w205stData);
+      setW205Times(w205stData);
     };
 
     ws.onerror = (error) => {
@@ -84,7 +87,7 @@ export default function Home() {
     };
 
     return () => {
-      console.log("I want to close!");
+      console.log("Websocket closing.");
       ws.close();
     };
   }, []);
@@ -96,11 +99,11 @@ export default function Home() {
         <Countdown name={"Bedford Park Blvd / Grand Concourse"} vehicles={concourseTimes} routes={routes}></Countdown>
       </div>
       <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Alert name={"Service Disruptions"} header={serviceAlerts} routes={routes} />
+        <Alert name={"Service Disruptions"} headers={serviceAlerts} routes={routes} />
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
         <List name={"Paul Av / W 205 St"} vehicles={paulTimes}></List>
-        <List name={"W 205 St / Paul Av"} vehicles={w205stTimes}></List>
+        <List name={"W 205 St / Paul Av"} vehicles={w205Times}></List>
       </div>
     </div>
   );

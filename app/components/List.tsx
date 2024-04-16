@@ -8,9 +8,9 @@ export function List(props: { name: string; vehicles: { [key: string]: { [key: s
   let displays: Array<ReactNode> = [];
 
   Object.values(routes).forEach((destinations) => {
-    Object.values(destinations).forEach((vehicles, index) => {
+    Object.values(destinations).forEach((vehicles) => {
       displays.push(
-        <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500" key={index}>
+        <div className="flex w-full grow flex-row items-center rounded-lg bg-blue-500" key={Math.random()}>
           <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
             <div className="flex h-full w-3/4 flex-col items-center justify-center">
               <h1 className="font-black lg:text-6xl">{vehicles[0].route}</h1>
