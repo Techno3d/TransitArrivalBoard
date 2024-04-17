@@ -69,8 +69,8 @@ export default function Home() {
         });
       setServiceAlerts(delayData);
 
-      if (serviceData.length > 0) {
-        setIndex((i) => ((i % serviceData.length) + serviceData.length) % serviceData.length);
+      if (delayData.length > 0) {
+        setIndex((i) => ((i % delayData.length) + delayData.length) % delayData.length);
       } else {
         setIndex(0);
       }

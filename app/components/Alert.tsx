@@ -18,7 +18,7 @@ export function Alert(props: {
   return (
     <React.Fragment>
       <div className="flex h-14 flex-row items-center rounded-lg bg-red-600">
-        {headers.length > 1 ? (
+        {headers.length > 0 ? (
           <Title name={name + " (" + (index + 1) + "/" + headers.length + ")"}></Title>
         ) : (
           <Title name={name}></Title>
