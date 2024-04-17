@@ -19,3 +19,6 @@ gtfs-structures = { version="0.41.2", default-features=false, features=[] }
 
 [build-dependencies]
 prost-build = { version = "0.12.3" }
+
+[lints.rust]
+unsafe_code = "forbid"

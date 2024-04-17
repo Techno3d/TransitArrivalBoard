@@ -30,16 +30,13 @@ impl ServiceAlertHandler {
             let alert = entity.alert.as_ref().unwrap();
             for informed in alert.informed_entity.as_ref().unwrap().iter() {
                 if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
-                    let decomposed: Vec<&str> = selector.sort_order.split(":").collect();
+                    let decomposed: Vec<&str> = selector.sort_order.split(':').collect();
                     let line = informed.route_id.as_ref().unwrap();
-                    let gtfs_route = match data.gtfs_static_feed.get_route(&line) {
+                    let gtfs_route = match data.gtfs_static_feed.get_route(line) {
                         Ok(a) => a.short_name.as_ref().unwrap(),
                         Err(_) => return,
                     };
-                    let severity = match (*decomposed.get(2).unwrap()).parse() {
-                        Ok(x) => x,
-                        Err(_) => 0,
-                    };
+                    let severity = (*decomposed.get(2).unwrap()).parse().unwrap_or(0);
 
                     self.subway.push(Disruption {
                         route: gtfs_route.to_string(),
@@ -49,7 +46,7 @@ impl ServiceAlertHandler {
                                 .translation
                                 .as_ref()
                                 .unwrap()
-                                .get(0)
+                                .first()
                                 .unwrap()
                                 .text
                                 .as_ref()

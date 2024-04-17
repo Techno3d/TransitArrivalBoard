@@ -85,18 +85,18 @@ impl BusStopHandler {
                 let route_name = visit
                     .monitored_vehicle_journey
                     .published_line_name
-                    .get(0)
+                    .first()
                     .unwrap();
                 let route_id = visit
                     .monitored_vehicle_journey
                     .line_ref
-                    .split("_")
+                    .split('_')
                     .last()
                     .unwrap();
                 let destination_name = visit
                     .monitored_vehicle_journey
                     .destination_name
-                    .get(0)
+                    .first()
                     .unwrap()
                     .split(" via ")
                     .next()
@@ -104,7 +104,7 @@ impl BusStopHandler {
                 let destination_ref = visit
                     .monitored_vehicle_journey
                     .destination_ref
-                    .split("_")
+                    .split('_')
                     .last()
                     .unwrap();
                 let time = visit
@@ -121,28 +121,28 @@ impl BusStopHandler {
                 let mut min_away = 0;
                 // Let the cursed code begin
                 // Unwraps should be fine if the MTA doesn't change the time format they are using
-                if time != "Now".to_owned() {
-                    let mut thing = time.split(".");
-                    let mut time = thing.next().unwrap().split("T");
+                if time != *"Now" {
+                    let mut thing = time.split('.');
+                    let mut time = thing.next().unwrap().split('T');
                     // It is a limitation to hardcode this, but MTA is in eastern time so it will
                     // be either 5 (est) or 4 (edt)
                     let offset = if thing
                         .next()
                         .unwrap()
-                        .split("-")
+                        .split('-')
                         .last()
                         .unwrap()
-                        .contains("5")
+                        .contains('5')
                     {
                         5
                     } else {
                         4
                     };
-                    let day: Vec<&str> = time.next().unwrap().split("-").collect();
-                    let mut secs = time.next().unwrap().split(":");
+                    let day: Vec<&str> = time.next().unwrap().split('-').collect();
+                    let mut secs = time.next().unwrap().split(':');
                     let parse = day.get(1).unwrap().parse::<i32>();
                     let date = Date::from_calendar_date(
-                        day.get(0).unwrap().parse().unwrap(),
+                        day.first().unwrap().parse().unwrap(),
                         match parse.unwrap() {
                             1 => time::Month::January,
                             2 => time::Month::February,

@@ -27,7 +27,7 @@ fn main() {
             let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
             let config: Result<Config, serde_json::Error> = match ws.read() {
-                Ok(c) => serde_json::from_str(c.to_text().unwrap().as_ref()),
+                Ok(c) => serde_json::from_str(c.to_text().unwrap()),
                 Err(_) => Ok(Config::new(Vec::new(), Vec::new())),
             };
             let config: Config = match config {
@@ -64,14 +64,7 @@ fn main() {
                 for i in 0..subway.len() {
                     subway.get_mut(i).unwrap().refresh();
                     subway_map.insert(
-                        subway
-                            .get(i)
-                            .unwrap()
-                            .stop_ids
-                            .iter()
-                            .next()
-                            .unwrap()
-                            .to_owned(),
+                        subway.get(i).unwrap().stop_ids.first().unwrap().to_owned(),
                         subway.get(i).unwrap().serialize(),
                     );
                 }
@@ -79,13 +72,7 @@ fn main() {
                 for i in 0..bus.len() {
                     bus.get_mut(i).unwrap().refresh();
                     bus_map.insert(
-                        bus.get(i)
-                            .unwrap()
-                            .stop_ids
-                            .iter()
-                            .next()
-                            .unwrap()
-                            .to_string(),
+                        bus.get(i).unwrap().stop_ids.first().unwrap().to_string(),
                         bus.get(i).unwrap().serialize(),
                     );
                 }

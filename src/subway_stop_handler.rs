@@ -58,7 +58,7 @@ impl SubwayStopHandler {
                             };
                             // Parsing trip id for train name as defined in https://api.mta.info/GTFS.pdf
                             // Shouldn't break unless trip id is changed
-                            let trip_id = trip_update.trip.trip_id().split("_").last().unwrap();
+                            let trip_id = trip_update.trip.trip_id().split('_').last().unwrap();
                             let mut trip_id = trip_id.split("..");
                             let route_id = trip_id.next().unwrap();
                             let destination_id =
