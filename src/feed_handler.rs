@@ -36,7 +36,10 @@ impl FeedHandler {
         self.service_alerts_feed = Default::default();
 
         for uri in feed_uris {
-            let resp = minreq::get(uri).send().unwrap();
+            let resp = match minreq::get(uri).send() {
+                Ok(a) => a,
+                Err(_) => return,
+            };
             let bytes = resp.as_bytes();
             let feed = match gtfsrt::FeedMessage::decode(bytes) {
                 // if no data so abort
