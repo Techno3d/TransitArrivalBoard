@@ -16,7 +16,7 @@ export function Countdown(props: {
     return (
       <React.Fragment>
         <div className="flex h-14 flex-row items-center rounded-lg bg-emerald-700">{<Title name={name}></Title>}</div>
-        <div className="flex grow flex-row items-center">
+        <div className="flex grow basis-0 flex-row items-center">
           <div className="flex h-full w-full flex-row items-center rounded-lg bg-slate-100">
             <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No trains scheduled</h1>
           </div>
