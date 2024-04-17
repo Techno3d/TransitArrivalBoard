@@ -69,6 +69,12 @@ export default function Home() {
         });
       setServiceAlerts(delayData);
 
+      if (serviceAlerts.length === 0) {
+        setIndex(0);
+      } else {
+        setIndex((i) => ((i % serviceAlerts.length) + serviceAlerts.length) % serviceAlerts.length);
+      }
+
       const routeData: { [key: string]: { [key: string]: string } } = message["routes"];
       setRoutes(routeData);
 
@@ -91,7 +97,7 @@ export default function Home() {
       console.log("Websocket closing.");
       ws.close();
     };
-  }, []);
+  }, [serviceAlerts.length]);
 
   useEffect(() => {
     const loop = setInterval(() => {
