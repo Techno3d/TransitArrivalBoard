@@ -13,6 +13,7 @@ export default function Home() {
   const [routes, setRoutes] = useState<{ [key: string]: { [key: string]: string } }>({});
   const [paulTimes, setPaulTimes] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
   const [w205Times, setW205Times] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
@@ -92,6 +93,20 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const loop = setInterval(() => {
+      if (serviceAlerts.length === 0) {
+        setIndex(0);
+        return;
+      }
+      setIndex((i) => (((i + 1) % serviceAlerts.length) + serviceAlerts.length) % serviceAlerts.length);
+    }, 5000);
+
+    return () => {
+      clearInterval(loop);
+    };
+  }, [serviceAlerts.length]);
+
   return (
     <div className="grid min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
       <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
@@ -99,7 +114,7 @@ export default function Home() {
         <Countdown name={"Bedford Park Blvd / Grand Concourse"} vehicles={concourseTimes} routes={routes}></Countdown>
       </div>
       <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Alert name={"Service Disruptions"} headers={serviceAlerts} routes={routes} />
+        <Alert name={"Service Disruptions"} headers={serviceAlerts} routes={routes} index={index} />
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
         <List name={"Paul Av / W 205 St"} vehicles={paulTimes}></List>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Logo from "../../public/logo.png";
 import { Bullet } from "./Bullet";
 import { Title } from "./Title";
@@ -8,26 +8,12 @@ export function Alert(props: {
   name: string;
   headers: Array<string>;
   routes: { [key: string]: { [key: string]: string } };
+  index: number;
 }) {
-  const [index, setIndex] = useState(0);
-
   let name = props.name;
   let headers = props.headers;
   let routes = props.routes;
-
-  useEffect(() => {
-    const loop = setInterval(() => {
-      if (headers.length === 0) {
-        setIndex(0);
-        return;
-      }
-      setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
-    }, 5000);
-
-    return () => {
-      clearInterval(loop);
-    };
-  }, [headers, headers.length, index]);
+  let index = props.index;
 
   return (
     <React.Fragment>
