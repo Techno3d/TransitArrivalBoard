@@ -58,14 +58,15 @@ export default function Home() {
 
       const delayData: Array<string> = [];
 
-      const serviceData: Array<{ route: string; priority: number; header: string }> = message["service_alerts"];
+      const serviceData: Array<{ route_id: string; sort_order: number; header_text: string }> =
+        message["service_alerts"];
       serviceData
         .slice()
         .reverse()
         .forEach((alert) => {
-          if (delayData.indexOf(alert.header) !== -1) return;
-          if (alert.priority < 22) return;
-          delayData.push(alert.header);
+          if (delayData.indexOf(alert.header_text) !== -1) return;
+          if (alert.sort_order < 22) return;
+          delayData.push(alert.header_text);
         });
       setServiceAlerts(delayData);
 

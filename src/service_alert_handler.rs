@@ -34,9 +34,9 @@ impl ServiceAlertHandler {
           let severity = (decomposed.get(2).unwrap()).parse().unwrap_or(0);
 
           self.subway.push(Disruption {
-            route: informed.route_id.as_ref().unwrap().to_string(),
-            priority: severity,
-            header: match alert.header_text {
+            route_id: informed.route_id.as_ref().unwrap().to_string(),
+            sort_order: severity,
+            header_text: match alert.header_text {
               Some(ref a) => a
                 .translation
                 .as_ref()
@@ -53,10 +53,10 @@ impl ServiceAlertHandler {
         }
 
         self.subway.sort_by(|a, b| {
-          if a.priority > b.priority {
+          if a.sort_order > b.sort_order {
             return Ordering::Greater;
           }
-          if a.priority < b.priority {
+          if a.sort_order < b.sort_order {
             return Ordering::Less;
           }
           Ordering::Equal

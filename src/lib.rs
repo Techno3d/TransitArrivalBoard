@@ -15,8 +15,10 @@ pub mod gtfsrt {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Vehicle {
-  pub route: String,
-  pub destination: String,
+  pub route_id: String,
+  pub route_name: String,
+  pub destination_id: String,
+  pub destination_name: String,
   pub minutes_until_arrival: i32,
 }
 
@@ -29,7 +31,7 @@ pub struct Stop {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Disruption {
-  pub route: String,
-  pub priority: i32,
-  pub header: String,
+  pub route_id: String,
+  pub sort_order: i32,
+  pub header_text: String,
 }

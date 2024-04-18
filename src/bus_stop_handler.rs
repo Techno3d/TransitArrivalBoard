@@ -24,8 +24,8 @@ impl BusStopHandler {
   }
 
   pub fn refresh(&mut self) {
-    self.trips.clear();
-    self.routes.clear();
+    let mut trips: Vec<Vehicle> = Vec::new();
+    let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
     let current_time = Local::now();
 
@@ -87,39 +87,42 @@ impl BusStopHandler {
             .unwrap();
 
           // Input data into trips
-          self.trips.push(Vehicle {
-            route: route_name.to_owned(),
-            destination: destination_name.to_owned(),
+          trips.push(Vehicle {
+            route_id: route_id.to_owned(),
+            route_name: route_name.to_owned(),
+            destination_id: destination_id.to_owned(),
+            destination_name: destination_name.to_owned(),
             minutes_until_arrival: duration,
           });
 
           // Input data into routes
-          if !self.routes.contains_key(route_id) {
-            self.routes.insert(route_id.to_owned(), BTreeMap::new());
+          if !routes.contains_key(route_id) {
+            routes.insert(route_id.to_owned(), BTreeMap::new());
           }
-          if !self.routes.get(route_id).unwrap().contains_key(destination_id) {
-            self
-              .routes
+          if !routes.get(route_id).unwrap().contains_key(destination_id) {
+            routes
               .get_mut(route_id)
               .unwrap()
               .insert(destination_id.to_owned(), Vec::new());
           };
-          self
-            .routes
+
+          routes
             .get_mut(route_id)
             .unwrap()
             .get_mut(destination_id)
             .unwrap()
             .push(Vehicle {
-              route: route_name.to_owned(),
-              destination: destination_name.to_owned(),
+              route_id: route_id.to_owned(),
+              route_name: route_name.to_owned(),
+              destination_id: destination_id.to_owned(),
+              destination_name: destination_name.to_owned(),
               minutes_until_arrival: duration,
             });
         }
       }
     }
 
-    self.trips.sort_by(|a, b| {
+    trips.sort_by(|a, b| {
       if a.minutes_until_arrival > b.minutes_until_arrival {
         return Ordering::Greater;
       }
@@ -128,6 +131,9 @@ impl BusStopHandler {
       }
       Ordering::Equal
     });
+
+    self.trips = trips;
+    self.routes = routes;
   }
 
   pub fn serialize(&self) -> Stop {
@@ -138,5 +144,46 @@ impl BusStopHandler {
     }
   }
 
-  pub fn predict(&self) {}
+  pub fn predict(&mut self) {
+    self.routes.clear();
+
+    for trip in &mut self.trips {
+      trip.minutes_until_arrival -= 1;
+
+      if trip.minutes_until_arrival < 0 {
+        continue;
+      }
+
+      if !self.routes.contains_key(&trip.route_id) {
+        self.routes.insert(trip.route_id.to_owned(), BTreeMap::new());
+      }
+      if !self
+        .routes
+        .get(&trip.route_id)
+        .unwrap()
+        .contains_key(&trip.destination_id)
+      {
+        self
+          .routes
+          .get_mut(&trip.route_id)
+          .unwrap()
+          .insert(trip.destination_id.to_owned(), Vec::new());
+      };
+      self
+        .routes
+        .get_mut(&trip.route_id)
+        .unwrap()
+        .get_mut(&trip.destination_id)
+        .unwrap()
+        .push(Vehicle {
+          route_id: trip.route_id.to_owned(),
+          route_name: trip.route_name.to_owned(),
+          destination_id: trip.destination_id.to_owned(),
+          destination_name: trip.destination_name.to_owned(),
+          minutes_until_arrival: trip.minutes_until_arrival,
+        });
+    }
+
+    self.trips.retain(|a| a.minutes_until_arrival >= 0);
+  }
 }

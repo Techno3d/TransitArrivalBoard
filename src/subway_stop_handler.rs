@@ -27,6 +27,11 @@ impl SubwayStopHandler {
   }
 
   pub fn refresh(&mut self) {
+    if !self.feed_data.read().unwrap().subway_feed_success {
+      self.predict();
+      return;
+    }
+
     self.trips.clear();
     self.routes.clear();
 
@@ -71,8 +76,10 @@ impl SubwayStopHandler {
 
               // Input data into trips
               self.trips.push(Vehicle {
-                route: route_name.to_owned(),
-                destination: destination_name.to_owned(),
+                route_id: route_id.to_owned(),
+                route_name: route_name.to_owned(),
+                destination_id: destination_id.to_owned(),
+                destination_name: destination_name.to_owned(),
                 minutes_until_arrival: duration,
               });
 
@@ -94,8 +101,10 @@ impl SubwayStopHandler {
                 .get_mut(destination_id)
                 .unwrap()
                 .push(Vehicle {
-                  route: route_name.to_owned(),
-                  destination: destination_name.to_owned(),
+                  route_id: route_id.to_owned(),
+                  route_name: route_name.to_owned(),
+                  destination_id: destination_id.to_owned(),
+                  destination_name: destination_name.to_owned(),
                   minutes_until_arrival: duration,
                 });
             }
@@ -123,5 +132,46 @@ impl SubwayStopHandler {
     }
   }
 
-  pub fn predict(&self) {}
+  pub fn predict(&mut self) {
+    self.routes.clear();
+
+    for trip in &mut self.trips {
+      trip.minutes_until_arrival -= 1;
+
+      if trip.minutes_until_arrival < 0 {
+        continue;
+      }
+
+      if !self.routes.contains_key(&trip.route_id) {
+        self.routes.insert(trip.route_id.to_owned(), BTreeMap::new());
+      }
+      if !self
+        .routes
+        .get(&trip.route_id)
+        .unwrap()
+        .contains_key(&trip.destination_id)
+      {
+        self
+          .routes
+          .get_mut(&trip.route_id)
+          .unwrap()
+          .insert(trip.destination_id.to_owned(), Vec::new());
+      };
+      self
+        .routes
+        .get_mut(&trip.route_id)
+        .unwrap()
+        .get_mut(&trip.destination_id)
+        .unwrap()
+        .push(Vehicle {
+          route_id: trip.route_id.to_owned(),
+          route_name: trip.route_name.to_owned(),
+          destination_id: trip.destination_id.to_owned(),
+          destination_name: trip.destination_name.to_owned(),
+          minutes_until_arrival: trip.minutes_until_arrival,
+        });
+    }
+
+    self.trips.retain(|a| a.minutes_until_arrival >= 0);
+  }
 }

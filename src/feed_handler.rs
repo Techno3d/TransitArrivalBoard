@@ -9,6 +9,7 @@ use crate::{gtfsrt, mercury_structs::MercuryDelays};
 #[derive(Default)]
 pub struct FeedHandler {
   pub subway_feed: Vec<gtfsrt::FeedMessage>,
+  pub subway_feed_success: bool,
   pub service_alerts_feed: MercuryDelays,
   pub gtfs_static_feed: Gtfs,
 }
@@ -21,6 +22,7 @@ impl FeedHandler {
   pub fn refresh_realtime(&mut self) {
     self.subway_feed.clear();
     self.service_alerts_feed = Default::default();
+    self.subway_feed_success = true;
 
     // Subway
     let feed_uris = [
@@ -35,7 +37,10 @@ impl FeedHandler {
     for uri in feed_uris {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
-        Err(_) => return, // HTTP request failed.
+        Err(_) => {
+          self.subway_feed_success = false;
+          return;
+        } // HTTP request failed.
       };
       let bytes = resp.as_bytes();
       let feed = match gtfsrt::FeedMessage::decode(bytes) {

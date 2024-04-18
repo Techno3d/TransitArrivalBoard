@@ -16,8 +16,8 @@ export function List(props: { name: string; vehicles: { [key: string]: { [key: s
         >
           <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-blue-400 shadow-2xl">
             <div className="flex h-full w-3/4 flex-col items-center justify-center">
-              <h1 className="font-black lg:text-6xl">{vehicles[0].route}</h1>
-              <h1 className="mx-2 line-clamp-1 text-center font-bold lg:text-2xl">{vehicles[0].destination}</h1>
+              <h1 className="font-black lg:text-6xl">{vehicles[0].route_name}</h1>
+              <h1 className="mx-2 line-clamp-1 text-center font-bold lg:text-2xl">{vehicles[0].destination_name}</h1>
             </div>
             <div className="flex h-full w-1/4 flex-col items-center justify-center">
               <h1 className="font-black lg:text-6xl">{vehicles[0].minutes_until_arrival}</h1>
