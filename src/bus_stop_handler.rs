@@ -38,7 +38,10 @@ impl BusStopHandler {
         .send()
       {
         Ok(a) => a,
-        Err(_) => return, // HTTP request failed.
+        Err(_) => {
+          self.predict();
+          return;
+        } // HTTP request failed.
       };
       let data: BusData = match serde_json::from_slice(resp.as_bytes()) {
         Ok(a) => a,
@@ -134,4 +137,6 @@ impl BusStopHandler {
       walk_time: self.walk_time,
     }
   }
+
+  pub fn predict(&self) {}
 }

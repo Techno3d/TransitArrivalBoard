@@ -122,4 +122,6 @@ impl SubwayStopHandler {
       walk_time: self.walk_time,
     }
   }
+
+  pub fn predict(&self) {}
 }
