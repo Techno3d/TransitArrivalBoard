@@ -12,13 +12,15 @@ dotenvy = "0.15.7"
 prost = "0.12.3"
 serde = { version = "1.0.196", features = ["derive"] }
 serde_json = "1.0.112"
-time = { version="0.3.31", features = ["local-offset", "macros"] }
 tungstenite = "0.21.0"
 crossbeam-channel = "0.5.12"
 gtfs-structures = { version="0.41.2", default-features=false, features=[] }
+chrono = { version="0.4.38", features = ["alloc"]}
 
 [build-dependencies]
 prost-build = { version = "0.12.3" }
 
 [lints.rust]
 unsafe_code = "forbid"
+
+[features]
