@@ -27,13 +27,13 @@ export function Alert(props: {
 
       {headers.length > 0 ? (
         <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
-          <h1 className="line-clamp-3 text-4xl font-semibold leading-relaxed">
+          <h1 className="line-clamp-3 text-5xl font-semibold leading-normal">
             {headers[index].split(/(\[.*?\])/).map((text) => {
               if (text.length === 0) return;
               if (text.charAt(0) === "[" && text.charAt(text.length - 1) === "]") {
                 return (
                   <div className="mx-1 inline-flex -translate-y-1" key={Math.random()}>
-                    <Bullet route={text.charAt(1)} color={routes[text.charAt(1)].route_color} size={36} />
+                    <Bullet route={text.charAt(1)} color={routes[text.charAt(1)].route_color} size={48} />
                   </div>
                 );
               }

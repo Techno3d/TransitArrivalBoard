@@ -12,11 +12,16 @@ const config = {
       },
       animation: {
         "infinite-scroll": "infinite-scroll 7.5s linear infinite",
+        flashing: "flashing 2s ease-in-out infinite",
       },
       keyframes: {
         "infinite-scroll": {
           from: { transform: "translateX(100%)" },
           to: { transform: "translateX(-100%)" },
+        },
+        flashing: {
+          "0%, 100%": { backgroundColor: "white" },
+          "50%": { backgroundColor: "#fcd34d" },
         },
       },
     },

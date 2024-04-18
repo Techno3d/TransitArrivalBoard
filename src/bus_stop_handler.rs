@@ -63,8 +63,9 @@ impl BusStopHandler {
             .monitored_call
             .expected_departure_time
             .unwrap_or(current_time.to_rfc3339());
-          let arrival_time = DateTime::parse_from_rfc3339(arrival_time.as_str()).unwrap();
-          let duration = ((arrival_time.timestamp() - current_time.timestamp()).max(0) / 60) as i32;
+          let arrival_time =
+            u64::try_from(DateTime::parse_from_rfc3339(arrival_time.as_str()).unwrap().timestamp()).unwrap();
+          let duration = ((arrival_time - u64::try_from(current_time.timestamp()).unwrap()).max(0) / 60) as i32;
 
           // Route
           let route_id = visit.monitored_vehicle_journey.line_ref.split('_').last().unwrap();

@@ -32,10 +32,10 @@ impl SubwayStopHandler {
       return;
     }
 
-    self.trips.clear();
-    self.routes.clear();
+    let mut trips: Vec<Vehicle> = Vec::new();
+    let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
-    let current_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+    let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
     let data = self.feed_data.read().unwrap();
     for message in data.subway_feed.iter() {
@@ -49,7 +49,6 @@ impl SubwayStopHandler {
                 None => continue,
               })
               .time();
-              let arrival_time = u64::try_from(arrival_time).unwrap();
               let duration = ((arrival_time - current_time).max(0) / 60) as i32;
 
               // Route
@@ -75,7 +74,7 @@ impl SubwayStopHandler {
               };
 
               // Input data into trips
-              self.trips.push(Vehicle {
+              trips.push(Vehicle {
                 route_id: route_id.to_owned(),
                 route_name: route_name.to_owned(),
                 destination_id: destination_id.to_owned(),
@@ -84,18 +83,16 @@ impl SubwayStopHandler {
               });
 
               // Input data into routes
-              if !self.routes.contains_key(route_id) {
-                self.routes.insert(route_id.to_owned(), BTreeMap::new());
+              if !routes.contains_key(route_id) {
+                routes.insert(route_id.to_owned(), BTreeMap::new());
               }
-              if !self.routes.get(route_id).unwrap().contains_key(destination_id) {
-                self
-                  .routes
+              if !routes.get(route_id).unwrap().contains_key(destination_id) {
+                routes
                   .get_mut(route_id)
                   .unwrap()
                   .insert(destination_id.to_owned(), Vec::new());
               };
-              self
-                .routes
+              routes
                 .get_mut(route_id)
                 .unwrap()
                 .get_mut(destination_id)
@@ -113,7 +110,7 @@ impl SubwayStopHandler {
       }
     }
 
-    self.trips.sort_by(|a, b| {
+    trips.sort_by(|a, b| {
       if a.minutes_until_arrival > b.minutes_until_arrival {
         return Ordering::Greater;
       }
@@ -122,6 +119,9 @@ impl SubwayStopHandler {
       }
       Ordering::Equal
     });
+
+    self.trips = trips;
+    self.routes = routes;
   }
 
   pub fn serialize(&self) -> Stop {
