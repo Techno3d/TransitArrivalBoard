@@ -1,7 +1,12 @@
-use chrono::{DateTime, Local};
+use chrono::DateTime;
 
 use crate::{siri_structs::BusData, Stop, Vehicle};
-use std::{cmp::Ordering, collections::BTreeMap, sync::Arc};
+use std::{
+  cmp::Ordering,
+  collections::BTreeMap,
+  sync::Arc,
+  time::{SystemTime, UNIX_EPOCH},
+};
 
 #[derive(Debug, Clone)]
 pub struct BusStopHandler {
@@ -27,7 +32,7 @@ impl BusStopHandler {
     let mut trips: Vec<Vehicle> = Vec::new();
     let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
-    let current_time = Local::now();
+    let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
     for id in self.stop_ids.to_owned().iter() {
       let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
@@ -62,9 +67,8 @@ impl BusStopHandler {
             Some(a) => a,
             None => continue,
           };
-          let arrival_time =
-            u64::try_from(DateTime::parse_from_rfc3339(arrival_time.as_str()).unwrap().timestamp()).unwrap();
-          let duration = ((arrival_time - u64::try_from(current_time.timestamp()).unwrap()).max(0) / 60) as i32;
+          let arrival_time = DateTime::parse_from_rfc3339(arrival_time.as_str()).unwrap().timestamp();
+          let duration = ((arrival_time - current_time).max(0) / 60) as i32;
 
           // Route
           let route_id = visit.monitored_vehicle_journey.line_ref.split('_').last().unwrap();
