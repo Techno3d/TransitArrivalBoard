@@ -27,7 +27,7 @@ export function Alert(props: {
 
       {headers.length > 0 ? (
         <div className="flex w-full grow flex-row items-start rounded-lg bg-slate-100 px-4 py-2">
-          <h1 className="line-clamp-3 text-5xl font-semibold leading-normal">
+          <h1 className="line-clamp-3 text-5xl font-semibold leading-tight">
             {headers[index].split(/(\[.*?\])/).map((text) => {
               if (text.length === 0) return;
               if (text.charAt(0) === "[" && text.charAt(text.length - 1) === "]") {

@@ -115,7 +115,7 @@ export default function Home() {
   }, [serviceAlerts.length]);
 
   return (
-    <div className="grid min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
+    <div className="grid max-h-screen min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
       <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
         <Countdown name={"Bedford Park Blvd / Jerome Av"} vehicles={jeromeTimes} routes={routes}></Countdown>
         <Countdown name={"Bedford Park Blvd / Grand Concourse"} vehicles={concourseTimes} routes={routes}></Countdown>
