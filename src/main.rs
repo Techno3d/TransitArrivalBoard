@@ -92,7 +92,7 @@ fn main() {
           subway_realtime: subway_map.to_owned(),
           bus_realtime: bus_map.to_owned(),
           service_alerts_realtime: service_alerts.subway.to_owned(),
-          routes_static: routes_static,
+          routes_static: routes_static.to_owned(),
         };
 
         let data = serde_json::to_string(&data).unwrap();

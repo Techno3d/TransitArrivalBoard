@@ -126,7 +126,7 @@ impl SubwayStopHandler {
         .read()
         .unwrap()
         .subway_static_feed
-        .get_stop(self.stop_ids.iter().next().unwrap())
+        .get_stop(self.stop_ids.first().unwrap())
         .unwrap()
         .name
         .as_ref()

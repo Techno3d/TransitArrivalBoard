@@ -152,7 +152,7 @@ impl BusStopHandler {
   pub fn serialize(&self) -> Stop {
     let mut stop_name: String = Default::default();
     for gtfs in self.feed_data.read().unwrap().bus_static_feed.iter() {
-      stop_name = match gtfs.get_stop(self.stop_ids.iter().next().unwrap()) {
+      stop_name = match gtfs.get_stop(self.stop_ids.first().unwrap()) {
         Ok(a) => a.name.to_owned().unwrap(),
         Err(_) => continue,
       };
