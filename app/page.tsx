@@ -7,11 +7,15 @@ import { List } from "./components/List";
 import { Vehicle } from "./types";
 
 export default function Home() {
+  const [jeromeNames, setJeromeNames] = useState<string>("");
   const [jeromeTimes, setJeromeTimes] = useState<Array<Vehicle>>([]);
+  const [concourseNames, setConcourseNames] = useState<string>("");
   const [concourseTimes, setConcourseTimes] = useState<Array<Vehicle>>([]);
   const [serviceAlerts, setServiceAlerts] = useState<Array<string>>([]);
   const [routes, setRoutes] = useState<{ [key: string]: { [key: string]: string } }>({});
+  const [paulNames, setPaulNames] = useState<string>("");
   const [paulTimes, setPaulTimes] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
+  const [w205Names, setW205Names] = useState<string>("");
   const [w205Times, setW205Times] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
   const [index, setIndex] = useState(0);
 
@@ -50,8 +54,14 @@ export default function Home() {
       console.log("Message recieved.");
       const message = JSON.parse(event.data);
 
+      const jeromeName: string = message["subway"]["405S"]["stop_name"];
+      setJeromeNames(jeromeName);
+
       const jeromeData: Vehicle[] = message["subway"]["405S"]["trips"];
       setJeromeTimes(jeromeData);
+
+      const concouseName: string = message["subway"]["D03S"]["stop_name"];
+      setConcourseNames(concouseName);
 
       const concourseData: Vehicle[] = message["subway"]["D03S"]["trips"];
       setConcourseTimes(concourseData);
@@ -79,8 +89,14 @@ export default function Home() {
       const routeData: { [key: string]: { [key: string]: string } } = message["routes"];
       setRoutes(routeData);
 
+      const paulName: string = message["bus"]["100017"]["stop_name"];
+      setPaulNames(paulName);
+
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100017"]["routes"];
       setPaulTimes(paulData);
+
+      const w205Name: string = message["bus"]["100723"]["stop_name"];
+      setW205Names(w205Name);
 
       const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100723"]["routes"];
       setW205Times(w205stData);
@@ -117,15 +133,15 @@ export default function Home() {
   return (
     <div className="grid max-h-screen min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
       <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Countdown name={"Bedford Park Blvd / Jerome Av"} vehicles={jeromeTimes} routes={routes}></Countdown>
-        <Countdown name={"Bedford Park Blvd / Grand Concourse"} vehicles={concourseTimes} routes={routes}></Countdown>
+        <Countdown name={jeromeNames} vehicles={jeromeTimes} routes={routes}></Countdown>
+        <Countdown name={concourseNames} vehicles={concourseTimes} routes={routes}></Countdown>
       </div>
       <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Alert name={"Service Disruptions"} headers={serviceAlerts} routes={routes} index={index} />
+        <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} />
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <List name={"Paul Av / W 205 St"} vehicles={paulTimes}></List>
-        <List name={"W 205 St / Paul Av"} vehicles={w205Times}></List>
+        <List name={paulNames} vehicles={paulTimes}></List>
+        <List name={w205Names} vehicles={w205Times}></List>
       </div>
     </div>
   );

@@ -1,30 +1,31 @@
 use chrono::DateTime;
 
-use crate::{siri_structs::BusData, Stop, Vehicle};
+use crate::{feed_handler::FeedHandler, siri_structs::BusData, Stop, Vehicle};
 use std::{
   cmp::Ordering,
   collections::BTreeMap,
-  sync::Arc,
+  sync::{Arc, RwLock},
   time::{SystemTime, UNIX_EPOCH},
 };
 
-#[derive(Debug, Clone)]
 pub struct BusStopHandler {
   pub stop_ids: Vec<String>,
   pub walk_time: i32,
   pub trips: Vec<Vehicle>,
   pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
   api_key: Arc<String>,
+  feed_data: Arc<RwLock<FeedHandler>>,
 }
 
 impl BusStopHandler {
-  pub fn new(stop_ids: Vec<String>, walk_time: i32, api_key: Arc<String>) -> Self {
+  pub fn new(stop_ids: Vec<String>, walk_time: i32, api_key: Arc<String>, feed_data: Arc<RwLock<FeedHandler>>) -> Self {
     Self {
       stop_ids,
       walk_time,
       trips: Vec::new(),
       routes: BTreeMap::new(),
       api_key,
+      feed_data,
     }
   }
 
@@ -37,28 +38,29 @@ impl BusStopHandler {
     for id in self.stop_ids.to_owned().iter() {
       let mut data: Option<BusData> = None;
       for _ in 0..3 {
-          let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
-              .with_param("key", &*self.api_key)
-              .with_param("version", "2")
-              .with_param("OperatorRef", "MTA")
-              .with_param("MonitoringRef", id)
-              .send() {
-              Ok(a) => a,
-              Err(_) => continue // HTTP request failed.
-          };
-          data = Some(match serde_json::from_slice(resp.as_bytes()) {
-              Ok(a) => a,
-              Err(_) => continue,
-          });
-          break;
+        let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
+          .with_param("key", &*self.api_key)
+          .with_param("version", "2")
+          .with_param("OperatorRef", "MTA")
+          .with_param("MonitoringRef", id)
+          .send()
+        {
+          Ok(a) => a,
+          Err(_) => continue, // HTTP request failed.
+        };
+        data = Some(match serde_json::from_slice(resp.as_bytes()) {
+          Ok(a) => a,
+          Err(_) => continue,
+        });
+        break;
       }
       let data = match data {
         Some(a) => a,
         None => {
-            self.predict();
-            return;
-        },
-    };
+          self.predict();
+          return;
+        }
+      };
       let temp = match data.siri.service_delivery {
         Some(a) => a,
         None => return,
@@ -148,7 +150,16 @@ impl BusStopHandler {
   }
 
   pub fn serialize(&self) -> Stop {
+    let mut stop_name: String = Default::default();
+    for gtfs in self.feed_data.read().unwrap().bus_static_feed.iter() {
+      stop_name = match gtfs.get_stop(self.stop_ids.iter().next().unwrap()) {
+        Ok(a) => a.name.to_owned().unwrap(),
+        Err(_) => continue,
+      };
+    }
+
     Stop {
+      stop_name: stop_name.to_owned(),
       trips: self.trips.to_owned(),
       routes: self.routes.to_owned(),
       walk_time: self.walk_time,

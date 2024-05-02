@@ -8,10 +8,10 @@ use crate::{gtfsrt, mercury_structs::MercuryDelays};
 // No bus because bus api can be queried per stop
 #[derive(Default)]
 pub struct FeedHandler {
-  pub subway_feed: Vec<gtfsrt::FeedMessage>,
-  pub subway_feed_success: bool,
-  pub service_alerts_feed: MercuryDelays,
-  pub gtfs_static_feed: Gtfs,
+  pub subway_static_feed: Gtfs,
+  pub subway_realtime_feed: Vec<gtfsrt::FeedMessage>,
+  pub bus_static_feed: Vec<Gtfs>,
+  pub service_alerts_realtime_feed: MercuryDelays,
 }
 
 impl FeedHandler {
@@ -20,9 +20,8 @@ impl FeedHandler {
   }
 
   pub fn refresh_realtime(&mut self) {
-    self.subway_feed.clear();
-    self.service_alerts_feed = Default::default();
-    self.subway_feed_success = true;
+    self.subway_realtime_feed.clear();
+    self.service_alerts_realtime_feed = Default::default();
 
     // Subway
     let feed_uris = [
@@ -38,7 +37,6 @@ impl FeedHandler {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
         Err(_) => {
-          self.subway_feed_success = false;
           return;
         } // HTTP request failed.
       };
@@ -47,7 +45,7 @@ impl FeedHandler {
         Ok(a) => a,
         Err(_) => return,
       };
-      self.subway_feed.push(feed);
+      self.subway_realtime_feed.push(feed);
     }
 
     // Service Alerts
@@ -59,10 +57,32 @@ impl FeedHandler {
       Ok(r) => r,
       Err(_) => Default::default(),
     };
-    self.service_alerts_feed = alerts;
+    self.service_alerts_realtime_feed = alerts;
   }
 
   pub fn refresh_static(&mut self) {
+    self.bus_static_feed.clear();
+    self.subway_static_feed = Default::default();
+
+    // Bus
+    let feed_uris = [
+      "http://web.mta.info/developers/data/nyct/bus/google_transit_bronx.zip",
+      "http://web.mta.info/developers/data/nyct/bus/google_transit_brooklyn.zip",
+      "http://web.mta.info/developers/data/nyct/bus/google_transit_manhattan.zip",
+      "http://web.mta.info/developers/data/nyct/bus/google_transit_queens.zip",
+      "http://web.mta.info/developers/data/nyct/bus/google_transit_staten_island.zip",
+    ];
+    for uri in feed_uris {
+      let resp = minreq::get(uri).send().unwrap();
+      let bytes = resp.as_bytes();
+      let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
+        Ok(a) => a,
+        Err(_) => return,
+      };
+      self.bus_static_feed.push(gtfs);
+    }
+
+    // Subway
     let resp = minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip")
       .send()
       .unwrap();
@@ -71,6 +91,6 @@ impl FeedHandler {
       Ok(a) => a,
       Err(_) => return,
     };
-    self.gtfs_static_feed = gtfs;
+    self.subway_static_feed = gtfs;
   }
 }

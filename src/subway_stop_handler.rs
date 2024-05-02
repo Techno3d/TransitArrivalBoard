@@ -27,18 +27,13 @@ impl SubwayStopHandler {
   }
 
   pub fn refresh(&mut self) {
-    if !self.feed_data.read().unwrap().subway_feed_success {
-      self.predict();
-      return;
-    }
-
     let mut trips: Vec<Vehicle> = Vec::new();
     let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
     let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
     let data = self.feed_data.read().unwrap();
-    for message in data.subway_feed.iter() {
+    for message in data.subway_realtime_feed.iter() {
       for entity in &message.entity {
         if let Some(trip_update) = &entity.trip_update {
           for stop in trip_update.stop_time_update.iter() {
@@ -61,14 +56,14 @@ impl SubwayStopHandler {
                 .split("..")
                 .next()
                 .unwrap();
-              let route_name = match data.gtfs_static_feed.get_route(route_id) {
+              let route_name = match data.subway_static_feed.get_route(route_id) {
                 Ok(a) => a.short_name.as_ref().unwrap(),
                 Err(_) => return,
               };
 
               // Destination
               let destination_id = trip_update.stop_time_update.last().unwrap().stop_id();
-              let destination_name = match data.gtfs_static_feed.get_stop(destination_id) {
+              let destination_name = match data.subway_static_feed.get_stop(destination_id) {
                 Ok(a) => a.name.as_ref().unwrap(),
                 Err(_) => return,
               };
@@ -126,6 +121,17 @@ impl SubwayStopHandler {
 
   pub fn serialize(&self) -> Stop {
     Stop {
+      stop_name: self
+        .feed_data
+        .read()
+        .unwrap()
+        .subway_static_feed
+        .get_stop(self.stop_ids.iter().next().unwrap())
+        .unwrap()
+        .name
+        .as_ref()
+        .unwrap()
+        .to_string(),
       trips: self.trips.to_owned(),
       routes: self.routes.to_owned(),
       walk_time: self.walk_time,

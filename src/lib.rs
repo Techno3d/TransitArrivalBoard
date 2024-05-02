@@ -24,13 +24,14 @@ pub struct Vehicle {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stop {
+  pub stop_name: String,
+  pub walk_time: i32,
   pub trips: Vec<Vehicle>,
   pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
-  pub walk_time: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Disruption {
+pub struct Alert {
   pub route_id: String,
   pub sort_order: i32,
   pub header_text: String,

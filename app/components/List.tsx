@@ -44,7 +44,7 @@ export function List(props: { name: string; vehicles: { [key: string]: { [key: s
         <div className="flex h-14 flex-row items-center rounded-lg bg-emerald-700">{<Title name={name}></Title>}</div>
         <div className="flex grow flex-row items-center">
           <div className="flex h-full w-full flex-row items-center rounded-lg bg-slate-100">
-            <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No buses scheduled</h1>
+            <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No vehicles scheduled</h1>
           </div>
         </div>
       </React.Fragment>

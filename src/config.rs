@@ -32,11 +32,18 @@ impl Config {
       .collect()
   }
 
-  pub fn get_bus_handlers(&self, api_key: Arc<String>) -> Vec<BusStopHandler> {
+  pub fn get_bus_handlers(&self, api_key: Arc<String>, feed_data: Arc<RwLock<FeedHandler>>) -> Vec<BusStopHandler> {
     self
       .bus
       .iter()
-      .map(|a| BusStopHandler::new(a.stop_ids.to_owned(), a.walk_time, api_key.to_owned()))
+      .map(|a| {
+        BusStopHandler::new(
+          a.stop_ids.to_owned(),
+          a.walk_time,
+          api_key.to_owned(),
+          feed_data.to_owned(),
+        )
+      })
       .collect()
   }
 

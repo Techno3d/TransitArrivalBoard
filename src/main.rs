@@ -10,7 +10,7 @@ use gtfs_structures::Route;
 use serde::{Deserialize, Serialize};
 use transit_board::config::Config;
 use transit_board::feed_handler::FeedHandler;
-use transit_board::{Disruption, Stop};
+use transit_board::{Alert, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
 use tungstenite::protocol::CloseFrame;
 use tungstenite::Message;
@@ -45,7 +45,7 @@ fn main() {
       data.write().unwrap().refresh_static();
 
       let mut subway = config.get_subway_handlers(data.to_owned());
-      let mut bus = config.get_bus_handlers(api_key_bus.to_owned());
+      let mut bus = config.get_bus_handlers(api_key_bus.to_owned(), data.to_owned());
       let mut service_alerts = config.get_service_alerts_handler(data.to_owned());
 
       let mut subway_map: BTreeMap<String, Stop> = BTreeMap::new();
@@ -83,7 +83,7 @@ fn main() {
           subway: subway_map.to_owned(),
           bus: bus_map.to_owned(),
           service_alerts: service_alerts.subway.to_owned(),
-          routes: data.read().unwrap().gtfs_static_feed.routes.to_owned(),
+          routes: data.read().unwrap().subway_static_feed.routes.to_owned(),
         };
 
         let data = serde_json::to_string(&data).unwrap();
@@ -106,6 +106,6 @@ fn main() {
 struct InfoJson {
   subway: BTreeMap<String, Stop>,
   bus: BTreeMap<String, Stop>,
-  service_alerts: Vec<Disruption>,
+  service_alerts: Vec<Alert>,
   routes: HashMap<String, Route>,
 }

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import React from "react";
-import Logo from "../../public/logo.png";
 import { Bullet } from "./Bullet";
 import { Title } from "./Title";
 
@@ -43,18 +42,13 @@ export function Alert(props: {
         </div>
       ) : (
         <div className="flex w-full grow flex-row items-center rounded-lg bg-slate-100">
-          <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No service disruptions</h1>
+          <h1 className="w-full p-8 text-center text-8xl font-bold text-black">No service alerts</h1>
         </div>
       )}
 
-      <div className="flex h-14 flex-row items-center rounded-lg bg-slate-800">
+      <div className="flex h-14 flex-row items-center rounded-lg bg-black">
         <h1 className="mx-2 text-base font-bold text-white lg:text-3xl">
           {"Made with ❤️ by "}
-          <span className="inline-flex items-baseline">
-            <Image src={Logo} alt="" className="mx-1 self-center rounded-full" height={32} width={32} />
-            <span>Transit Club</span>
-          </span>
-          {" ("}
           <span className="inline-flex items-baseline">
             <Image
               src="https://avatars.githubusercontent.com/u/76977073?"
@@ -64,8 +58,8 @@ export function Alert(props: {
               width={32}
             />
             <span>Shadman Syed</span>
-            {", "}
           </span>
+          {" and "}
           <span className="inline-flex items-baseline">
             <Image
               src="https://avatars.githubusercontent.com/u/95447323?"
@@ -76,7 +70,6 @@ export function Alert(props: {
             />
             <span>David Wang</span>
           </span>
-          {")"}
         </h1>
       </div>
     </React.Fragment>
