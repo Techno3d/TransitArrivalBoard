@@ -26,20 +26,24 @@ export default function Home() {
       subway: [
         {
           stop_ids: ["405S"],
+          display: "Countdown",
           walk_time: 10,
         },
         {
           stop_ids: ["D03S"],
+          display: "Countdown",
           walk_time: 14,
         },
       ],
       bus: [
         {
           stop_ids: ["100017", "103400"],
+          display: "List",
           walk_time: 3,
         },
         {
           stop_ids: ["100723"],
+          display: "List",
           walk_time: 3,
         },
       ],
@@ -54,16 +58,16 @@ export default function Home() {
       console.log("Message recieved.");
       const message = JSON.parse(event.data);
 
-      const jeromeName: string = message["subway_realtime"]["405S"]["stop_name"];
+      const jeromeName: string = message["stops_realtime"]["100017"]["stop_name"];
       setJeromeNames(jeromeName);
 
-      const jeromeData: Vehicle[] = message["subway_realtime"]["405S"]["trips"];
+      const jeromeData: Vehicle[] = message["stops_realtime"]["100017"]["trips"];
       setJeromeTimes(jeromeData);
 
-      const concouseName: string = message["subway_realtime"]["D03S"]["stop_name"];
+      const concouseName: string = message["stops_realtime"]["100723"]["stop_name"];
       setConcourseNames(concouseName);
 
-      const concourseData: Vehicle[] = message["subway_realtime"]["D03S"]["trips"];
+      const concourseData: Vehicle[] = message["stops_realtime"]["100723"]["trips"];
       setConcourseTimes(concourseData);
 
       const delayData: Array<string> = [];
@@ -89,18 +93,18 @@ export default function Home() {
       const routeData: { [key: string]: { [key: string]: string } } = message["routes_static"];
       setRoutes(routeData);
 
-      const paulName: string = message["bus_realtime"]["100017"]["stop_name"];
+      const paulName: string = message["stops_realtime"]["405S"]["stop_name"];
       setPaulNames(paulName);
 
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } =
-        message["bus_realtime"]["100017"]["routes"];
+        message["stops_realtime"]["405S"]["routes"];
       setPaulTimes(paulData);
 
-      const w205Name: string = message["bus_realtime"]["100723"]["stop_name"];
+      const w205Name: string = message["stops_realtime"]["D03S"]["stop_name"];
       setW205Names(w205Name);
 
       const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } =
-        message["bus_realtime"]["100723"]["routes"];
+        message["stops_realtime"]["D03S"]["routes"];
       setW205Times(w205stData);
     };
 

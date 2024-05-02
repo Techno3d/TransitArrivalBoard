@@ -16,6 +16,7 @@ pub struct Config {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct StopConfig {
   pub stop_ids: Vec<String>,
+  pub display: String,
   pub walk_time: i32,
 }
 
@@ -28,7 +29,14 @@ impl Config {
     self
       .subway
       .iter()
-      .map(|a| SubwayStopHandler::new(a.stop_ids.to_owned(), a.walk_time, feed_data.to_owned()))
+      .map(|a| {
+        SubwayStopHandler::new(
+          a.stop_ids.to_owned(),
+          a.display.to_owned(),
+          a.walk_time,
+          feed_data.to_owned(),
+        )
+      })
       .collect()
   }
 
@@ -39,6 +47,7 @@ impl Config {
       .map(|a| {
         BusStopHandler::new(
           a.stop_ids.to_owned(),
+          a.display.to_owned(),
           a.walk_time,
           api_key.to_owned(),
           feed_data.to_owned(),

@@ -10,6 +10,7 @@ use std::{
 
 pub struct BusStopHandler {
   pub stop_ids: Vec<String>,
+  pub display: String,
   pub walk_time: i32,
   pub trips: Vec<Vehicle>,
   pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
@@ -18,9 +19,16 @@ pub struct BusStopHandler {
 }
 
 impl BusStopHandler {
-  pub fn new(stop_ids: Vec<String>, walk_time: i32, api_key: Arc<String>, feed_data: Arc<RwLock<FeedHandler>>) -> Self {
+  pub fn new(
+    stop_ids: Vec<String>,
+    display: String,
+    walk_time: i32,
+    api_key: Arc<String>,
+    feed_data: Arc<RwLock<FeedHandler>>,
+  ) -> Self {
     Self {
       stop_ids,
+      display,
       walk_time,
       trips: Vec::new(),
       routes: BTreeMap::new(),

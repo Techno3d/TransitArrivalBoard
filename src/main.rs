@@ -49,22 +49,20 @@ fn main() {
       let mut bus = config.get_bus_handlers(api_key_bus.to_owned(), data.to_owned());
       let mut service_alerts = config.get_service_alerts_handler(data.to_owned());
 
-      let mut subway_map: BTreeMap<String, Stop> = BTreeMap::new();
-      let mut bus_map: BTreeMap<String, Stop> = BTreeMap::new();
+      let mut stops_map: BTreeMap<String, Stop> = BTreeMap::new();
 
       loop {
         if !ws.can_write() {
           break;
         }
 
-        subway_map.clear();
-        bus_map.clear();
+        stops_map.clear();
 
         data.write().unwrap().refresh_realtime();
 
         for i in 0..subway.len() {
           subway.get_mut(i).unwrap().refresh();
-          subway_map.insert(
+          stops_map.insert(
             subway.get(i).unwrap().stop_ids.first().unwrap().to_owned(),
             subway.get(i).unwrap().serialize(),
           );
@@ -72,7 +70,7 @@ fn main() {
 
         for i in 0..bus.len() {
           bus.get_mut(i).unwrap().refresh();
-          bus_map.insert(
+          stops_map.insert(
             bus.get(i).unwrap().stop_ids.first().unwrap().to_string(),
             bus.get(i).unwrap().serialize(),
           );
@@ -89,8 +87,7 @@ fn main() {
         }
 
         let data = InfoJson {
-          subway_realtime: subway_map.to_owned(),
-          bus_realtime: bus_map.to_owned(),
+          stops_realtime: stops_map.to_owned(),
           service_alerts_realtime: service_alerts.subway.to_owned(),
           routes_static: routes_static.to_owned(),
         };
@@ -113,8 +110,7 @@ fn main() {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
-  subway_realtime: BTreeMap<String, Stop>,
-  bus_realtime: BTreeMap<String, Stop>,
+  stops_realtime: BTreeMap<String, Stop>,
   service_alerts_realtime: Vec<Alert>,
   routes_static: HashMap<String, Route>,
 }
