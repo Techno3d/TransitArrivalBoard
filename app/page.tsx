@@ -58,16 +58,16 @@ export default function Home() {
       console.log("Message recieved.");
       const message = JSON.parse(event.data);
 
-      const jeromeName: string = message["stops_realtime"]["100017"]["stop_name"];
+      const jeromeName: string = message["stops_realtime"]["405S"]["stop_name"];
       setJeromeNames(jeromeName);
 
-      const jeromeData: Vehicle[] = message["stops_realtime"]["100017"]["trips"];
+      const jeromeData: Vehicle[] = message["stops_realtime"]["405S"]["trips"];
       setJeromeTimes(jeromeData);
 
-      const concouseName: string = message["stops_realtime"]["100723"]["stop_name"];
+      const concouseName: string = message["stops_realtime"]["D03S"]["stop_name"];
       setConcourseNames(concouseName);
 
-      const concourseData: Vehicle[] = message["stops_realtime"]["100723"]["trips"];
+      const concourseData: Vehicle[] = message["stops_realtime"]["D03S"]["trips"];
       setConcourseTimes(concourseData);
 
       const delayData: Array<string> = [];
@@ -93,18 +93,18 @@ export default function Home() {
       const routeData: { [key: string]: { [key: string]: string } } = message["routes_static"];
       setRoutes(routeData);
 
-      const paulName: string = message["stops_realtime"]["405S"]["stop_name"];
+      const paulName: string = message["stops_realtime"]["100017"]["stop_name"];
       setPaulNames(paulName);
 
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } =
-        message["stops_realtime"]["405S"]["routes"];
+        message["stops_realtime"]["100017"]["routes"];
       setPaulTimes(paulData);
 
-      const w205Name: string = message["stops_realtime"]["D03S"]["stop_name"];
+      const w205Name: string = message["stops_realtime"]["100723"]["stop_name"];
       setW205Names(w205Name);
 
       const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } =
-        message["stops_realtime"]["D03S"]["routes"];
+        message["stops_realtime"]["100723"]["routes"];
       setW205Times(w205stData);
     };
 
