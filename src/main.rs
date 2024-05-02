@@ -1,6 +1,7 @@
 mod siri_structs;
 
 use std::collections::{BTreeMap, HashMap};
+
 use std::net::TcpListener;
 use std::sync::{Arc, RwLock};
 use std::thread;
@@ -79,11 +80,19 @@ fn main() {
 
         service_alerts.refresh();
 
+        let mut routes_static = data.read().unwrap().subway_static_feed.routes.to_owned();
+
+        for gtfs in &data.read().unwrap().bus_static_feed {
+          for (key, value) in gtfs.routes.iter() {
+            routes_static.insert(key.to_owned(), value.to_owned());
+          }
+        }
+
         let data = InfoJson {
-          subway: subway_map.to_owned(),
-          bus: bus_map.to_owned(),
-          service_alerts: service_alerts.subway.to_owned(),
-          routes: data.read().unwrap().subway_static_feed.routes.to_owned(),
+          subway_realtime: subway_map.to_owned(),
+          bus_realtime: bus_map.to_owned(),
+          service_alerts_realtime: service_alerts.subway.to_owned(),
+          routes_static: routes_static,
         };
 
         let data = serde_json::to_string(&data).unwrap();
@@ -104,8 +113,8 @@ fn main() {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
-  subway: BTreeMap<String, Stop>,
-  bus: BTreeMap<String, Stop>,
-  service_alerts: Vec<Alert>,
-  routes: HashMap<String, Route>,
+  subway_realtime: BTreeMap<String, Stop>,
+  bus_realtime: BTreeMap<String, Stop>,
+  service_alerts_realtime: Vec<Alert>,
+  routes_static: HashMap<String, Route>,
 }

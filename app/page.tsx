@@ -54,22 +54,22 @@ export default function Home() {
       console.log("Message recieved.");
       const message = JSON.parse(event.data);
 
-      const jeromeName: string = message["subway"]["405S"]["stop_name"];
+      const jeromeName: string = message["subway_realtime"]["405S"]["stop_name"];
       setJeromeNames(jeromeName);
 
-      const jeromeData: Vehicle[] = message["subway"]["405S"]["trips"];
+      const jeromeData: Vehicle[] = message["subway_realtime"]["405S"]["trips"];
       setJeromeTimes(jeromeData);
 
-      const concouseName: string = message["subway"]["D03S"]["stop_name"];
+      const concouseName: string = message["subway_realtime"]["D03S"]["stop_name"];
       setConcourseNames(concouseName);
 
-      const concourseData: Vehicle[] = message["subway"]["D03S"]["trips"];
+      const concourseData: Vehicle[] = message["subway_realtime"]["D03S"]["trips"];
       setConcourseTimes(concourseData);
 
       const delayData: Array<string> = [];
 
       const serviceData: Array<{ route_id: string; sort_order: number; header_text: string }> =
-        message["service_alerts"];
+        message["service_alerts_realtime"];
       serviceData
         .slice()
         .reverse()
@@ -86,19 +86,21 @@ export default function Home() {
         setIndex(0);
       }
 
-      const routeData: { [key: string]: { [key: string]: string } } = message["routes"];
+      const routeData: { [key: string]: { [key: string]: string } } = message["routes_static"];
       setRoutes(routeData);
 
-      const paulName: string = message["bus"]["100017"]["stop_name"];
+      const paulName: string = message["bus_realtime"]["100017"]["stop_name"];
       setPaulNames(paulName);
 
-      const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100017"]["routes"];
+      const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } =
+        message["bus_realtime"]["100017"]["routes"];
       setPaulTimes(paulData);
 
-      const w205Name: string = message["bus"]["100723"]["stop_name"];
+      const w205Name: string = message["bus_realtime"]["100723"]["stop_name"];
       setW205Names(w205Name);
 
-      const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } = message["bus"]["100723"]["routes"];
+      const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } =
+        message["bus_realtime"]["100723"]["routes"];
       setW205Times(w205stData);
     };
 
@@ -140,8 +142,8 @@ export default function Home() {
         <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} />
       </div>
       <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <List name={paulNames} vehicles={paulTimes}></List>
-        <List name={w205Names} vehicles={w205Times}></List>
+        <List name={paulNames} vehicles={paulTimes} routes={routes}></List>
+        <List name={w205Names} vehicles={w205Times} routes={routes}></List>
       </div>
     </div>
   );
