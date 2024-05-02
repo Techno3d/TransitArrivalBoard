@@ -21,9 +21,9 @@ export function List(props: {
           key={Math.random()}
         >
           <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
-            <div className="flex h-full w-3/4 flex-col items-center justify-center">
+            <div className="flex h-full w-3/4 flex-row items-center justify-center px-2">
               <Bullet route={vehicles[0].route_name} color={routes[vehicles[0].route_id].route_color} size={60} />
-              <h1 className="mx-2 line-clamp-1 text-center font-bold lg:text-2xl">{vehicles[0].destination_name}</h1>
+              <h1 className="mx-2 line-clamp-2 text-pretty font-bold lg:text-4xl">{vehicles[0].destination_name}</h1>
             </div>
             <div className="flex h-full w-1/4 flex-col items-center justify-center">
               <h1 className="font-black lg:text-6xl">{vehicles[0].minutes_until_arrival}</h1>
