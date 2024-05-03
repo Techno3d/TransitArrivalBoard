@@ -38,7 +38,7 @@ export function Countdown(props: {
                   </h1>
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
-                  <Bullet route={vehicles[0].route_name} color={routes[vehicles[0].route_id].route_color} size={112} />
+                  <Bullet route={vehicles[0].route_name} color={routes[vehicles[0].route_id].route_color} size={96} />
                   <div className="flex items-baseline">
                     <h1 className="text-9xl font-bold text-black">{vehicles[0].minutes_until_arrival}</h1>
                     <h1 className="text-5xl font-semibold text-black">min</h1>
@@ -49,7 +49,7 @@ export function Countdown(props: {
             {vehicles[1] ? (
               <div className="flex h-full w-1/3 flex-col px-8 py-4">
                 <div className="flex w-full basis-2/5 flex-row items-center">
-                  <Bullet route={vehicles[1].route_name} color={routes[vehicles[1].route_id].route_color} size={96} />
+                  <Bullet route={vehicles[1].route_name} color={routes[vehicles[1].route_id].route_color} size={72} />
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
                   <div className="flex items-baseline">
@@ -63,7 +63,7 @@ export function Countdown(props: {
           {vehicles[2] ? (
             <div className="flex h-full w-1/4 flex-col px-8 py-4">
               <div className="flex w-full basis-2/5 flex-row items-center">
-                <Bullet route={vehicles[2].route_name} color={routes[vehicles[2].route_id].route_color} size={96} />
+                <Bullet route={vehicles[2].route_name} color={routes[vehicles[2].route_id].route_color} size={72} />
               </div>
               <div className="flex basis-3/5 flex-row items-center gap-4">
                 <div className="flex items-baseline">

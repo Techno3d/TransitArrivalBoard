@@ -11,7 +11,7 @@ export function Bullet(props: { route: string; color: string; size: number }) {
       }}
     >
       <h1
-        className="text-center font-bold text-white"
+        className="overflow-hidden text-clip text-nowrap text-center font-bold text-white"
         style={{ fontSize: `${size * 0.65}px`, paddingLeft: `${size * 0.15}px`, paddingRight: `${size * 0.15}px` }}
       >
         {route}
