@@ -30,7 +30,7 @@ export default function Home() {
           walk_time: 10,
         },
         {
-          stop_ids: ["631S"],
+          stop_ids: ["D03S"],
           display: "Countdown",
           walk_time: 14,
         },
@@ -42,7 +42,7 @@ export default function Home() {
           walk_time: 3,
         },
         {
-          stop_ids: ["100797"],
+          stop_ids: ["100723"],
           display: "List",
           walk_time: 3,
         },
@@ -64,10 +64,10 @@ export default function Home() {
       const jeromeData: Vehicle[] = message["stops_realtime"]["405S"]["trips"];
       setJeromeTimes(jeromeData);
 
-      const concouseName: string = message["stops_realtime"]["100797"]["stop_name"];
+      const concouseName: string = message["stops_realtime"]["D03S"]["stop_name"];
       setConcourseNames(concouseName);
 
-      const concourseData: Vehicle[] = message["stops_realtime"]["100797"]["trips"];
+      const concourseData: Vehicle[] = message["stops_realtime"]["D03S"]["trips"];
       setConcourseTimes(concourseData);
 
       const delayData: Array<string> = [];
@@ -93,11 +93,11 @@ export default function Home() {
       const routeData: { [key: string]: { [key: string]: string } } = message["routes_static"];
       setRoutes(routeData);
 
-      const paulName: string = message["stops_realtime"]["631S"]["stop_name"];
+      const paulName: string = message["stops_realtime"]["100017"]["stop_name"];
       setPaulNames(paulName);
 
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } =
-        message["stops_realtime"]["631S"]["routes"];
+        message["stops_realtime"]["100017"]["routes"];
       setPaulTimes(paulData);
 
       const w205Name: string = message["stops_realtime"]["100723"]["stop_name"];
