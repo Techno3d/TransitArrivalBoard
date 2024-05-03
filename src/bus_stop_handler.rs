@@ -44,36 +44,25 @@ impl BusStopHandler {
     let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
     for id in self.stop_ids.to_owned().iter() {
-      let mut data: Option<BusData> = None;
-      for _ in 0..3 {
-        let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
-          .with_param("key", &*self.api_key)
-          .with_param("version", "2")
-          .with_param("OperatorRef", "MTA")
-          .with_param("MonitoringRef", id)
-          .send()
-        {
-          Ok(a) => a,
-          Err(_) => {
-            continue;
-          } // HTTP request failed.
-        };
-        let bytes = resp.as_bytes();
-        data = match serde_json::from_slice(bytes) {
-          Ok(r) => r,
-          Err(_) => {
-            continue;
-          }
-        };
-        break;
-      }
-      let data = match data {
-        Some(a) => a,
-        None => {
+      let resp = match minreq::get("https://bustime.mta.info/api/siri/stop-monitoring.json")
+        .with_param("key", &*self.api_key)
+        .with_param("version", "2")
+        .with_param("OperatorRef", "MTA")
+        .with_param("MonitoringRef", id)
+        .send()
+      {
+        Ok(a) => a,
+        Err(_) => {
           self.predict();
           return;
-        }
+        } // HTTP request failed.
       };
+      let bytes = resp.as_bytes();
+      let data: BusData = match serde_json::from_slice(bytes) {
+        Ok(a) => a,
+        Err(_) => return,
+      };
+
       let temp = match data.siri.service_delivery {
         Some(a) => a,
         None => {

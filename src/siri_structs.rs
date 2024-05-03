@@ -17,7 +17,7 @@ pub struct Siri {
 pub struct ServiceDelivery {
   pub response_timestamp: String,
   pub stop_monitoring_delivery: Vec<StopMonitoringDelivery>,
-  pub situation_exchange_delivery: Option<Vec<SituationExchangeDelivery>>,
+  //pub situation_exchange_delivery: Option<Vec<SituationExchangeDelivery>>,
 }
 
 #[derive(Serialize, Deserialize)]
