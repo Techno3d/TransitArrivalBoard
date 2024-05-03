@@ -24,7 +24,7 @@ fn main() {
 
   for stream in server.incoming() {
     let api_key_bus = api_key_bus.to_owned();
-    let handle = thread::spawn(move || {
+    thread::spawn(move || {
       let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
 
       let config: Result<Config, serde_json::Error> = match ws.read() {

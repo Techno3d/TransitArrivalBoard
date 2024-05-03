@@ -54,12 +54,17 @@ impl BusStopHandler {
           .send()
         {
           Ok(a) => a,
-          Err(_) => continue, // HTTP request failed.
+          Err(_) => {
+            continue;
+          } // HTTP request failed.
         };
-        data = Some(match serde_json::from_slice(resp.as_bytes()) {
-          Ok(a) => a,
-          Err(_) => continue,
-        });
+        let bytes = resp.as_bytes();
+        data = match serde_json::from_slice(bytes) {
+          Ok(r) => r,
+          Err(_) => {
+            continue;
+          }
+        };
         break;
       }
       let data = match data {
@@ -71,7 +76,9 @@ impl BusStopHandler {
       };
       let temp = match data.siri.service_delivery {
         Some(a) => a,
-        None => return,
+        None => {
+          return;
+        }
       };
       for stop_data in temp.stop_monitoring_delivery {
         let monitored_visit = match stop_data.monitored_stop_visit {
