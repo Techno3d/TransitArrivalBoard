@@ -41,6 +41,8 @@ impl BusStopHandler {
     let mut trips: Vec<Vehicle> = Vec::new();
     let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
+    // If we cannot get a duration from the UNIX_EPOCH, or make that into an i64, we have problems. 
+    // Should not fail else we can't get any time data at all.
     let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
     for id in self.stop_ids.to_owned().iter() {
@@ -80,27 +82,34 @@ impl BusStopHandler {
             Some(a) => a,
             None => continue,
           };
-          let arrival_time = DateTime::parse_from_rfc3339(arrival_time.as_str()).unwrap().timestamp();
+
+          // If parsing fails, then the MTA Bus API may no longer use iso8601 for times
+          let arrival_time = DateTime::parse_from_rfc3339(arrival_time.as_str())
+              .expect("Error parsing the bus time data.\nIf this happens consistently contact the board maintainers (Error line 91, bus_stop_handler.rs)")
+              .timestamp();
           let duration = ((arrival_time - current_time).max(0) / 60) as i32;
 
           // Route
-          let route_id = visit.monitored_vehicle_journey.line_ref.split('_').last().unwrap();
-          let route_name = visit.monitored_vehicle_journey.published_line_name.first().unwrap();
+          let route_id = visit.monitored_vehicle_journey.line_ref.split('_').last().unwrap_or(&visit.monitored_vehicle_journey.line_ref);
+          let route_name = match visit.monitored_vehicle_journey.published_line_name.first() {
+            Some(a) => a.to_owned(),
+            None =>  self.try_get_route_name(&route_id),
+        };
 
           // Destination
           let destination_id = visit
             .monitored_vehicle_journey
             .destination_ref
             .split('_')
-            .last()
-            .unwrap();
+            .last() // There should be at least one element
+            .unwrap(); // However, there should actually be two, because of MTA formating
           let destination_name = visit
             .monitored_vehicle_journey
             .destination_name
-            .first()
+            .first() // Should have a destination_name
             .unwrap()
             .split(" via ")
-            .next()
+            .next() // Should not be just the string " via "
             .unwrap();
 
           // Input data into trips
@@ -116,18 +125,18 @@ impl BusStopHandler {
           if !routes.contains_key(route_id) {
             routes.insert(route_id.to_owned(), BTreeMap::new());
           }
-          if !routes.get(route_id).unwrap().contains_key(destination_id) {
+          if !routes.get(route_id).unwrap().contains_key(destination_id) { // Key must exist because of above line
             routes
-              .get_mut(route_id)
+              .get_mut(route_id) // Key must exist for same reason above
               .unwrap()
               .insert(destination_id.to_owned(), Vec::new());
           };
 
           routes
-            .get_mut(route_id)
+            .get_mut(route_id) // Key exists
             .unwrap()
             .get_mut(destination_id)
-            .unwrap()
+            .unwrap() // Key exists due to above if statement check
             .push(Vehicle {
               route_id: route_id.to_owned(),
               route_name: route_name.to_owned(),
@@ -153,9 +162,35 @@ impl BusStopHandler {
     self.routes = routes;
   }
 
+  // Hopefully not called often if ever
+  fn try_get_route_name(&self, route_id: &str) -> String {
+      let feed_data = match self.feed_data.read() {
+        Ok(a) => a,
+        Err(_) => return route_id.to_string(),
+      };
+      let bus_static = &feed_data.bus_static_feed;
+      for bus in bus_static {
+          match bus.get_route(route_id) {
+            Ok(a) => {
+                // Short name is optional
+                let name: &str = match a.short_name.as_ref() {
+                    Some(a) => a,
+                    None => return route_id.to_owned(),
+                };
+                return name.to_owned();
+            },
+            Err(_) => continue,
+        }
+      }
+      route_id.to_owned()
+  }
+
   pub fn serialize(&self) -> Stop {
     let mut stop_name: String = Default::default();
-    for gtfs in self.feed_data.read().unwrap().bus_static_feed.iter() {
+    // If RwLock fail, then something went wrong
+    let feed_data = self.feed_data.read().unwrap();
+    for gtfs in feed_data.bus_static_feed.iter() {
+      // We just added a stop id in the refresh function, so exists
       stop_name = match gtfs.get_stop(self.stop_ids.first().unwrap()) {
         Ok(a) => a.name.to_owned().unwrap(),
         Err(_) => continue,
@@ -180,6 +215,7 @@ impl BusStopHandler {
         continue;
       }
 
+      // All unwraps between lines 219-246 have been accounted for by these if checks
       if !self.routes.contains_key(&trip.route_id) {
         self.routes.insert(trip.route_id.to_owned(), BTreeMap::new());
       }
