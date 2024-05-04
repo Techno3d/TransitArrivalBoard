@@ -32,8 +32,11 @@ impl SubwayStopHandler {
     let mut trips: Vec<Vehicle> = Vec::new();
     let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
 
+    // If we can't find time from UNIX_EPOCH or convert it to i64, then its okay to crash
+    // Assumed safe
     let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
+    // Crash on feed_data becoming poisined
     let data = self.feed_data.read().unwrap();
     for message in data.subway_realtime_feed.iter() {
       for entity in &message.entity {
@@ -54,18 +57,21 @@ impl SubwayStopHandler {
                 .trip_id()
                 .split('_')
                 .last()
-                .unwrap()
+                .unwrap() // No station name can be "_"
                 .split("..")
                 .next()
-                .unwrap();
-              let route_name = match data.subway_static_feed.get_route(route_id) {
-                Ok(a) => a.short_name.as_ref().unwrap(),
-                Err(_) => return,
+                .unwrap(); // No station name can be "_.."
+              let route_name = match data.subway_static_feed.get_route(&route_id) {
+                // Theoretically, all routes should have a route name
+                Ok(route_name) => route_name.short_name.as_ref().unwrap(),
+                Err(_) => continue,
               };
 
               // Destination
+              // Should have atleast the station we are looking at, thus should not fail
               let destination_id = trip_update.stop_time_update.last().unwrap().stop_id();
               let destination_name = match data.subway_static_feed.get_stop(destination_id) {
+                // Theoritcally, all destination ids should reference a name
                 Ok(a) => a.name.as_ref().unwrap(),
                 Err(_) => return,
               };
@@ -79,6 +85,7 @@ impl SubwayStopHandler {
                 minutes_until_arrival: duration,
               });
 
+              // All data from lines 90-110 are verified via the if statements
               // Input data into routes
               if !routes.contains_key(route_id) {
                 routes.insert(route_id.to_owned(), BTreeMap::new());
@@ -126,13 +133,13 @@ impl SubwayStopHandler {
       stop_name: self
         .feed_data
         .read()
-        .unwrap()
+        .unwrap() // If RwLock poisoned, server should crash
         .subway_static_feed
         .get_stop(self.stop_ids.first().unwrap())
-        .unwrap()
+        .unwrap() // Theoretically every stop id should have a stop name
         .name
         .as_ref()
-        .unwrap()
+        .unwrap() // A stop should have name
         .to_string(),
       trips: self.trips.to_owned(),
       routes: self.routes.to_owned(),
@@ -150,6 +157,7 @@ impl SubwayStopHandler {
         continue;
       }
 
+      // All the unwraps are verified between lines 161-191
       if !self.routes.contains_key(&trip.route_id) {
         self.routes.insert(trip.route_id.to_owned(), BTreeMap::new());
       }
