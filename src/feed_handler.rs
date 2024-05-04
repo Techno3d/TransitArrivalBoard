@@ -37,21 +37,23 @@ impl FeedHandler {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
         Err(_) => {
-          return;
+          continue;
         } // HTTP request failed.
       };
       let bytes = resp.as_bytes();
       let feed = match gtfsrt::FeedMessage::decode(bytes) {
         Ok(a) => a,
-        Err(_) => return,
+        Err(_) => continue,
       };
       self.subway_realtime_feed.push(feed);
     }
 
     // Service Alerts
-    let resp = minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
-      .send()
-      .unwrap();
+    let resp = match minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
+      .send() {
+        Ok(a) => a,
+        Err(_) => return, // Rely on old data, or no data
+    };
     let bytes = resp.as_bytes();
     let alerts: MercuryDelays = match serde_json::from_slice(bytes) {
       Ok(r) => r,
@@ -73,19 +75,27 @@ impl FeedHandler {
       "http://web.mta.info/developers/data/nyct/bus/google_transit_staten_island.zip",
     ];
     for uri in feed_uris {
-      let resp = minreq::get(uri).send().unwrap();
+      let resp = match minreq::get(uri).send() {
+        Ok(a) => a,
+        Err(_) => continue,
+      };
       let bytes = resp.as_bytes();
       let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
         Ok(a) => a,
-        Err(_) => return,
+        Err(_) => continue,
       };
       self.bus_static_feed.push(gtfs);
     }
 
     // Subway
-    let resp = minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip")
-      .send()
-      .unwrap();
+    let resp = match minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip")
+      .send() {
+        Ok(a) => a,
+        Err(_) => {
+            println!("If board is broken, then reload backend");
+            return;
+        }, // Relying on no data will probably bork transit board
+    };
     let bytes = resp.as_bytes();
     let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
       Ok(a) => a,
