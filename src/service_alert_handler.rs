@@ -25,22 +25,39 @@ impl ServiceAlertHandler {
   pub fn refresh(&mut self) {
     self.subway.clear();
 
+    // If RwLock poisined, should crash
     let data = self.feed_data.read().unwrap();
     for entity in &data.service_alerts_realtime_feed.entity {
-      let alert = entity.alert.as_ref().unwrap();
-      for informed in alert.informed_entity.as_ref().unwrap().iter() {
+      let alert = match entity.alert.as_ref() {
+        Some(a) => a,
+        None => continue,
+      };
+
+      let informed_entities = match alert.informed_entity.as_ref() {
+        Some(a) => a,
+        None => continue,
+    };
+      for informed in informed_entities.iter() {
         if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
           let decomposed: Vec<&str> = selector.sort_order.split(':').collect();
+          // If the selector formating changes, then we need to change. This would become a bug, so
+          // should crash
           let severity = (decomposed.get(2).unwrap()).parse().unwrap_or(0);
+          let route_id = match informed.route_id.as_ref() {
+            Some(a) => a,
+            None => continue,
+        };
 
           self.subway.push(Alert {
-            route_id: informed.route_id.as_ref().unwrap().to_string(),
+            // Should always have a route_id
+            route_id: route_id.to_string(),
             sort_order: severity,
+            // If header text exists, translation text should
             header_text: match alert.header_text {
               Some(ref a) => a
                 .translation
                 .as_ref()
-                .unwrap()
+                .unwrap() 
                 .first()
                 .unwrap()
                 .text
