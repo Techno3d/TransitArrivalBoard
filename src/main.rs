@@ -17,18 +17,25 @@ use tungstenite::protocol::CloseFrame;
 use tungstenite::Message;
 
 fn main() {
-  dotenvy::dotenv().unwrap();
-  let api_key_bus = Arc::new(std::env::var("MTABUSKEY").unwrap());
+  dotenvy::dotenv().expect("Dotenv not found, check that it exists or else board will not be able to use some MTA data (bus data)\n.env file should be located in the directory where you call the server, or a parent directory");
+  let api_key_bus = Arc::new(std::env::var("MTABUSKEY").expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"));
 
-  let server = TcpListener::bind("0.0.0.0:9001").unwrap();
+  let server = TcpListener::bind("0.0.0.0:9001").expect("Server failed to start, is port already in use?");
 
   for stream in server.incoming() {
-    let api_key_bus = api_key_bus.to_owned();
-    thread::spawn(move || {
-      let mut ws = tungstenite::accept(stream.unwrap()).unwrap();
+      let api_key_bus = api_key_bus.to_owned();
+      let spawn = thread::spawn(move || {
+        let stream = match stream {
+          Ok(stream) => stream,
+          Err(_) => return, // If stream fails to connect, don't crash
+      };
+      let mut ws = match tungstenite::accept(stream) {
+          Ok(ws) => ws,
+          Err(_) => return, // if not a websocket, don't crash
+      };
 
       let config: Result<Config, serde_json::Error> = match ws.read() {
-        Ok(c) => serde_json::from_str(c.to_text().unwrap()),
+        Ok(c) => serde_json::from_str(c.to_text().unwrap_or("")),
         Err(_) => Ok(Config::new(Vec::new(), Vec::new())),
       };
       let config: Config = match config {
@@ -43,7 +50,7 @@ fn main() {
       };
 
       let data = Arc::new(RwLock::new(FeedHandler::default()));
-      data.write().unwrap().refresh_static();
+      data.write().unwrap().refresh_static(); // Should be able to write
 
       let mut subway = config.get_subway_handlers(data.to_owned());
       let mut bus = config.get_bus_handlers(api_key_bus.to_owned(), data.to_owned());
@@ -58,19 +65,24 @@ fn main() {
 
         stops_map.clear();
 
+        // If we can't aquire write lock, we have problem
         data.write().unwrap().refresh_realtime();
 
         for i in 0..subway.len() {
+          // i must be in subway vector
           subway.get_mut(i).unwrap().refresh();
           stops_map.insert(
+            // There should be atleast one stop_id
             subway.get(i).unwrap().stop_ids.first().unwrap().to_owned(),
             subway.get(i).unwrap().serialize(),
           );
         }
 
         for i in 0..bus.len() {
+            // i is within the bus vector length
           bus.get_mut(i).unwrap().refresh();
           stops_map.insert(
+            // Atleast one stop_id must exist
             bus.get(i).unwrap().stop_ids.first().unwrap().to_string(),
             bus.get(i).unwrap().serialize(),
           );
@@ -78,9 +90,13 @@ fn main() {
 
         service_alerts.refresh();
 
-        let mut routes_static = data.read().unwrap().subway_static_feed.routes.to_owned();
+        // If lock cannot be acquired, then the data is no longer accessible
+        // Application should crash on RwLock poisining
+        let feed_data = data.read().unwrap();
+        let mut routes_static = feed_data.subway_static_feed.routes.clone();
 
-        for gtfs in &data.read().unwrap().bus_static_feed {
+        // Combines bus static feed data into subway static feed data
+        for gtfs in feed_data.bus_static_feed.iter() {
           for (key, value) in gtfs.routes.iter() {
             routes_static.insert(key.to_owned(), value.to_owned());
           }
@@ -92,7 +108,14 @@ fn main() {
           routes_static: routes_static.to_owned(),
         };
 
-        let data = serde_json::to_string(&data).unwrap();
+        // Should not error, but incase
+        let data = match serde_json::to_string(&data) {
+            Ok(a) => a,
+            Err(_) => { 
+                eprintln!("Sent blank data, could not serialize data");
+                serde_json::to_string(&InfoJson::default()).unwrap()
+            }, // Send blank data
+        };
         let message = Message::Text(data);
 
         match ws.send(message) {
