@@ -61,7 +61,7 @@ impl SubwayStopHandler {
                 .split("..")
                 .next()
                 .unwrap(); // No station name can be "_.."
-              let route_name = match data.subway_static_feed.get_route(&route_id) {
+              let route_name = match data.subway_static_feed.get_route(route_id) {
                 // Theoretically, all routes should have a route name
                 Ok(route_name) => route_name.short_name.as_ref().unwrap(),
                 Err(_) => continue,

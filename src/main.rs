@@ -18,20 +18,23 @@ use tungstenite::Message;
 
 fn main() {
   dotenvy::dotenv().expect("Dotenv not found, check that it exists or else board will not be able to use some MTA data (bus data)\n.env file should be located in the directory where you call the server, or a parent directory");
-  let api_key_bus = Arc::new(std::env::var("MTABUSKEY").expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"));
+  let api_key_bus = Arc::new(
+    std::env::var("MTABUSKEY")
+      .expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"),
+  );
 
   let server = TcpListener::bind("0.0.0.0:9001").expect("Server failed to start, is port already in use?");
 
   for stream in server.incoming() {
-      let api_key_bus = api_key_bus.to_owned();
-      let spawn = thread::spawn(move || {
-        let stream = match stream {
-          Ok(stream) => stream,
-          Err(_) => return, // If stream fails to connect, don't crash
+    let api_key_bus = api_key_bus.to_owned();
+    let _spawn = thread::spawn(move || {
+      let stream = match stream {
+        Ok(stream) => stream,
+        Err(_) => return, // If stream fails to connect, don't crash
       };
       let mut ws = match tungstenite::accept(stream) {
-          Ok(ws) => ws,
-          Err(_) => return, // if not a websocket, don't crash
+        Ok(ws) => ws,
+        Err(_) => return, // if not a websocket, don't crash
       };
 
       let config: Result<Config, serde_json::Error> = match ws.read() {
@@ -79,7 +82,7 @@ fn main() {
         }
 
         for i in 0..bus.len() {
-            // i is within the bus vector length
+          // i is within the bus vector length
           bus.get_mut(i).unwrap().refresh();
           stops_map.insert(
             // Atleast one stop_id must exist
@@ -110,11 +113,11 @@ fn main() {
 
         // Should not error, but incase
         let data = match serde_json::to_string(&data) {
-            Ok(a) => a,
-            Err(_) => { 
-                eprintln!("Sent blank data, could not serialize data");
-                serde_json::to_string(&InfoJson::default()).unwrap()
-            }, // Send blank data
+          Ok(a) => a,
+          Err(_) => {
+            eprintln!("Sent blank data, could not serialize data");
+            serde_json::to_string(&InfoJson::default()).unwrap()
+          } // Send blank data
         };
         let message = Message::Text(data);
 

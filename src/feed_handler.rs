@@ -49,11 +49,11 @@ impl FeedHandler {
     }
 
     // Service Alerts
-    let resp = match minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json")
-      .send() {
+    let resp =
+      match minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json").send() {
         Ok(a) => a,
         Err(_) => return, // Rely on old data, or no data
-    };
+      };
     let bytes = resp.as_bytes();
     let alerts: MercuryDelays = match serde_json::from_slice(bytes) {
       Ok(r) => r,
@@ -88,13 +88,12 @@ impl FeedHandler {
     }
 
     // Subway
-    let resp = match minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip")
-      .send() {
-        Ok(a) => a,
-        Err(_) => {
-            println!("If board is broken, then reload backend");
-            return;
-        }, // Relying on no data will probably bork transit board
+    let resp = match minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip").send() {
+      Ok(a) => a,
+      Err(_) => {
+        println!("If board is broken, then reload backend");
+        return;
+      } // Relying on no data will probably bork transit board
     };
     let bytes = resp.as_bytes();
     let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {

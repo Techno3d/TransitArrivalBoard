@@ -36,7 +36,7 @@ impl ServiceAlertHandler {
       let informed_entities = match alert.informed_entity.as_ref() {
         Some(a) => a,
         None => continue,
-    };
+      };
       for informed in informed_entities.iter() {
         if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
           let decomposed: Vec<&str> = selector.sort_order.split(':').collect();
@@ -46,7 +46,7 @@ impl ServiceAlertHandler {
           let route_id = match informed.route_id.as_ref() {
             Some(a) => a,
             None => continue,
-        };
+          };
 
           self.subway.push(Alert {
             // Should always have a route_id
@@ -57,7 +57,7 @@ impl ServiceAlertHandler {
               Some(ref a) => a
                 .translation
                 .as_ref()
-                .unwrap() 
+                .unwrap()
                 .first()
                 .unwrap()
                 .text
