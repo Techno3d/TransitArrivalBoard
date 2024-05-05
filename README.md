@@ -21,7 +21,7 @@ Open 2 terminals and run the following commands.
 cargo run
 ```
 ```bash
-npm run install
+npm install
 npm run dev
 ```
 #### Production
@@ -32,7 +32,7 @@ cargo build --release
 start .\target\release\transit-board.exe
 ```
 ```bash
-npm run install
+npm install
 npm run build
 npm run start
 ```
