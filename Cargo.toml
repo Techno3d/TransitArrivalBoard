@@ -22,5 +22,3 @@ prost-build = { version = "0.12.3" }
 
 [lints.rust]
 unsafe_code = "forbid"
-
-[features]

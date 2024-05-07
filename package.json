@@ -1,5 +1,5 @@
 {
-  "name": "transitarrivalboard",
+  "name": "transit-board",
   "version": "0.1.0",
   "description": "Gets and displays public transit info around Bronx Science",
   "main": "index.js",
