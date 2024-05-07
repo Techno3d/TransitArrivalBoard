@@ -7,38 +7,39 @@ use std::{
 
 use crate::{feed_handler::FeedHandler, Stop, Vehicle};
 
+#[derive(Default)]
 pub struct SubwayStopHandler {
+  feed_data: Arc<RwLock<FeedHandler>>,
   pub stop_ids: Vec<String>,
-  pub display: String,
-  pub walk_time: i32,
   pub trips: Vec<Vehicle>,
   pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
-  feed_data: Arc<RwLock<FeedHandler>>,
 }
 
 impl SubwayStopHandler {
-  pub fn new(stop_ids: Vec<String>, display: String, walk_time: i32, feed_data: Arc<RwLock<FeedHandler>>) -> Self {
+  pub fn new(feed_data: Arc<RwLock<FeedHandler>>, stop_ids: Vec<String>) -> Self {
     Self {
-      stop_ids,
-      display,
-      walk_time,
-      trips: Vec::new(),
-      routes: BTreeMap::new(),
       feed_data,
+      stop_ids,
+      ..Default::default()
     }
   }
 
   pub fn refresh(&mut self) {
-    let mut trips: Vec<Vehicle> = Vec::new();
-    let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = BTreeMap::new();
+    if self.feed_data.read().unwrap().subway_realtime_feed.is_none() {
+      self.predict();
+      return;
+    }
 
-    // If we can't find time from UNIX_EPOCH or convert it to i64, then its okay to crash
-    // Assumed safe
+    let mut trips: Vec<Vehicle> = Default::default();
+    let mut routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = Default::default();
+
+    // Crash if UNIX_EPOCH fails to convert to i64
     let current_time = i64::try_from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()).unwrap();
 
-    // Crash on feed_data becoming poisined
+    // Crash if feed_data becomes poisoned
     let data = self.feed_data.read().unwrap();
-    for message in data.subway_realtime_feed.iter() {
+
+    for message in data.subway_realtime_feed.as_ref().unwrap().to_owned().iter() {
       for entity in &message.entity {
         if let Some(trip_update) = &entity.trip_update {
           for stop in trip_update.stop_time_update.iter() {
@@ -130,7 +131,7 @@ impl SubwayStopHandler {
 
   pub fn serialize(&self) -> Stop {
     Stop {
-      stop_name: self
+      name: self
         .feed_data
         .read()
         .unwrap() // If RwLock poisoned, server should crash
@@ -143,7 +144,6 @@ impl SubwayStopHandler {
         .to_string(),
       trips: self.trips.to_owned(),
       routes: self.routes.to_owned(),
-      walk_time: self.walk_time,
     }
   }
 
@@ -187,7 +187,5 @@ impl SubwayStopHandler {
           minutes_until_arrival: trip.minutes_until_arrival,
         });
     }
-
-    self.trips.retain(|a| a.minutes_until_arrival >= 0);
   }
 }

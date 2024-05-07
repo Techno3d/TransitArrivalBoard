@@ -27,13 +27,18 @@ impl ServiceAlertHandler {
 
     // If RwLock poisined, should crash
     let data = self.feed_data.read().unwrap();
-    for entity in &data.service_alerts_realtime_feed.entity {
-      let alert = match entity.alert.as_ref() {
+
+    if data.service_alerts_realtime_feed.is_none() {
+      return;
+    }
+
+    for entity in data.service_alerts_realtime_feed.to_owned().unwrap().entity {
+      let alert = match entity.alert {
         Some(a) => a,
         None => continue,
       };
 
-      let informed_entities = match alert.informed_entity.as_ref() {
+      let informed_entities = match alert.informed_entity {
         Some(a) => a,
         None => continue,
       };

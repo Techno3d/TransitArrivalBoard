@@ -29,14 +29,7 @@ impl Config {
     self
       .subway
       .iter()
-      .map(|a| {
-        SubwayStopHandler::new(
-          a.stop_ids.to_owned(),
-          a.display.to_owned(),
-          a.walk_time,
-          feed_data.to_owned(),
-        )
-      })
+      .map(|a| SubwayStopHandler::new(feed_data.to_owned(), a.stop_ids.to_owned()))
       .collect()
   }
 
@@ -44,15 +37,7 @@ impl Config {
     self
       .bus
       .iter()
-      .map(|a| {
-        BusStopHandler::new(
-          a.stop_ids.to_owned(),
-          a.display.to_owned(),
-          a.walk_time,
-          api_key.to_owned(),
-          feed_data.to_owned(),
-        )
-      })
+      .map(|a| BusStopHandler::new(feed_data.to_owned(), api_key.to_owned(), a.stop_ids.to_owned()))
       .collect()
   }
 

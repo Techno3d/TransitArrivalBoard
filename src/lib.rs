@@ -24,8 +24,7 @@ pub struct Vehicle {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Stop {
-  pub stop_name: String,
-  pub walk_time: i32,
+  pub name: String,
   pub trips: Vec<Vehicle>,
   pub routes: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
 }

@@ -9,9 +9,9 @@ use crate::{gtfsrt, mercury_structs::MercuryDelays};
 #[derive(Default)]
 pub struct FeedHandler {
   pub subway_static_feed: Gtfs,
-  pub subway_realtime_feed: Vec<gtfsrt::FeedMessage>,
+  pub subway_realtime_feed: Option<Vec<gtfsrt::FeedMessage>>,
   pub bus_static_feed: Vec<Gtfs>,
-  pub service_alerts_realtime_feed: MercuryDelays,
+  pub service_alerts_realtime_feed: Option<MercuryDelays>,
 }
 
 impl FeedHandler {
@@ -20,8 +20,7 @@ impl FeedHandler {
   }
 
   pub fn refresh_realtime(&mut self) {
-    self.subway_realtime_feed.clear();
-    self.service_alerts_realtime_feed = Default::default();
+    let mut subway: Vec<gtfsrt::FeedMessage> = Default::default();
 
     // Subway
     let feed_uris = [
@@ -37,7 +36,8 @@ impl FeedHandler {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
         Err(_) => {
-          continue;
+          self.subway_realtime_feed = None;
+          break;
         } // HTTP request failed.
       };
       let bytes = resp.as_bytes();
@@ -45,26 +45,31 @@ impl FeedHandler {
         Ok(a) => a,
         Err(_) => continue,
       };
-      self.subway_realtime_feed.push(feed);
+      subway.push(feed);
     }
 
     // Service Alerts
     let resp =
       match minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json").send() {
         Ok(a) => a,
-        Err(_) => return, // Rely on old data, or no data
+        Err(_) => {
+          self.service_alerts_realtime_feed = None;
+          return;
+        }
       };
+
     let bytes = resp.as_bytes();
-    let alerts: MercuryDelays = match serde_json::from_slice(bytes) {
+    let service_alerts: MercuryDelays = match serde_json::from_slice(bytes) {
       Ok(r) => r,
       Err(_) => Default::default(),
     };
-    self.service_alerts_realtime_feed = alerts;
+
+    self.subway_realtime_feed = Some(subway);
+    self.service_alerts_realtime_feed = Some(service_alerts);
   }
 
   pub fn refresh_static(&mut self) {
     self.bus_static_feed.clear();
-    self.subway_static_feed = Default::default();
 
     // Bus
     let feed_uris = [
