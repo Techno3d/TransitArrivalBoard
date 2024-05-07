@@ -32,7 +32,12 @@ export function Alert(props: {
               if (text.charAt(0) === "[" && text.charAt(text.length - 1) === "]") {
                 return (
                   <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
-                    <Bullet route={text.charAt(1)} color={routes[text.charAt(1)].route_color} size={42} />
+                    <Bullet
+                      short_name={text.charAt(1)}
+                      color={routes[text.charAt(1)].route_color}
+                      text_color={routes[text.charAt(1)].route_text_color}
+                      size={42}
+                    />
                   </div>
                 );
               }
@@ -41,7 +46,7 @@ export function Alert(props: {
           </h1>
         </div>
       ) : (
-        <div className="h-51 flex w-full flex-row items-center rounded-lg bg-slate-100">
+        <div className="flex w-full grow flex-row items-center rounded-lg bg-slate-100">
           <h1 className="w-full text-center font-bold text-black 2xl:text-5xl">No active alerts </h1>
         </div>
       )}
