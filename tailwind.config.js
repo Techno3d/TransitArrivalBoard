@@ -24,6 +24,10 @@ const config = {
           "50%": { backgroundColor: "#fcd34d" },
         },
       },
+      spacing: {
+        29: "116px",
+        51: "240px",
+      },
     },
   },
   plugins: [],

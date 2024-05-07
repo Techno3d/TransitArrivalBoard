@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Alert } from "./components/Alert";
 import { Countdown } from "./components/Countdown";
@@ -7,6 +8,7 @@ import { List } from "./components/List";
 import { Vehicle } from "./types";
 
 export default function Home() {
+  const [time, setTime] = useState<string>("");
   const [jeromeNames, setJeromeNames] = useState<string>("");
   const [jeromeTimes, setJeromeTimes] = useState<Array<Vehicle>>([]);
   const [concourseNames, setConcourseNames] = useState<string>("");
@@ -18,6 +20,7 @@ export default function Home() {
   const [w205Names, setW205Names] = useState<string>("");
   const [w205Times, setW205Times] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
   const [index, setIndex] = useState(0);
+  const [status, setStatus] = useState(false);
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
@@ -55,16 +58,19 @@ export default function Home() {
     };
 
     ws.onmessage = (event) => {
+      setStatus(true);
       console.log("Message recieved.");
+      console.log(event.data);
+
       const message = JSON.parse(event.data);
 
-      const jeromeName: string = message["stops_realtime"]["405S"]["stop_name"];
+      const jeromeName: string = message["stops_realtime"]["405S"]["name"];
       setJeromeNames(jeromeName);
 
       const jeromeData: Vehicle[] = message["stops_realtime"]["405S"]["trips"];
       setJeromeTimes(jeromeData);
 
-      const concouseName: string = message["stops_realtime"]["D03S"]["stop_name"];
+      const concouseName: string = message["stops_realtime"]["D03S"]["name"];
       setConcourseNames(concouseName);
 
       const concourseData: Vehicle[] = message["stops_realtime"]["D03S"]["trips"];
@@ -93,14 +99,14 @@ export default function Home() {
       const routeData: { [key: string]: { [key: string]: string } } = message["routes_static"];
       setRoutes(routeData);
 
-      const paulName: string = message["stops_realtime"]["100017"]["stop_name"];
+      const paulName: string = message["stops_realtime"]["100017"]["name"];
       setPaulNames(paulName);
 
       const paulData: { [key: string]: { [key: string]: Array<Vehicle> } } =
         message["stops_realtime"]["100017"]["routes"];
       setPaulTimes(paulData);
 
-      const w205Name: string = message["stops_realtime"]["100723"]["stop_name"];
+      const w205Name: string = message["stops_realtime"]["100723"]["name"];
       setW205Names(w205Name);
 
       const w205stData: { [key: string]: { [key: string]: Array<Vehicle> } } =
@@ -108,16 +114,13 @@ export default function Home() {
       setW205Times(w205stData);
     };
 
-    ws.onerror = (error) => {
-      console.error("Websocket errored.", error);
-    };
-
     ws.onclose = () => {
+      setStatus(false);
       console.log("Websocket closed.");
     };
 
     return () => {
-      console.log("Websocket closing.");
+      console.log("Closing old websocket...");
       ws.close();
     };
   }, []);
@@ -136,18 +139,70 @@ export default function Home() {
     };
   }, [serviceAlerts.length]);
 
+  useEffect(() => {
+    setInterval(() => {
+      const date = new Date();
+      setTime(
+        date.toLocaleString("en-US", {
+          hour12: true,
+          timeZone: "America/New_York",
+          timeStyle: "short",
+          dateStyle: "long",
+        }),
+      );
+    }, 1000);
+  }, []);
+
   return (
-    <div className="grid max-h-screen min-h-screen grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
-      <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Countdown name={jeromeNames} vehicles={jeromeTimes} routes={routes}></Countdown>
-        <Countdown name={concourseNames} vehicles={concourseTimes} routes={routes}></Countdown>
+    <div className="flex min-h-screen flex-col">
+      <div className="grid grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
+        <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
+          <Countdown name={jeromeNames} vehicles={jeromeTimes} routes={routes}></Countdown>
+          <Countdown name={concourseNames} vehicles={concourseTimes} routes={routes}></Countdown>
+        </div>
+        <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
+          <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} status={status} />
+        </div>
+        <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
+          <List name={paulNames} vehicles={paulTimes} routes={routes}></List>
+          <List name={w205Names} vehicles={w205Times} routes={routes}></List>
+        </div>
       </div>
-      <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} />
-      </div>
-      <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
-        <List name={paulNames} vehicles={paulTimes} routes={routes}></List>
-        <List name={w205Names} vehicles={w205Times} routes={routes}></List>
+      <div className="flex h-14 flex-row items-center rounded-lg bg-black">
+        <h1 className="mx-2 flex-1 grow text-start font-bold text-white 2xl:text-3xl">
+          {"Status: "}
+          {status ? (
+            <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
+          ) : (
+            <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
+          )}
+        </h1>
+        <h1 className="mx-2 text-center font-bold text-white 2xl:text-3xl">
+          {"Made with ❤️ by "}
+          <span className="inline-flex items-baseline">
+            <Image
+              src="https://avatars.githubusercontent.com/u/76977073?"
+              alt=""
+              className="mx-1 self-center rounded-full"
+              height={36}
+              width={36}
+            />
+            <span>Shadman Syed</span>
+          </span>
+          {" and "}
+          <span className="inline-flex items-baseline">
+            <Image
+              src="https://avatars.githubusercontent.com/u/95447323?"
+              alt=""
+              className="mx-1 self-center rounded-full"
+              height={36}
+              width={36}
+            />
+            <span>David Wang</span>
+          </span>
+        </h1>
+
+        <h1 className="mx-2 flex-1 grow text-end font-bold text-white 2xl:text-3xl">{time}</h1>
       </div>
     </div>
   );
