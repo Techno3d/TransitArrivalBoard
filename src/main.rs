@@ -106,6 +106,7 @@ fn main() {
         }
 
         let data = InfoJson {
+          online: true,
           stops_realtime: stops_map.to_owned(),
           service_alerts_realtime: service_alerts.subway.to_owned(),
           routes_static: routes_static.to_owned(),
@@ -134,6 +135,7 @@ fn main() {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 struct InfoJson {
+  online: bool,
   stops_realtime: BTreeMap<String, Stop>,
   service_alerts_realtime: Vec<Alert>,
   routes_static: HashMap<String, Route>,

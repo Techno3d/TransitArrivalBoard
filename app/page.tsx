@@ -20,7 +20,7 @@ export default function Home() {
   const [w205Names, setW205Names] = useState<string>("");
   const [w205Times, setW205Times] = useState<{ [key: string]: { [key: string]: Array<Vehicle> } }>({});
   const [index, setIndex] = useState(0);
-  const [status, setStatus] = useState(false);
+  const [wsStatus, setWsStatus] = useState(false);
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
@@ -58,9 +58,8 @@ export default function Home() {
     };
 
     ws.onmessage = (event) => {
-      setStatus(true);
+      setWsStatus(true);
       console.log("Message recieved.");
-      console.log(event.data);
 
       const message = JSON.parse(event.data);
 
@@ -115,7 +114,7 @@ export default function Home() {
     };
 
     ws.onclose = () => {
-      setStatus(false);
+      setWsStatus(false);
       console.log("Websocket closed.");
     };
 
@@ -161,7 +160,7 @@ export default function Home() {
           <Countdown name={concourseNames} vehicles={concourseTimes} routes={routes}></Countdown>
         </div>
         <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-          <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} status={status} />
+          <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} />
         </div>
         <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
           <List name={paulNames} vehicles={paulTimes} routes={routes}></List>
@@ -171,7 +170,7 @@ export default function Home() {
       <div className="flex h-14 flex-row items-center rounded-lg bg-black">
         <h1 className="mx-2 flex-1 grow text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
-          {status ? (
+          {wsStatus ? (
             <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
           ) : (
             <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>

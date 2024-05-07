@@ -187,5 +187,7 @@ impl SubwayStopHandler {
           minutes_until_arrival: trip.minutes_until_arrival,
         });
     }
+
+    self.trips.retain(|a| a.minutes_until_arrival >= 0);
   }
 }
