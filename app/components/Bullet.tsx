@@ -11,6 +11,7 @@ export function Bullet(props: { short_name: string; color: string; text_color: s
         style={{
           backgroundColor: `#${color}`,
           height: `${size}px`,
+          width: `${size}px`,
         }}
       >
         <h1
@@ -28,6 +29,41 @@ export function Bullet(props: { short_name: string; color: string; text_color: s
         >
           {short_name}
         </h1>
+      </span>
+    );
+  }
+
+  if (short_name.length <= 2 && short_name.charAt(1) === "X") {
+    return (
+      <span
+        className="flex items-center justify-center"
+        style={{
+          height: `${size}px`,
+          width: `${size}px`,
+        }}
+      >
+        <span
+          className="flex rotate-[45deg] items-center justify-center"
+          style={{
+            backgroundColor: `#${color}`,
+            height: `${size / Math.sqrt(2)}px`,
+            width: `${size / Math.sqrt(2)}px`,
+          }}
+        >
+          <h1
+            className="rotate-[-45deg] text-center font-bold"
+            style={{
+              fontSize: `${(size * 0.65) / Math.sqrt(2)}px`,
+
+              color: `#FFFFFF`,
+              // Due to the MTA forgetting to add route_text_color to their GTFS static files,
+              // we'll have to manually set all the colors to white at the expense of the BMT Broadway Line bullets
+              // color: `#${text_color}`
+            }}
+          >
+            {short_name.charAt(0)}
+          </h1>
+        </span>
       </span>
     );
   }

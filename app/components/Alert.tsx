@@ -32,9 +32,9 @@ export function Alert(props: {
                 return (
                   <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
                     <Bullet
-                      short_name={text.charAt(1)}
-                      color={routes[text.charAt(1)].route_color}
-                      text_color={routes[text.charAt(1)].route_text_color}
+                      short_name={text.substring(1, text.length - 1)}
+                      color={routes[text.substring(1, text.length - 1)].route_color}
+                      text_color={routes[text.substring(1, text.length - 1)].route_text_color}
                       size={42}
                     />
                   </div>
