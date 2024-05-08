@@ -53,7 +53,7 @@ export function Bullet(props: { short_name: string; color: string; text_color: s
           <h1
             className="rotate-[-45deg] text-center font-bold"
             style={{
-              fontSize: `${(size * 0.65) / Math.sqrt(2)}px`,
+              fontSize: `${size * 0.65}px`,
 
               color: `#FFFFFF`,
               // Due to the MTA forgetting to add route_text_color to their GTFS static files,
