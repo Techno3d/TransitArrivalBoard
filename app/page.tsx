@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Alert } from "./components/Alert";
+import { Calendar } from "./components/Calendar";
 import { Countdown } from "./components/Countdown";
 import { List } from "./components/List";
 import { Vehicle } from "./types";
@@ -155,12 +155,11 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-3 gap-4 bg-emerald-700 p-2 text-black">
-        <div className="col-span-2 row-span-2 flex flex-col gap-2 rounded-xl bg-black p-2">
-          <Countdown name={jeromeNames} vehicles={jeromeTimes} routes={routes}></Countdown>
-          <Countdown name={concourseNames} vehicles={concourseTimes} routes={routes}></Countdown>
+        <div className="col-span-2 row-span-2 flex flex-row gap-2 rounded-xl bg-black p-2">
+          <Calendar name={"Calendar"}></Calendar>
         </div>
         <div className="col-span-2 row-span-1 flex flex-col gap-2 rounded-xl bg-black p-2">
-          <Alert name={"Service Alerts"} headers={serviceAlerts} routes={routes} index={index} />
+          <Countdown name={jeromeNames} vehicles={jeromeTimes} routes={routes} />
         </div>
         <div className="col-span-1 row-span-3 flex flex-col gap-2 rounded-xl bg-black p-2">
           <List name={paulNames} vehicles={paulTimes} routes={routes}></List>
