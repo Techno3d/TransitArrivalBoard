@@ -16,7 +16,6 @@ pub struct Config {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct StopConfig {
   pub stop_ids: Vec<String>,
-  pub display: String,
   pub walk_time: i32,
 }
 
