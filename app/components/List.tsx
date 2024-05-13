@@ -46,7 +46,7 @@ export function List(props: {
     });
   });
 
-  if (displays.length === 0) {
+  if (displays.length == 0) {
     return (
       <React.Fragment>
         <div className="flex h-14 flex-row items-center rounded-lg bg-emerald-700">{<Title name={name}></Title>}</div>

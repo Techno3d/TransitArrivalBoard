@@ -126,7 +126,7 @@ export default function Home() {
 
   useEffect(() => {
     const loop = setInterval(() => {
-      if (serviceAlerts.length === 0) {
+      if (serviceAlerts.length == 0) {
         setIndex(0);
         return;
       }

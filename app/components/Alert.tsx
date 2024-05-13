@@ -27,8 +27,8 @@ export function Alert(props: {
         <div className="flex h-51 w-full flex-row items-start rounded-lg bg-slate-100 px-4">
           <h1 className="line-clamp-4 text-pretty font-semibold 2xl:text-5xl 2xl:leading-tight">
             {headers[index].split(/(\[.*?\])/).map((text) => {
-              if (text.length === 0) return;
-              if (text.charAt(0) === "[" && text.charAt(text.length - 1) === "]") {
+              if (text.length == 0) return;
+              if (text.substring(0, 1) == "[" && text.substring(text.length - 1) == "]") {
                 return (
                   <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
                     <Bullet

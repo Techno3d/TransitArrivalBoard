@@ -33,7 +33,7 @@ export function Bullet(props: { short_name: string; color: string; text_color: s
     );
   }
 
-  if (short_name.length <= 2 && short_name.charAt(1) === "X") {
+  if (short_name.length <= 2 && short_name.substring(1) == "X") {
     return (
       <span
         className="flex items-center justify-center"
@@ -61,7 +61,7 @@ export function Bullet(props: { short_name: string; color: string; text_color: s
               // color: `#${text_color}`
             }}
           >
-            {short_name.charAt(0)}
+            {short_name.substring(0, 1)}
           </h1>
         </span>
       </span>
