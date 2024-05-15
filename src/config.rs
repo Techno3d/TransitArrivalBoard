@@ -1,26 +1,22 @@
 use std::sync::{Arc, RwLock};
 
 use serde::{Deserialize, Serialize};
+use ts_rs::TS;
 
 use crate::{
   bus_stop_handler::BusStopHandler, feed_handler::FeedHandler, service_alert_handler::ServiceAlertHandler,
   subway_stop_handler::SubwayStopHandler,
 };
 
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, TS)]
+#[ts(export)]
 pub struct Config {
-  subway: Vec<StopConfig>,
-  bus: Vec<StopConfig>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct StopConfig {
-  pub stop_ids: Vec<String>,
-  pub walk_time: i32,
+  subway: Vec<Vec<String>>,
+  bus: Vec<Vec<String>>,
 }
 
 impl Config {
-  pub fn new(subway: Vec<StopConfig>, bus: Vec<StopConfig>) -> Self {
+  pub fn new(subway: Vec<Vec<String>>, bus: Vec<Vec<String>>) -> Self {
     Self { subway, bus }
   }
 
@@ -28,7 +24,7 @@ impl Config {
     self
       .subway
       .iter()
-      .map(|a| SubwayStopHandler::new(feed_data.to_owned(), a.stop_ids.to_owned()))
+      .map(|a| SubwayStopHandler::new(feed_data.to_owned(), a.to_owned()))
       .collect()
   }
 
@@ -36,7 +32,7 @@ impl Config {
     self
       .bus
       .iter()
-      .map(|a| BusStopHandler::new(feed_data.to_owned(), api_key.to_owned(), a.stop_ids.to_owned()))
+      .map(|a| BusStopHandler::new(feed_data.to_owned(), api_key.to_owned(), a.to_owned()))
       .collect()
   }
 

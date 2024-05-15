@@ -29,6 +29,7 @@ The webpage can be found at http://localhost:3000/ after deploying.
 Open 2 terminals and run the following commands.
 
 ```bash
+cargo test
 cargo run
 ```
 
@@ -44,6 +45,7 @@ Open 2 terminals and run the following commands.
 > Note: `start` is a command only found on Windows.
 
 ```bash
+cargo test
 cargo build --release
 start .\target\release\transit-board.exe
 ```
