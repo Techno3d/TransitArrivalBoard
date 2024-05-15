@@ -45,7 +45,7 @@ export default function Home() {
       setStatus(true);
       console.log("Message recieved.");
 
-      const message = JSON.parse(event.data);
+      const message: Import = JSON.parse(event.data);
       setImportConfig(message);
 
       const headers: Array<string> = [];
@@ -74,20 +74,6 @@ export default function Home() {
       ws.close();
     };
   });
-
-  useEffect(() => {
-    const loop = setInterval(() => {
-      if (serviceAlerts.length == 0) {
-        setIndex(0);
-        return;
-      }
-      setIndex((i) => (((i + 1) % serviceAlerts.length) + serviceAlerts.length) % serviceAlerts.length);
-    }, 5000);
-
-    return () => {
-      clearInterval(loop);
-    };
-  }, [serviceAlerts.length]);
 
   useEffect(() => {
     const loop = setInterval(() => {
