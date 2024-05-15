@@ -45,10 +45,11 @@ export default function Home() {
       setStatus(true);
       console.log("Message recieved.");
 
-      setImportConfig(JSON.parse(event.data));
+      const message = JSON.parse(event.data);
+      setImportConfig(message);
 
       const headers: Array<string> = [];
-      const serviceData: Array<Alert> = importConfig.service_alerts_realtime;
+      const serviceData: Array<Alert> = message.service_alerts_realtime;
       serviceData
         .slice()
         .reverse()
@@ -126,6 +127,7 @@ export default function Home() {
                       ? importConfig.stops_realtime[value.stop_ids[0]]
                       : { name: "", trips: [], destinations: {} }
                   }
+                  walk_time={value.walk_time}
                   routes={importConfig.routes_static}
                 ></Countdown>
               );
@@ -152,6 +154,7 @@ export default function Home() {
                       : { name: "", trips: [], destinations: {} }
                   }
                   routes={importConfig.routes_static}
+                  walk_time={value.walk_time}
                 ></Bulletin>
               );
             })}
