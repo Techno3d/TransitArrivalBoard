@@ -19,6 +19,8 @@ fn main() {
     std::env::var("MTABUSKEY")
       .expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"),
   );
+  let data = Arc::new(RwLock::new(FeedHandler::default()));
+  data.write().unwrap().refresh_static(); // Should be able to write
 
   let server = TcpListener::bind("0.0.0.0:9001").expect("Server failed to start, is port already in use?");
 
