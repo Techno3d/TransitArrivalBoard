@@ -73,7 +73,7 @@ export default function Home() {
 
       ws.close();
     };
-  }, [importConfig.service_alerts_realtime]);
+  });
 
   useEffect(() => {
     const loop = setInterval(() => {
@@ -111,7 +111,7 @@ export default function Home() {
     return () => {
       clearInterval(loop);
     };
-  }, [serviceAlerts.length]);
+  });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -161,7 +161,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="flex min-h-14 flex-row items-center rounded-lg bg-black">
+      <div className="flex min-h-14 flex-row items-center bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
           {status ? (
