@@ -39,7 +39,7 @@ export default function Home() {
         .slice()
         .reverse()
         .forEach((alert) => {
-          if (headers.indexOf(alert.header_text) !== -1) return;
+          if (headers.indexOf(alert.header_text) != -1) return;
           if (alert.sort_order < 22) return;
           headers.push(alert.header_text);
         });
@@ -145,7 +145,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="flex h-14 flex-row items-center rounded-lg bg-black">
+      <div className="flex min-h-14 flex-row items-center rounded-lg bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
           {status ? (

@@ -13,7 +13,10 @@ export function Bulletin(props: { routes: Record<string, Route>; stop: Stop }) {
         Object.values(props.stop.destinations).map((destinations) => {
           return Object.values(destinations).map((vehicles) => {
             return (
-              <div className="flex h-29 flex-row items-center rounded-lg bg-slate-200 text-black" key={Math.random()}>
+              <div
+                className="flex min-h-29 flex-row items-center rounded-lg bg-slate-200 text-black"
+                key={Math.random()}
+              >
                 <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
                   <div className="flex h-full w-3/4 flex-row items-center justify-start gap-2 px-2">
                     <Bullet route={props.routes[vehicles[0].route_id]} size={72} />

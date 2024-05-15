@@ -6,13 +6,13 @@ import { Bullet } from "./Bullet";
 export function Countdown(props: { routes: Record<string, Route>; stop: Stop }) {
   return (
     <React.Fragment>
-      <div className="flex h-14 flex-row items-center rounded-lg bg-emerald-700">
+      <div className="flex min-h-14 flex-row items-center rounded-lg bg-emerald-700">
         <h1 className="mx-2 font-black text-white 2xl:text-3xl">{props.stop.name}</h1>
       </div>
       {props.stop.trips.length > 0 ? (
-        <div className="flex h-64 flex-row rounded-lg bg-slate-300">
+        <div className="flex min-h-64 flex-row rounded-lg bg-slate-300">
           <div className="flex h-full w-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
-            <div className="h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
+            <div className="flex h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
               <div className="flex h-full flex-col px-8 py-4">
                 <div className="flex basis-2/5 flex-row items-center">
                   <h1 className="line-clamp-1 font-bold text-black 2xl:text-6xl 2xl:leading-normal">
@@ -57,7 +57,7 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop }) 
           ) : undefined}
         </div>
       ) : (
-        <div className="flex h-64 basis-0 flex-row items-center rounded-lg bg-slate-100">
+        <div className="flex min-h-64 basis-0 flex-row items-center rounded-lg bg-slate-100">
           <h1 className="flex-1 text-center font-bold text-black 2xl:text-5xl">No scheduled vehicles</h1>
         </div>
       )}
