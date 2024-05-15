@@ -26,6 +26,7 @@ fn main() {
 
   for stream in server.incoming() {
     let api_key_bus = api_key_bus.to_owned();
+    let data = data.clone();
     let _spawn = thread::spawn(move || {
       let stream = match stream {
         Ok(stream) => stream,
@@ -61,9 +62,6 @@ fn main() {
           return;
         }
       };
-
-      let data = Arc::new(RwLock::new(FeedHandler::default()));
-      data.write().unwrap().refresh_static(); // Should be able to write
 
       let mut subway = config.get_subway_handlers(data.to_owned());
       let mut bus = config.get_bus_handlers(data.to_owned(), api_key_bus.to_owned());
