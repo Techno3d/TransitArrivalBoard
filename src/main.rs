@@ -7,8 +7,8 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
 
+use transit_board::config::Import;
 use transit_board::feed_handler::FeedHandler;
-use transit_board::import::Import;
 use transit_board::{Export, Route, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
 use tungstenite::{protocol::CloseFrame, Message};
@@ -27,17 +27,28 @@ fn main() {
     let _spawn = thread::spawn(move || {
       let stream = match stream {
         Ok(stream) => stream,
-        Err(_) => return, // If stream fails to connect, don't crash
+        Err(_) => {
+          return;
+        } // If stream fails to connect, don't crash
       };
       let mut ws = match tungstenite::accept(stream) {
         Ok(ws) => ws,
-        Err(_) => return, // if not a websocket, don't crash
+        Err(_) => {
+          return;
+        } // If not a websocket, don't crash
       };
 
       let import: Result<Import, serde_json::Error> = match ws.read() {
-        Ok(c) => serde_json::from_str(c.to_text().unwrap_or("")),
-        Err(_) => Ok(Import::new(Vec::new(), Vec::new())),
+        Ok(a) => serde_json::from_str(a.to_text().unwrap_or("")),
+        Err(_) => {
+          _ = ws.close(Some(CloseFrame {
+            code: CloseCode::Error,
+            reason: "The config that was sent is malformed".into(),
+          }));
+          return;
+        }
       };
+
       let import: Import = match import {
         Ok(a) => a,
         Err(_) => {
@@ -46,7 +57,7 @@ fn main() {
             reason: "The config that was sent is malformed".into(),
           }));
           return;
-        } // Just close connection on incorrect data
+        }
       };
 
       let data = Arc::new(RwLock::new(FeedHandler::default()));

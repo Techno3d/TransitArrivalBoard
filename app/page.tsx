@@ -1,24 +1,22 @@
 "use client";
 
-import { Alert } from "@/types/Alert";
+import { config } from "@/config";
 import { Export } from "@/types/Export";
 import { Import } from "@/types/Import";
+import { Route } from "@/types/Route";
+import { Stop } from "@/types/Stop";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bulletin } from "./components/Bulletin";
 import { Countdown } from "./components/Countdown";
 import { Message } from "./components/Message";
-import { config } from "./config";
 
 export default function Home() {
   const [time, setTime] = useState<string>("");
   const [status, setStatus] = useState(false);
-  const [importConfig, setImportConfig] = useState<Import>({
-    stops_realtime: {},
-    service_alerts_realtime: [],
-    routes_static: {},
-  });
-  const [serviceAlerts, setServiceAlerts] = useState<Array<string>>([]);
+  const [stops, setStops] = useState<Record<string, Stop>>({});
+  const [routes, setRoutes] = useState<Record<string, Route>>({});
+  const [headers, setHeaders] = useState<Array<string>>([]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -28,17 +26,19 @@ export default function Home() {
       setStatus(true);
       console.log("Websocket opened.");
 
-      let exportConfig: Export = { subway: [], bus: [] };
+      const message: Export = { subway: [], bus: [] };
 
       Object.values(config.subway).forEach((value) => {
-        exportConfig.subway.push(value.stop_ids);
+        message.subway.push(value.stop_ids);
       });
 
       Object.values(config.bus).forEach((value) => {
-        exportConfig.bus.push(value.stop_ids);
+        message.bus.push(value.stop_ids);
       });
 
-      ws.send(JSON.stringify(exportConfig));
+      console.log(message);
+
+      ws.send(JSON.stringify(message));
     };
 
     ws.onmessage = (event) => {
@@ -46,11 +46,11 @@ export default function Home() {
       console.log("Message recieved.");
 
       const message: Import = JSON.parse(event.data);
-      setImportConfig(message);
+      setStops(message.stops_realtime);
+      setRoutes(message.routes_static);
 
       const headers: Array<string> = [];
-      const serviceData: Array<Alert> = message.service_alerts_realtime;
-      serviceData
+      message.service_alerts_realtime
         .slice()
         .reverse()
         .forEach((alert) => {
@@ -58,7 +58,7 @@ export default function Home() {
           if (alert.sort_order < 22) return;
           headers.push(alert.header_text);
         });
-      setServiceAlerts(headers);
+      setHeaders(headers);
       headers.length > 0 ? setIndex((i) => ((i % headers.length) + headers.length) % headers.length) : setIndex(0);
     };
 
@@ -87,17 +87,15 @@ export default function Home() {
         }),
       );
 
-      if (serviceAlerts.length > 0) {
-        setIndex((i) => (((i + 1) % serviceAlerts.length) + serviceAlerts.length) % serviceAlerts.length);
-      } else {
-        setIndex(0);
-      }
+      headers.length > 0
+        ? setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length)
+        : setIndex(0);
     }, 5000);
 
     return () => {
       clearInterval(loop);
     };
-  }, [serviceAlerts.length]);
+  });
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -108,24 +106,15 @@ export default function Home() {
               return (
                 <Countdown
                   key={Math.random()}
-                  stop={
-                    importConfig.stops_realtime[value.stop_ids[0]]
-                      ? importConfig.stops_realtime[value.stop_ids[0]]
-                      : { name: "", trips: [], destinations: {} }
-                  }
+                  stop={stops[value.stop_ids[0]] ? stops[value.stop_ids[0]] : { name: "", trips: [], destinations: {} }}
                   walk_time={value.walk_time}
-                  routes={importConfig.routes_static}
+                  routes={routes}
                 ></Countdown>
               );
             })}
           </div>
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            <Message
-              name={"Service Alerts"}
-              headers={serviceAlerts}
-              routes={importConfig.routes_static}
-              index={index}
-            />
+            <Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />
           </div>
         </div>
         <div className="flex min-h-full basis-1/3 flex-col gap-4">
@@ -134,12 +123,8 @@ export default function Home() {
               return (
                 <Bulletin
                   key={Math.random()}
-                  stop={
-                    importConfig.stops_realtime[value.stop_ids[0]]
-                      ? importConfig.stops_realtime[value.stop_ids[0]]
-                      : { name: "", trips: [], destinations: {} }
-                  }
-                  routes={importConfig.routes_static}
+                  stop={stops[value.stop_ids[0]] ? stops[value.stop_ids[0]] : { name: "", trips: [], destinations: {} }}
+                  routes={routes}
                   walk_time={value.walk_time}
                 ></Bulletin>
               );

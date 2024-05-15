@@ -4,8 +4,8 @@ use ts_rs::TS;
 use serde::{Deserialize, Serialize};
 
 pub mod bus_stop_handler;
+pub mod config;
 pub mod feed_handler;
-pub mod import;
 pub mod mercury_structs;
 pub mod service_alert_handler;
 pub mod siri_structs;

@@ -16,10 +16,6 @@ pub struct Import {
 }
 
 impl Import {
-  pub fn new(subway: Vec<Vec<String>>, bus: Vec<Vec<String>>) -> Self {
-    Self { subway, bus }
-  }
-
   pub fn get_subway_handlers(&self, feed_data: Arc<RwLock<FeedHandler>>) -> Vec<SubwayStopHandler> {
     self
       .subway

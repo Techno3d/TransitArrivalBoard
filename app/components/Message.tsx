@@ -19,14 +19,12 @@ export function Message(props: { routes: Record<string, Route>; name: string; he
           <h1 className="line-clamp-4 text-pretty font-semibold 2xl:text-5xl 2xl:leading-tight">
             {props.headers[props.index].split(/(\[.*?\])/).map((text) => {
               if (text.length == 0) return;
-              if (text.substring(0, 1) == "[" && text.substring(text.length - 1) == "]") {
-                return (
-                  <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
-                    <Bullet route={props.routes[text.substring(1, text.length - 1)]} size={42} />
-                  </div>
-                );
-              }
-              return text;
+              if (text.substring(0, 1) != "[" || text.substring(text.length - 1) != "]") return text;
+              return (
+                <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
+                  <Bullet route={props.routes[text.substring(1, text.length - 1)]} size={42} />
+                </div>
+              );
             })}
           </h1>
         </div>
