@@ -2,17 +2,15 @@
 
 A hobby project that uses the MTA's GTFS static and realtime feeds to get realtime transit info about public transit near our high school, The Bronx High School of Science.
 
-## Build Instructions
-
-### Environment Variables
+## Environment Variables
 
 Create a `.env` file and add the following variables.
 
-#### `MTABUSKEY`
+### `MTABUSKEY`
 
 The MTA's BusTime feeds require an API key, which you can obtain [here](http://www.bustime.mta.info/wiki/Developers/Index).
 
-### Dependencies
+## Dependencies
 
 Install the following dependencies.
 
@@ -20,11 +18,11 @@ Install the following dependencies.
 - [Node.js](https://nodejs.org/en/download)
 - [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
 
-### Deploying
+## Deploying
 
 The webpage can be found at http://localhost:3000/ after deploying.
 
-#### Development
+### Development
 
 Open 2 terminals and run the following commands.
 
@@ -38,7 +36,7 @@ npm install
 npm run dev
 ```
 
-#### Production
+### Production
 
 Open 2 terminals and run the following commands.
 
