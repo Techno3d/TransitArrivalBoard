@@ -7,7 +7,7 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
 
-use transit_board::config::Config;
+use transit_board::config::Import;
 use transit_board::feed_handler::FeedHandler;
 use transit_board::{Export, Route, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
@@ -34,11 +34,11 @@ fn main() {
         Err(_) => return, // if not a websocket, don't crash
       };
 
-      let config: Result<Config, serde_json::Error> = match ws.read() {
+      let import: Result<Import, serde_json::Error> = match ws.read() {
         Ok(c) => serde_json::from_str(c.to_text().unwrap_or("")),
-        Err(_) => Ok(Config::new(Vec::new(), Vec::new())),
+        Err(_) => Ok(Import::new(Vec::new(), Vec::new())),
       };
-      let config: Config = match config {
+      let import: Import = match import {
         Ok(a) => a,
         Err(_) => {
           _ = ws.close(Some(CloseFrame {
@@ -52,9 +52,9 @@ fn main() {
       let data = Arc::new(RwLock::new(FeedHandler::default()));
       data.write().unwrap().refresh_static(); // Should be able to write
 
-      let mut subway = config.get_subway_handlers(data.to_owned());
-      let mut bus = config.get_bus_handlers(api_key_bus.to_owned(), data.to_owned());
-      let mut service_alerts = config.get_service_alerts_handler(data.to_owned());
+      let mut subway = import.get_subway_handlers(data.to_owned());
+      let mut bus = import.get_bus_handlers(data.to_owned(), api_key_bus.to_owned());
+      let mut service_alerts = import.get_service_alerts_handler(data.to_owned());
 
       let mut stops_map: BTreeMap<String, Stop> = BTreeMap::new();
 

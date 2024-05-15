@@ -9,13 +9,13 @@ use crate::{
 };
 
 #[derive(Debug, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
-pub struct Config {
+#[ts(export, rename = "Export")]
+pub struct Import {
   subway: Vec<Vec<String>>,
   bus: Vec<Vec<String>>,
 }
 
-impl Config {
+impl Import {
   pub fn new(subway: Vec<Vec<String>>, bus: Vec<Vec<String>>) -> Self {
     Self { subway, bus }
   }
@@ -28,7 +28,7 @@ impl Config {
       .collect()
   }
 
-  pub fn get_bus_handlers(&self, api_key: Arc<String>, feed_data: Arc<RwLock<FeedHandler>>) -> Vec<BusStopHandler> {
+  pub fn get_bus_handlers(&self, feed_data: Arc<RwLock<FeedHandler>>, api_key: Arc<String>) -> Vec<BusStopHandler> {
     self
       .bus
       .iter()

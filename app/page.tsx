@@ -1,9 +1,10 @@
 "use client";
 
+import { Alert } from "@/types/Alert";
+import { Export } from "@/types/Export";
+import { Import } from "@/types/Import";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Alert } from "../types/Alert";
-import { Export } from "../types/Export";
 import { Bulletin } from "./components/Bulletin";
 import { Countdown } from "./components/Countdown";
 import { Message } from "./components/Message";
@@ -12,7 +13,11 @@ import { config } from "./config";
 export default function Home() {
   const [time, setTime] = useState<string>("");
   const [status, setStatus] = useState(false);
-  const [info, setInfo] = useState<Export>({ stops_realtime: {}, service_alerts_realtime: [], routes_static: {} });
+  const [importConfig, setImportConfig] = useState<Import>({
+    stops_realtime: {},
+    service_alerts_realtime: [],
+    routes_static: {},
+  });
   const [serviceAlerts, setServiceAlerts] = useState<Array<string>>([]);
   const [index, setIndex] = useState(0);
 
@@ -23,18 +28,27 @@ export default function Home() {
       setStatus(true);
       console.log("Websocket opened.");
 
-      ws.send(JSON.stringify(config));
+      let exportConfig: Export = { subway: [], bus: [] };
+
+      Object.values(config.subway).forEach((value) => {
+        exportConfig.subway.push(value.stop_ids);
+      });
+
+      Object.values(config.bus).forEach((value) => {
+        exportConfig.bus.push(value.stop_ids);
+      });
+
+      ws.send(JSON.stringify(exportConfig));
     };
 
     ws.onmessage = (event) => {
       setStatus(true);
       console.log("Message recieved.");
 
-      const message = JSON.parse(event.data);
-      setInfo(message);
+      setImportConfig(JSON.parse(event.data));
 
       const headers: Array<string> = [];
-      const serviceData: Array<Alert> = message.service_alerts_realtime;
+      const serviceData: Array<Alert> = importConfig.service_alerts_realtime;
       serviceData
         .slice()
         .reverse()
@@ -44,11 +58,7 @@ export default function Home() {
           headers.push(alert.header_text);
         });
       setServiceAlerts(headers);
-      if (headers.length > 0) {
-        setIndex((i) => ((i % headers.length) + headers.length) % headers.length);
-      } else {
-        setIndex(0);
-      }
+      headers.length > 0 ? setIndex((i) => ((i % headers.length) + headers.length) % headers.length) : setIndex(0);
     };
 
     ws.onclose = () => {
@@ -62,7 +72,7 @@ export default function Home() {
 
       ws.close();
     };
-  }, []);
+  }, [importConfig.service_alerts_realtime]);
 
   useEffect(() => {
     const loop = setInterval(() => {
@@ -107,41 +117,44 @@ export default function Home() {
       <div className="flex grow flex-row gap-4 bg-emerald-700 p-2 text-black">
         <div className="flex min-h-full basis-2/3 flex-col gap-4">
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            <Countdown
-              stop={
-                info.stops_realtime["405S"] ? info.stops_realtime["405S"] : { name: "", trips: [], destinations: {} }
-              }
-              routes={info.routes_static}
-            ></Countdown>
-            <Countdown
-              stop={
-                info.stops_realtime["D03S"] ? info.stops_realtime["D03S"] : { name: "", trips: [], destinations: {} }
-              }
-              routes={info.routes_static}
-            ></Countdown>
+            {Object.values(config.subway).map((value) => {
+              return (
+                <Countdown
+                  key={Math.random()}
+                  stop={
+                    importConfig.stops_realtime[value.stop_ids[0]]
+                      ? importConfig.stops_realtime[value.stop_ids[0]]
+                      : { name: "", trips: [], destinations: {} }
+                  }
+                  routes={importConfig.routes_static}
+                ></Countdown>
+              );
+            })}
           </div>
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            <Message name={"Service Alerts"} headers={serviceAlerts} routes={info.routes_static} index={index} />
+            <Message
+              name={"Service Alerts"}
+              headers={serviceAlerts}
+              routes={importConfig.routes_static}
+              index={index}
+            />
           </div>
         </div>
         <div className="flex min-h-full basis-1/3 flex-col gap-4">
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            <Bulletin
-              stop={
-                info.stops_realtime["100017"]
-                  ? info.stops_realtime["100017"]
-                  : { name: "", trips: [], destinations: {} }
-              }
-              routes={info.routes_static}
-            ></Bulletin>
-            <Bulletin
-              stop={
-                info.stops_realtime["100723"]
-                  ? info.stops_realtime["100723"]
-                  : { name: "", trips: [], destinations: {} }
-              }
-              routes={info.routes_static}
-            ></Bulletin>
+            {Object.values(config.bus).map((value) => {
+              return (
+                <Bulletin
+                  key={Math.random()}
+                  stop={
+                    importConfig.stops_realtime[value.stop_ids[0]]
+                      ? importConfig.stops_realtime[value.stop_ids[0]]
+                      : { name: "", trips: [], destinations: {} }
+                  }
+                  routes={importConfig.routes_static}
+                ></Bulletin>
+              );
+            })}
           </div>
         </div>
       </div>

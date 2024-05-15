@@ -50,7 +50,7 @@ pub struct Route {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
+#[ts(export, rename = "Import")]
 pub struct Export {
   pub stops_realtime: BTreeMap<String, Stop>,
   pub service_alerts_realtime: Vec<Alert>,

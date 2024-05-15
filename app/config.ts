@@ -1,12 +1,4 @@
-import { Config } from "@/types/Config";
-
-export const config: Config = {
-  subway: [["405S"], ["D03S"]],
-  bus: [["100017", "103400"], ["100723"]],
-};
-
-/*
-export const config: Config = {
+export const config: { subway: Array<StopConfig>; bus: Array<StopConfig> } = {
   subway: [
     {
       stop_ids: ["405S"],
@@ -28,4 +20,8 @@ export const config: Config = {
     },
   ],
 };
-*/
+
+interface StopConfig {
+  stop_ids: Array<string>;
+  walk_time: number;
+}
