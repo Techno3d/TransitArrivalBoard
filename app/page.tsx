@@ -36,8 +36,6 @@ export default function Home() {
         message.bus.push(value.stop_ids);
       });
 
-      console.log(message);
-
       ws.send(JSON.stringify(message));
     };
 

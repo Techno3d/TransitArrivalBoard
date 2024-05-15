@@ -8,14 +8,14 @@ use crate::{
   subway_stop_handler::SubwayStopHandler,
 };
 
-#[derive(Debug, Serialize, Deserialize, Default, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
 #[ts(export, rename = "Export")]
-pub struct Import {
+pub struct Config {
   subway: Vec<Vec<String>>,
   bus: Vec<Vec<String>>,
 }
 
-impl Import {
+impl Config {
   pub fn get_subway_handlers(&self, feed_data: Arc<RwLock<FeedHandler>>) -> Vec<SubwayStopHandler> {
     self
       .subway
