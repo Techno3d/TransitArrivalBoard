@@ -1,5 +1,11 @@
-import { Config } from "./types";
+import { Config } from "@/types/Config";
 
+export const config: Config = {
+  subway: [["405S"], ["D03S"]],
+  bus: [["100017", "103400"], ["100723"]],
+};
+
+/*
 export const config: Config = {
   subway: [
     {
@@ -22,3 +28,4 @@ export const config: Config = {
     },
   ],
 };
+*/
