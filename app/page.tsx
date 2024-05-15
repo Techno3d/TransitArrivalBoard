@@ -97,7 +97,7 @@ export default function Home() {
     return () => {
       clearInterval(loop);
     };
-  });
+  }, [serviceAlerts.length]);
 
   return (
     <div className="flex min-h-screen flex-col">

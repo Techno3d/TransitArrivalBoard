@@ -7,8 +7,8 @@ use std::sync::{Arc, RwLock};
 use std::thread;
 use std::time::Duration;
 
-use transit_board::config::Import;
 use transit_board::feed_handler::FeedHandler;
+use transit_board::import::Import;
 use transit_board::{Export, Route, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
 use tungstenite::{protocol::CloseFrame, Message};
