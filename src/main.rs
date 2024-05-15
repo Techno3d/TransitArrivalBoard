@@ -19,11 +19,14 @@ fn main() {
     std::env::var("MTABUSKEY")
       .expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"),
   );
+  let data = Arc::new(RwLock::new(FeedHandler::default()));
+  data.write().unwrap().refresh_static(); // Should be able to write
 
   let server = TcpListener::bind("0.0.0.0:9001").expect("Server failed to start, is port already in use?");
 
   for stream in server.incoming() {
     let api_key_bus = api_key_bus.to_owned();
+    let data = data.clone();
     let _spawn = thread::spawn(move || {
       let stream = match stream {
         Ok(stream) => stream,
@@ -59,9 +62,6 @@ fn main() {
           return;
         }
       };
-
-      let data = Arc::new(RwLock::new(FeedHandler::default()));
-      data.write().unwrap().refresh_static(); // Should be able to write
 
       let mut subway = import.get_subway_handlers(data.to_owned());
       let mut bus = import.get_bus_handlers(data.to_owned(), api_key_bus.to_owned());
