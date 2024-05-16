@@ -22,19 +22,19 @@ export default function Home() {
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
 
+    const message: Export = { subway: [], bus: [] };
+
+    Object.values(config.subway).forEach((value) => {
+      message.subway.push(value.stop_ids);
+    });
+
+    Object.values(config.bus).forEach((value) => {
+      message.bus.push(value.stop_ids);
+    });
+
     ws.onopen = () => {
       setStatus(true);
       console.log("Websocket opened.");
-
-      const message: Export = { subway: [], bus: [] };
-
-      Object.values(config.subway).forEach((value) => {
-        message.subway.push(value.stop_ids);
-      });
-
-      Object.values(config.bus).forEach((value) => {
-        message.bus.push(value.stop_ids);
-      });
 
       ws.send(JSON.stringify(message));
     };
@@ -93,7 +93,7 @@ export default function Home() {
     return () => {
       clearInterval(loop);
     };
-  });
+  }, [headers.length]);
 
   return (
     <div className="flex min-h-screen flex-col">

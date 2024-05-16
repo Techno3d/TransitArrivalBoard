@@ -22,7 +22,7 @@ fn main() {
   let data = Arc::new(RwLock::new(FeedHandler::default()));
   data.write().unwrap().refresh_static(); // Should be able to write
 
-  let server = TcpListener::bind("0.0.0.0:9001").expect("Server failed to start, is port already in use?");
+  let server = TcpListener::bind("127.0.0.1:9001").expect("Server failed to start, is port already in use?");
 
   for stream in server.incoming() {
     let api_key_bus = api_key_bus.to_owned();
@@ -30,19 +30,21 @@ fn main() {
     let _spawn = thread::spawn(move || {
       let stream = match stream {
         Ok(stream) => stream,
-        Err(_) => {
+        Err(e) => {
+          println!("{}", e);
           return;
         } // If stream fails to connect, don't crash
       };
       let mut ws = match tungstenite::accept(stream) {
         Ok(ws) => ws,
-        Err(_) => {
+        Err(e) => {
+          println!("{}", e);
           return;
         } // If not a websocket, don't crash
       };
 
-      let config: Result<Config, serde_json::Error> = match ws.read() {
-        Ok(a) => serde_json::from_str(a.to_text().unwrap_or("")),
+      let config: String = match ws.read() {
+        Ok(a) => a.to_string(),
         Err(_) => {
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
@@ -52,7 +54,7 @@ fn main() {
         }
       };
 
-      let config: Config = match config {
+      let config: Config = match serde_json::from_str(&config) {
         Ok(a) => a,
         Err(_) => {
           _ = ws.close(Some(CloseFrame {
@@ -71,6 +73,10 @@ fn main() {
 
       loop {
         if !ws.can_write() {
+          let _ = ws.close(Some(CloseFrame {
+            code: CloseCode::Error,
+            reason: "Cannot write to websocket".into(),
+          }));
           break;
         }
 
@@ -149,7 +155,13 @@ fn main() {
 
         match ws.send(message) {
           Ok(_) => {}
-          Err(_) => break,
+          Err(_) => {
+            let _ = ws.close(Some(CloseFrame {
+              code: CloseCode::Error,
+              reason: "Cannot send to websocket".into(),
+            }));
+            break;
+          }
         };
 
         thread::sleep(Duration::from_secs(60));
