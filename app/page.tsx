@@ -13,35 +13,35 @@ import { Message } from "./components/Message";
 
 export default function Home() {
   const [time, setTime] = useState<string>("");
-  const [status, setStatus] = useState(false);
+  const [websocket, setWebsocket] = useState<boolean>(false);
   const [stops, setStops] = useState<Record<string, Stop>>({});
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [headers, setHeaders] = useState<Array<string>>([]);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
 
-    const message: Export = { subway: [], bus: [] };
-
-    Object.values(config.subway).forEach((value) => {
-      message.subway.push(value.stop_ids);
-    });
-
-    Object.values(config.bus).forEach((value) => {
-      message.bus.push(value.stop_ids);
-    });
-
     ws.onopen = () => {
-      setStatus(true);
       console.log("Websocket opened.");
+      setWebsocket(true);
+
+      const message: Export = { subway: [], bus: [] };
+
+      Object.values(config.subway).forEach((value) => {
+        message.subway.push(value.stop_ids);
+      });
+
+      Object.values(config.bus).forEach((value) => {
+        message.bus.push(value.stop_ids);
+      });
 
       ws.send(JSON.stringify(message));
     };
 
     ws.onmessage = (event) => {
-      setStatus(true);
       console.log("Message recieved.");
+      setWebsocket(true);
 
       const message: Import = JSON.parse(event.data);
       setStops(message.stops_realtime);
@@ -60,18 +60,27 @@ export default function Home() {
       headers.length > 0 ? setIndex((i) => ((i % headers.length) + headers.length) % headers.length) : setIndex(0);
     };
 
-    ws.onclose = () => {
-      setStatus(false);
-      console.log("Websocket closed.");
-    };
-
-    return () => {
-      setStatus(false);
-      console.log("Closing old websocket...");
+    ws.onerror = () => {
+      console.log("Websocket errored.");
+      setWebsocket(false);
 
       ws.close();
     };
-  });
+
+    ws.onclose = () => {
+      console.log("Websocket closed.");
+      setWebsocket(false);
+
+      ws.close();
+    };
+
+    return () => {
+      console.log("Closing old websocket...");
+      setWebsocket(false);
+
+      ws.close();
+    };
+  }, []);
 
   useEffect(() => {
     const loop = setInterval(() => {
@@ -112,7 +121,7 @@ export default function Home() {
             })}
           </div>
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            <Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />
+            {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
           </div>
         </div>
         <div className="flex min-h-full basis-1/3 flex-col gap-4">
@@ -133,7 +142,7 @@ export default function Home() {
       <div className="flex min-h-14 flex-row items-center bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
-          {status ? (
+          {websocket ? (
             <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
           ) : (
             <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>

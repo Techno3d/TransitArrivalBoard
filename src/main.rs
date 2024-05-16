@@ -11,6 +11,7 @@ use transit_board::config::Config;
 use transit_board::feed_handler::FeedHandler;
 use transit_board::{Export, Route, Stop};
 use tungstenite::protocol::frame::coding::CloseCode;
+use tungstenite::Error;
 use tungstenite::{protocol::CloseFrame, Message};
 
 fn main() {
@@ -19,36 +20,44 @@ fn main() {
     std::env::var("MTABUSKEY")
       .expect("The bus API key must be defined in the environment or .env for the board to access some MTA data"),
   );
-  let data = Arc::new(RwLock::new(FeedHandler::default()));
-  data.write().unwrap().refresh_static(); // Should be able to write
 
-  let server = TcpListener::bind("127.0.0.1:9001").expect("Server failed to start, is port already in use?");
+  let server = TcpListener::bind("127.0.0.1:9001").unwrap();
 
   for stream in server.incoming() {
     let api_key_bus = api_key_bus.to_owned();
-    let data = data.clone();
-    let _spawn = thread::spawn(move || {
+
+    thread::spawn(move || {
       let stream = match stream {
         Ok(stream) => stream,
-        Err(e) => {
-          println!("{}", e);
+        Err(_) => {
           return;
         } // If stream fails to connect, don't crash
       };
+
       let mut ws = match tungstenite::accept(stream) {
         Ok(ws) => ws,
-        Err(e) => {
-          println!("{}", e);
+        Err(_) => {
           return;
         } // If not a websocket, don't crash
       };
 
-      let config: String = match ws.read() {
-        Ok(a) => a.to_string(),
+      let config: Result<String, Error> = match ws.read() {
+        Ok(a) => a.into_text(),
         Err(_) => {
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
-            reason: "The config that was sent is malformed".into(),
+            reason: "Could not read from WebSocket".into(),
+          }));
+          return;
+        }
+      };
+
+      let config: String = match config {
+        Ok(a) => a,
+        Err(_) => {
+          _ = ws.close(Some(CloseFrame {
+            code: CloseCode::Error,
+            reason: "Could not get String from Message".into(),
           }));
           return;
         }
@@ -59,11 +68,14 @@ fn main() {
         Err(_) => {
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
-            reason: "The config that was sent is malformed".into(),
+            reason: "Could not get Config from Message".into(),
           }));
           return;
         }
       };
+
+      let data: Arc<RwLock<FeedHandler>> = Arc::new(RwLock::new(FeedHandler::default()));
+      data.write().unwrap().refresh_static();
 
       let mut subway = config.get_subway_handlers(data.to_owned());
       let mut bus = config.get_bus_handlers(data.to_owned(), api_key_bus.to_owned());
@@ -75,7 +87,7 @@ fn main() {
         if !ws.can_write() {
           let _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
-            reason: "Cannot write to websocket".into(),
+            reason: "Could not write to WebSocket".into(),
           }));
           break;
         }
@@ -146,10 +158,7 @@ fn main() {
         // Should not error, but incase
         let data = match serde_json::to_string(&data) {
           Ok(a) => a,
-          Err(_) => {
-            eprintln!("Sent blank data, could not serialize data");
-            serde_json::to_string(&Export::default()).unwrap()
-          } // Send blank data
+          Err(_) => serde_json::to_string(&Export::default()).unwrap(), // Send blank data
         };
         let message = Message::Text(data);
 
@@ -158,7 +167,7 @@ fn main() {
           Err(_) => {
             let _ = ws.close(Some(CloseFrame {
               code: CloseCode::Error,
-              reason: "Cannot send to websocket".into(),
+              reason: "Could not send to WebSocket".into(),
             }));
             break;
           }
@@ -166,6 +175,8 @@ fn main() {
 
         thread::sleep(Duration::from_secs(60));
       }
+
+      return;
     });
   }
 }

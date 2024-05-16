@@ -103,7 +103,6 @@ impl FeedHandler {
     let resp = match minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip").send() {
       Ok(a) => a,
       Err(_) => {
-        println!("If board is broken, then reload backend");
         return;
       } // Relying on no data will probably bork transit board
     };
