@@ -111,7 +111,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="rotate-[-45deg] text-center font-bold"
+            className="rotate-[-45deg] text-nowrap text-center font-bold"
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
@@ -134,21 +134,21 @@ export function Bullet(props: { route: Route; size: number }) {
         }}
       >
         <span
-          className="flex rotate-[45deg] items-center justify-center"
+          className="flex items-center justify-center rounded-full"
           style={{
             backgroundColor: `#${props.route.route_color}`,
-            height: `${props.size / Math.sqrt(2)}px`,
-            width: `${props.size / Math.sqrt(2)}px`,
+            height: `${props.size}px`,
+            width: `${props.size}px`,
           }}
         >
           <h1
-            className="rotate-[-45deg] text-center font-bold"
+            className="text-nowrap text-center font-bold"
             style={{
               fontSize: `${props.size * 0.5}px`,
               color: `#${props.route.route_text_color}`,
             }}
           >
-            {props.route.route_name.substring(0, 1)}
+            {props.route.route_name}
           </h1>
         </span>
       </span>
@@ -157,14 +157,14 @@ export function Bullet(props: { route: Route; size: number }) {
 
   return (
     <span
-      className="flex items-center justify-center rounded-2xl"
+      className="w-ful flex items-center justify-center rounded-2xl"
       style={{
         backgroundColor: `#${props.route.route_color}`,
         height: `${props.size}px`,
       }}
     >
       <h1
-        className="line-clamp-1 text-center font-bold"
+        className="text-nowrap text-center font-bold"
         style={{
           fontSize: `${props.size * 0.65}px`,
           color: `#${props.route.route_text_color}`,

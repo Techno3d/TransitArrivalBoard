@@ -107,7 +107,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex grow flex-row gap-4 bg-emerald-700 p-2 text-black">
-        <div className="flex min-h-full basis-2/3 flex-col gap-4">
+        <div className="flex min-h-full basis-3/5 flex-col gap-4">
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
             {Object.values(config.subway).map((value) => {
               return (
@@ -124,7 +124,7 @@ export default function Home() {
             {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
           </div>
         </div>
-        <div className="flex min-h-full basis-1/3 flex-col gap-4">
+        <div className="flex min-h-full basis-2/5 flex-col gap-4">
           <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
             {Object.values(config.bus).map((value) => {
               return (
