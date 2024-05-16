@@ -85,6 +85,7 @@ impl FeedHandler {
       "http://web.mta.info/developers/data/nyct/bus/google_transit_manhattan.zip",
       "http://web.mta.info/developers/data/nyct/bus/google_transit_queens.zip",
       "http://web.mta.info/developers/data/nyct/bus/google_transit_staten_island.zip",
+      "http://web.mta.info/developers/data/busco/google_transit.zip",
     ];
     for uri in feed_uris {
       let resp = match minreq::get(uri).send() {

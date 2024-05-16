@@ -24,7 +24,19 @@ export function Bulletin(props: { routes: Record<string, Route>; stop: Stop; wal
               >
                 <div className="flex h-full w-4/5 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
                   <div className="flex h-full w-3/4 flex-row items-center justify-start gap-2 px-2">
-                    <Bullet route={props.routes[times[0].route_id]} size={72} />
+                    <Bullet
+                      route={
+                        props.routes[times[0].route_id]
+                          ? props.routes[times[0].route_id]
+                          : {
+                              route_name: "",
+                              route_id: "",
+                              route_color: "",
+                              route_text_color: "",
+                            }
+                      }
+                      size={72}
+                    />
                     <h1 className="line-clamp-2 text-wrap font-bold 2xl:text-3xl">{times[0].destination_name}</h1>
                   </div>
                   <div className="flex h-full w-1/4 flex-col items-center justify-center">

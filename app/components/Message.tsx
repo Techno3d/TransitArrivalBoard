@@ -22,7 +22,19 @@ export function Message(props: { routes: Record<string, Route>; name: string; he
               if (text.substring(0, 1) != "[" || text.substring(text.length - 1) != "]") return text;
               return (
                 <div className="mx-1 inline-flex -translate-y-1.5" key={Math.random()}>
-                  <Bullet route={props.routes[text.substring(1, text.length - 1)]} size={42} />
+                  <Bullet
+                    route={
+                      props.routes[text.substring(1, text.length - 1)]
+                        ? props.routes[text.substring(1, text.length - 1)]
+                        : {
+                            route_name: "",
+                            route_id: "",
+                            route_color: "",
+                            route_text_color: "",
+                          }
+                    }
+                    size={42}
+                  />
                 </div>
               );
             })}

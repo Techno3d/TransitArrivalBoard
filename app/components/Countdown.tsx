@@ -25,7 +25,19 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
                   </h1>
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
-                  <Bullet route={props.routes[times[0].route_id]} size={112} />
+                  <Bullet
+                    route={
+                      props.routes[times[0].route_id]
+                        ? props.routes[times[0].route_id]
+                        : {
+                            route_name: "",
+                            route_id: "",
+                            route_color: "",
+                            route_text_color: "",
+                          }
+                    }
+                    size={112}
+                  />
                   <div className="flex items-baseline">
                     <h1 className="font-bold text-black 2xl:text-9xl">{times[0].minutes_until_arrival}</h1>
                     <h1 className="font-semibold text-black 2xl:text-5xl">min</h1>
@@ -36,7 +48,19 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
             {times[1] ? (
               <div className="flex h-full w-1/3 flex-col px-8 py-4">
                 <div className="flex basis-2/5 flex-row items-center">
-                  <Bullet route={props.routes[times[1].route_id]} size={96} />
+                  <Bullet
+                    route={
+                      props.routes[times[1].route_id]
+                        ? props.routes[times[1].route_id]
+                        : {
+                            route_name: "",
+                            route_id: "",
+                            route_color: "",
+                            route_text_color: "",
+                          }
+                    }
+                    size={96}
+                  />
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
                   <div className="flex items-baseline">
@@ -50,7 +74,19 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
           {times[2] ? (
             <div className="flex h-full w-1/4 flex-col px-8 py-4">
               <div className="flex basis-2/5 flex-row items-center">
-                <Bullet route={props.routes[times[2].route_id]} size={96} />
+                <Bullet
+                  route={
+                    props.routes[times[2].route_id]
+                      ? props.routes[times[2].route_id]
+                      : {
+                          route_name: "",
+                          route_id: "",
+                          route_color: "",
+                          route_text_color: "",
+                        }
+                  }
+                  size={96}
+                />
               </div>
               <div className="flex basis-3/5 flex-row items-center gap-4">
                 <div className="flex items-baseline">
