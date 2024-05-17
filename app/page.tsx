@@ -113,7 +113,7 @@ export default function Home() {
               return (
                 <Countdown
                   key={Math.random()}
-                  stop={stops[value.stop_ids[0]] ? stops[value.stop_ids[0]] : { name: "", trips: [], destinations: {} }}
+                  stop={stops[value.stop_ids[0]]}
                   walk_time={value.walk_time}
                   routes={routes}
                 ></Countdown>
@@ -130,7 +130,7 @@ export default function Home() {
               return (
                 <Bulletin
                   key={Math.random()}
-                  stop={stops[value.stop_ids[0]] ? stops[value.stop_ids[0]] : { name: "", trips: [], destinations: {} }}
+                  stop={stops[value.stop_ids[0]]}
                   routes={routes}
                   walk_time={value.walk_time}
                 ></Bulletin>

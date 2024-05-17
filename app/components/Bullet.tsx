@@ -1,6 +1,10 @@
 import { Route } from "@/types/Route";
 
 export function Bullet(props: { route: Route; size: number }) {
+  if (!props.route) {
+    return;
+  }
+
   const TEMP_TEXT_COLOR_OVERRIDE = [
     "1",
     "2",
