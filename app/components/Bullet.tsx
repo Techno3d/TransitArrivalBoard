@@ -161,7 +161,7 @@ export function Bullet(props: { route: Route; size: number }) {
 
   return (
     <span
-      className="w-ful flex items-center justify-center rounded-2xl"
+      className="flex items-center justify-center rounded-2xl"
       style={{
         backgroundColor: `#${props.route.route_color}`,
         height: `${props.size}px`,

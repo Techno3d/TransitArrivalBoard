@@ -24,8 +24,8 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
       </div>
       {times.length > 0 ? (
         <div className="flex min-h-64 flex-row rounded-lg bg-slate-300">
-          <div className="flex min-h-full w-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
-            <div className="flex min-h-full w-2/3 rounded-lg bg-slate-100 shadow-2xl">
+          <div className="flex min-h-full basis-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
+            <div className="flex min-h-full basis-2/3 rounded-lg bg-slate-100 shadow-2xl">
               <div className="flex min-h-full flex-col px-6 py-2">
                 <div className="flex basis-2/5 flex-row items-center">
                   <h1 className="line-clamp-1 font-bold text-black 2xl:text-6xl 2xl:leading-normal">
@@ -42,7 +42,7 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
               </div>
             </div>
             {times[1] ? (
-              <div className="flex min-h-full w-1/3 flex-col px-6 py-2">
+              <div className="flex min-h-full basis-1/3 flex-col px-6 py-2">
                 <div className="flex basis-2/5 flex-row items-center">
                   <Bullet route={props.routes[times[1].route_id]} size={72} />
                 </div>
@@ -56,7 +56,7 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
             ) : undefined}
           </div>
           {times[2] ? (
-            <div className="flex min-h-full w-1/4 flex-col px-6 py-2">
+            <div className="flex min-h-full basis-1/4 flex-col px-6 py-2">
               <div className="flex basis-2/5 flex-row items-center">
                 <Bullet route={props.routes[times[2].route_id]} size={72} />
               </div>
