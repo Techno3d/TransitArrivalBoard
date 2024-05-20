@@ -32,7 +32,7 @@ export function Bulletin(props: { routes: Record<string, Route>; stop: Stop; wal
             return times.length > 0 ? (
               <div
                 className="flex min-h-29 flex-row items-center rounded-lg bg-slate-200 text-black"
-                key={Math.random()}
+                key={times[0].route_id + "_" + times[0].destination_id}
               >
                 <div className="flex min-h-full w-5/6 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
                   <div className="flex min-h-full w-4/5 flex-row items-center justify-start gap-2 px-2">
