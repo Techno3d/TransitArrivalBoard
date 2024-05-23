@@ -112,7 +112,7 @@ export default function Home() {
             {Object.values(config.subway).map((value) => {
               return (
                 <Countdown
-                  key={Math.random()}
+                  key={value.stop_ids[0]}
                   stop={stops[value.stop_ids[0]]}
                   walk_time={value.walk_time}
                   routes={routes}
@@ -129,7 +129,7 @@ export default function Home() {
             {Object.values(config.bus).map((value) => {
               return (
                 <Bulletin
-                  key={Math.random()}
+                  key={value.stop_ids[0]}
                   stop={stops[value.stop_ids[0]]}
                   routes={routes}
                   walk_time={value.walk_time}
