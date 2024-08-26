@@ -1,3 +1,5 @@
+#This is the .gitignore file! This is where everything that does NOT need to be pushed onto github is stored in the form of file extensions, directory path names, specific file names, etc!
+
 # target
 /target
 
