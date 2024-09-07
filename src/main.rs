@@ -73,9 +73,11 @@ fn main() {
           return;
         }
       };
+      println!("Socket Connected");
 
       let data: Arc<RwLock<FeedHandler>> = Arc::new(RwLock::new(FeedHandler::default()));
       data.write().unwrap().refresh_static();
+      println!("Finished!");
 
       let mut subway = config.get_subway_handlers(data.to_owned());
       let mut bus = config.get_bus_handlers(data.to_owned(), api_key_bus.to_owned());
