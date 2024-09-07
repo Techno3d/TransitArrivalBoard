@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import { Bullet } from "./Bullet";
 import { Title } from "./Title";
@@ -52,3 +53,4 @@ export function News(props: {
     </React.Fragment>
   );
 }
+*/
