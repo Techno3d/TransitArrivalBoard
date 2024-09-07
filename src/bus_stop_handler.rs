@@ -44,15 +44,17 @@ impl BusStopHandler {
         .send()
       {
         Ok(a) => a,
-        Err(_) => {
+        Err(e) => {
           self.predict();
+          eprintln!("Failed to get new bus data, predicting instead\n {}", e);
           return;
         }
       };
       let bytes = resp.as_bytes();
       let data: BusData = match serde_json::from_slice(bytes) {
         Ok(a) => a,
-        Err(_) => {
+        Err(e) => {
+          eprintln!("Json failed to parse\n {}", e);
           return;
         }
       };

@@ -65,7 +65,10 @@ impl SubwayStopHandler {
               let route_name = match data.subway_static_feed.get_route(route_id) {
                 // Theoretically, all routes should have a route name
                 Ok(route_name) => route_name.short_name.as_ref().unwrap(),
-                Err(_) => continue,
+                Err(e) => {
+                    eprintln!("Failed to get route name\n{}", e);
+                    continue
+                },
               };
 
               // Destination
@@ -74,7 +77,10 @@ impl SubwayStopHandler {
               let destination_name = match data.subway_static_feed.get_stop(destination_id) {
                 // Theoritcally, all destination ids should reference a name
                 Ok(a) => a.name.as_ref().unwrap(),
-                Err(_) => return,
+                Err(e) => {
+                    eprintln!("Failed to get destination name\n{}", e);
+                    return
+                },
               };
 
               // Input data into trips

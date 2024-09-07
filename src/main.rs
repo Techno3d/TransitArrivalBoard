@@ -44,6 +44,7 @@ fn main() {
       let config: Result<String, Error> = match ws.read() {
         Ok(a) => a.into_text(),
         Err(_) => {
+          eprintln!("Socket failed to send config");
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
             reason: "Could not read from WebSocket".into(),
@@ -55,6 +56,7 @@ fn main() {
       let config: String = match config {
         Ok(a) => a,
         Err(_) => {
+          eprintln!("Socket failed to send valid config");
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
             reason: "Could not get String from Message".into(),
@@ -66,6 +68,7 @@ fn main() {
       let config: Config = match serde_json::from_str(&config) {
         Ok(a) => a,
         Err(_) => {
+          eprintln!("Socket failed to send config");
           _ = ws.close(Some(CloseFrame {
             code: CloseCode::Error,
             reason: "Could not get Config from Message".into(),
@@ -160,7 +163,10 @@ fn main() {
         // Should not error, but incase
         let data = match serde_json::to_string(&data) {
           Ok(a) => a,
-          Err(_) => serde_json::to_string(&Export::default()).unwrap(), // Send blank data
+          Err(e) => {
+              eprintln!("Serde failed where it shouldn't have\n{}", e);
+              serde_json::to_string(&Export::default()).unwrap() // Send blank data
+          },
         };
         let message = Message::Text(data);
 

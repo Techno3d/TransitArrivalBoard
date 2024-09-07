@@ -38,16 +38,18 @@ impl FeedHandler {
     for uri in feed_uris {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
-        Err(_) => {
+        Err(e) => {
           self.subway_realtime_feed = None;
+          eprintln!("Failed to get subway data\n{}", e);
           return;
         } // HTTP request failed.
       };
       let bytes = resp.as_bytes();
       let feed = match gtfsrt::FeedMessage::decode(bytes) {
         Ok(a) => a,
-        Err(_) => {
+        Err(e) => {
           self.subway_realtime_feed = None;
+          eprintln!("Failed to decode feed\n{e}");
           return;
         }
       };
@@ -61,8 +63,9 @@ impl FeedHandler {
     let resp =
       match minreq::get("https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/camsys%2Fsubway-alerts.json").send() {
         Ok(a) => a,
-        Err(_) => {
+        Err(e) => {
           self.service_alerts_realtime_feed = None;
+          eprintln!("Failed to get new data for alerts\n{}", e);
           return;
         }
       };
@@ -90,12 +93,18 @@ impl FeedHandler {
     for uri in feed_uris {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
-        Err(_) => continue,
+        Err(e) => {
+            eprintln!("Failed to get bus static info for a borough {}\n{}", uri, e);
+            continue;
+        },
       };
       let bytes = resp.as_bytes();
       let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
         Ok(a) => a,
-        Err(_) => continue,
+        Err(e) => {
+            eprintln!("GTFS deserialization failed {}\n{}", uri, e);
+            continue;
+        },
       };
       self.bus_static_feed.push(gtfs);
     }
@@ -103,14 +112,18 @@ impl FeedHandler {
     // Subway
     let resp = match minreq::get("http://web.mta.info/developers/data/nyct/subway/google_transit.zip").send() {
       Ok(a) => a,
-      Err(_) => {
+      Err(e) => {
+        eprintln!("Failed to get new subway data\n{}", e);
         return;
       } // Relying on no data will probably bork transit board
     };
     let bytes = resp.as_bytes();
     let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
       Ok(a) => a,
-      Err(_) => return,
+      Err(e) => {
+          eprintln!("Failed to deserialize gtfs data for subways\n{}", e);
+          return
+      },
     };
     self.subway_static_feed = gtfs;
   }
