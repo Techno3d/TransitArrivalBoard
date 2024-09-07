@@ -1,6 +1,7 @@
 use chrono::DateTime;
 
 use crate::{feed_handler::FeedHandler, siri_structs::BusData, Stop, Vehicle};
+use core::panic;
 use std::{
   cmp::Ordering,
   collections::BTreeMap,
@@ -54,7 +55,11 @@ impl BusStopHandler {
       let data: BusData = match serde_json::from_slice(bytes) {
         Ok(a) => a,
         Err(e) => {
-          eprintln!("Json failed to parse\n {}", e);
+          eprintln!("Json failed to parse\n {}\n{:?}", e, String::from_utf8(bytes.into()));
+          let json_str: String = String::from_utf8(bytes.into()).expect("Not valid String");
+          if json_str.contains("API key is not authorized") {
+            panic!("Your bus api key is invalid");
+          }
           return;
         }
       };
