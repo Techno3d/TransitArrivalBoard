@@ -51,6 +51,7 @@ impl SubwayStopHandler {
               })
               .time();
               let duration = ((arrival_time - current_time).max(0) / 60) as i32;
+              //println!("{}, {}, {}", arrival_time, current_time, arrival_time-current_time);
 
               // Route
               let route_id = trip_update

@@ -24,15 +24,15 @@ pub struct ServiceDelivery {
 #[serde(rename_all = "PascalCase")]
 pub struct StopMonitoringDelivery {
   pub monitored_stop_visit: Option<Vec<MonitoredStopVisit>>,
-  pub response_timestamp: String,
-  pub valid_until: String,
+  pub response_timestamp: Option<String>,
+  pub valid_until: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct MonitoredStopVisit {
   pub monitored_vehicle_journey: MonitoredVehicleJourney,
-  pub recorded_at_time: String,
+  pub recorded_at_time: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -59,8 +59,8 @@ pub struct MonitoredVehicleJourney {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct FramedVehicleJourneyRef {
-  pub data_frame_ref: String,
-  pub dated_vehicle_journey_ref: String,
+  pub data_frame_ref: Option<String>,
+  pub dated_vehicle_journey_ref: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -105,8 +105,8 @@ pub struct Situations {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
 pub struct PtSituationElement {
-  pub publication_window: PublicationWindow,
-  pub severity: String,
+  pub publication_window: Option<PublicationWindow>,
+  pub severity: Option<String>,
   pub summary: Vec<String>,
   pub description: Vec<String>,
   pub situation_number: String,
