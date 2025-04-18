@@ -14,7 +14,7 @@ serde = { version = "1.0.196", features = ["derive"] }
 serde_json = "1.0.112"
 tungstenite = "0.21.0"
 crossbeam-channel = "0.5.12"
-gtfs-structures = { version="0.41.2", default-features=false, features=[] }
+gtfs-structures = { version="0.43.0", default-features=false, features=[] }
 chrono = { version="0.4.38", features = ["alloc"]}
 ts-rs = { version="8.1", features=["serde-compat"]}
 rgb = { version="0.8.37", features = ["serde"]}

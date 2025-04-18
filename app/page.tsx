@@ -12,8 +12,13 @@ import { Countdown } from "./components/Countdown";
 import { Message } from "./components/Message";
 
 export default function Home() {
+  const WebSocketTypes = {
+    UNCONNECTED: 0,
+    CONNECTED: 1,
+    LOADING: 2,
+  }
   const [time, setTime] = useState<string>("");
-  const [websocket, setWebsocket] = useState<boolean>(false);
+  const [websocket, setWebsocket] = useState<number>(WebSocketTypes.UNCONNECTED);
   const [stops, setStops] = useState<Record<string, Stop>>({});
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [headers, setHeaders] = useState<Array<string>>([]);
@@ -24,7 +29,7 @@ export default function Home() {
 
     ws.onopen = () => {
       console.log("Websocket opened.");
-      setWebsocket(true);
+      setWebsocket(WebSocketTypes.LOADING);
 
       const message: Export = { subway: [], bus: [] };
 
@@ -41,7 +46,7 @@ export default function Home() {
 
     ws.onmessage = (event) => {
       console.log("Message recieved.");
-      setWebsocket(true);
+      setWebsocket(WebSocketTypes.CONNECTED);
 
       const message: Import = JSON.parse(event.data);
       setStops(message.stops_realtime);
@@ -62,21 +67,21 @@ export default function Home() {
 
     ws.onerror = () => {
       console.log("Websocket errored.");
-      setWebsocket(false);
+      setWebsocket(WebSocketTypes.UNCONNECTED);
 
       ws.close();
     };
 
     ws.onclose = () => {
       console.log("Websocket closed.");
-      setWebsocket(false);
+      setWebsocket(WebSocketTypes.UNCONNECTED);
 
       ws.close();
     };
 
     return () => {
       console.log("Closing old websocket...");
-      setWebsocket(false);
+      setWebsocket(WebSocketTypes.UNCONNECTED);
 
       ws.close();
     };
@@ -142,11 +147,17 @@ export default function Home() {
       <div className="flex min-h-14 flex-row items-center bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
-          {websocket ? (
-            <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
-          ) : (
-            <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
-          )}
+          {(() => {switch (websocket) {
+              case WebSocketTypes.UNCONNECTED:
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
+              case WebSocketTypes.CONNECTED:
+                return <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
+              case WebSocketTypes.LOADING:
+                return <span className="inline-flex items-baseline rounded-md bg-yellow-600 px-2">LOADING</span>
+              default:
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
+            }
+          })()}
         </h1>
         <h1 className="mx-2 text-center font-bold text-white 2xl:text-3xl">
           {"Made with ❤️ by "}
