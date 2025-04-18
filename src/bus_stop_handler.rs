@@ -16,6 +16,7 @@ pub struct BusStopHandler {
   pub stop_ids: Vec<String>,
   pub trips: Vec<Vehicle>,
   pub destinations: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
+  pub num_predicts: i32,
 }
 
 impl BusStopHandler {
@@ -28,7 +29,9 @@ impl BusStopHandler {
     }
   }
 
-  pub fn refresh(&mut self) {
+  /// Refresh refreshes the data. Returns true if data succesfully updated, false if it had to use
+  /// prediction.
+  pub fn refresh(&mut self) -> bool {
     let mut trips: Vec<Vehicle> = Default::default();
     let mut destinations: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>> = Default::default();
 
@@ -48,7 +51,7 @@ impl BusStopHandler {
         Err(e) => {
           self.predict();
           eprintln!("Failed to get new bus data, predicting instead\n {}", e);
-          return;
+          return false;
         }
       };
       let bytes = resp.as_bytes();
@@ -60,7 +63,7 @@ impl BusStopHandler {
           if json_str.contains("API key is not authorized") {
             panic!("Your bus api key is invalid");
           }
-          return;
+          return false;
         }
       };
 
@@ -153,6 +156,7 @@ impl BusStopHandler {
 
     self.trips = trips;
     self.destinations = destinations;
+    return true;
   }
 
   pub fn serialize(&self) -> Stop {

@@ -16,6 +16,7 @@ export default function Home() {
     UNCONNECTED: 0,
     CONNECTED: 1,
     LOADING: 2,
+    POSSIBLE_WIFI_ERROR: 3,
   }
   const [time, setTime] = useState<string>("");
   const [websocket, setWebsocket] = useState<number>(WebSocketTypes.UNCONNECTED);
@@ -48,6 +49,11 @@ export default function Home() {
       console.log("Message recieved.");
       setWebsocket(WebSocketTypes.CONNECTED);
 
+      console.log(event.data);
+      if(event.data == "Possible Connection Issue") {
+          setWebsocket(WebSocketTypes.POSSIBLE_WIFI_ERROR);
+          return;
+      }
       const message: Import = JSON.parse(event.data);
       setStops(message.stops_realtime);
       setRoutes(message.routes_static);
@@ -154,6 +160,8 @@ export default function Home() {
                 return <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
               case WebSocketTypes.LOADING:
                 return <span className="inline-flex items-baseline rounded-md bg-yellow-600 px-2">LOADING</span>
+              case WebSocketTypes.POSSIBLE_WIFI_ERROR:
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">CHECK WIFI</span>
               default:
                 return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
             }
