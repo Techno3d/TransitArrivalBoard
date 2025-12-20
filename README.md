@@ -8,7 +8,7 @@ Create a `.env` file and add the following variables.
 
 ### `MTABUSKEY`
 
-The MTA's BusTime feeds require an API key, which you can obtain [here](http://www.bustime.mta.info/wiki/Developers/Index).
+The MTA's BusTime feeds require an API key, which you can obtain [here](https://bustime.mta.info/wiki/Developers/Index).
 
 ## Configuration
 
