@@ -1,12 +1,12 @@
 export const config: { subway: Array<StopConfig>; bus: Array<StopConfig> } = {
   subway: [
     {
-      stop_ids: ["405S"],
-      walk_time: 10,
+      stop_ids: ["116N", "A15N"],
+      walk_time: 5,
     },
     {
-      stop_ids: ["D03S"],
-      walk_time: 14,
+      stop_ids: ["116S", "A15S"],
+      walk_time: 5,
     },
   ],
   bus: [

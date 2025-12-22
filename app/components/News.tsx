@@ -16,7 +16,7 @@ export function News(props: {
 
   return (
     <React.Fragment>
-      <div className="flex h-14 flex-row items-center rounded-lg bg-emerald-700">
+      <div className="flex h-14 flex-row items-center rounded-lg bg-[#B9D9EB]">
         {headers.length > 0 ? (
           <Title name={name + " (" + (index + 1) + "/" + headers.length + ")"}></Title>
         ) : (
