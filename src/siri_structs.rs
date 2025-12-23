@@ -2,18 +2,21 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct BusData {
   pub siri: Siri,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct Siri {
   pub service_delivery: Option<ServiceDelivery>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct ServiceDelivery {
   pub response_timestamp: Option<String>,
   pub stop_monitoring_delivery: Vec<StopMonitoringDelivery>,
@@ -22,6 +25,7 @@ pub struct ServiceDelivery {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct StopMonitoringDelivery {
   pub monitored_stop_visit: Option<Vec<MonitoredStopVisit>>,
   pub response_timestamp: Option<String>,
@@ -30,6 +34,7 @@ pub struct StopMonitoringDelivery {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct MonitoredStopVisit {
   pub monitored_vehicle_journey: MonitoredVehicleJourney,
   pub recorded_at_time: Option<String>,
@@ -37,6 +42,7 @@ pub struct MonitoredStopVisit {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct MonitoredVehicleJourney {
   pub line_ref: String,
   pub direction_ref: Option<String>,
@@ -59,6 +65,7 @@ pub struct MonitoredVehicleJourney {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct FramedVehicleJourneyRef {
   pub data_frame_ref: Option<String>,
   pub dated_vehicle_journey_ref: Option<String>,
@@ -66,12 +73,14 @@ pub struct FramedVehicleJourneyRef {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct SituationRef {
   pub situation_simple_ref: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct Location {
   pub longitude: Option<f64>,
   pub latitude: Option<f64>,
@@ -79,6 +88,7 @@ pub struct Location {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct MonitoredCall {
   pub aimed_arrival_time: Option<String>,
   pub expected_arrival_time: Option<String>,
@@ -93,18 +103,21 @@ pub struct MonitoredCall {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct SituationExchangeDelivery {
   pub situations: Option<Situations>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct Situations {
   pub pt_situation_element: Option<Vec<PtSituationElement>>,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct PtSituationElement {
   pub publication_window: Option<PublicationWindow>,
   pub severity: Option<String>,
@@ -115,6 +128,7 @@ pub struct PtSituationElement {
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "PascalCase")]
+#[allow(dead_code)]
 pub struct PublicationWindow {
   pub start_time: Option<String>,
   pub end_time: Option<String>,

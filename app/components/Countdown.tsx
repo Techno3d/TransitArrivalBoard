@@ -8,7 +8,7 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
   if (!props.stop)
     return (
       <React.Fragment>
-        <div className="flex min-h-14 flex-row items-center rounded-lg bg-[#B9D9EB]"></div>
+        <div className="flex min-h-14 flex-row items-center rounded-lg bg-[#162A5A]"></div>
         <div className="flex min-h-64 flex-row items-center rounded-lg bg-slate-100"></div>
       </React.Fragment>
     );
@@ -19,8 +19,8 @@ export function Countdown(props: { routes: Record<string, Route>; stop: Stop; wa
 
   return (
     <React.Fragment>
-      <div className="flex min-h-14 flex-row items-center rounded-lg bg-[#B9D9EB]">
-        <h1 className="mx-2 font-black text-black 2xl:text-3xl">{props.stop.name}</h1>
+      <div className="flex min-h-14 flex-row items-center rounded-lg bg-[#162A5A]">
+        <h1 className="mx-2 font-black text-white 2xl:text-3xl">{props.stop.name}</h1>
       </div>
       {times.length > 0 ? (
         <div className="flex min-h-64 flex-row rounded-lg bg-slate-300">

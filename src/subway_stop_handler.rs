@@ -58,7 +58,7 @@ impl SubwayStopHandler {
                 .trip
                 .trip_id()
                 .split('_')
-                .last()
+                .next_back()
                 .unwrap() // No station name can be "_"
                 .split("..");
 

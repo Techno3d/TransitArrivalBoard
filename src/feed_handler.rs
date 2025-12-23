@@ -70,10 +70,7 @@ impl FeedHandler {
         }
       };
     let bytes = resp.as_bytes();
-    let service_alerts: MercuryDelays = match serde_json::from_slice(bytes) {
-      Ok(r) => r,
-      Err(_) => Default::default(),
-    };
+    let service_alerts: MercuryDelays = serde_json::from_slice(bytes).unwrap_or_default();
 
     self.service_alerts_realtime_feed = Some(service_alerts);
   }

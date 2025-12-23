@@ -8,18 +8,13 @@ import { Stop } from "@/types/Stop";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bulletin } from "./components/Bulletin";
-import { Countdown } from "./components/Countdown";
 import { Message } from "./components/Message";
 
+type WebSocketState = "UNCONNECTED" | "CONNECTED" | "LOADING" | "POSSIBLE_WIFI_ERROR";
+
 export default function Home() {
-  const WebSocketTypes = {
-    UNCONNECTED: 0,
-    CONNECTED: 1,
-    LOADING: 2,
-    POSSIBLE_WIFI_ERROR: 3,
-  }
   const [time, setTime] = useState<string>("");
-  const [websocket, setWebsocket] = useState<number>(WebSocketTypes.UNCONNECTED);
+  const [websocket, setWebsocket] = useState<WebSocketState>("UNCONNECTED");
   const [stops, setStops] = useState<Record<string, Stop>>({});
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [headers, setHeaders] = useState<Array<string>>([]);
@@ -30,7 +25,7 @@ export default function Home() {
 
     ws.onopen = () => {
       console.log("Websocket opened.");
-      setWebsocket(WebSocketTypes.LOADING);
+      setWebsocket("LOADING");
 
       const message: Export = { subway: [], bus: [] };
 
@@ -47,12 +42,12 @@ export default function Home() {
 
     ws.onmessage = (event) => {
       console.log("Message recieved.");
-      setWebsocket(WebSocketTypes.CONNECTED);
+      setWebsocket("CONNECTED");
 
       console.log(event.data);
-      if(event.data == "Possible Connection Issue") {
-          setWebsocket(WebSocketTypes.POSSIBLE_WIFI_ERROR);
-          return;
+      if (event.data == "Possible Connection Issue") {
+        setWebsocket("POSSIBLE_WIFI_ERROR");
+        return;
       }
       const message: Import = JSON.parse(event.data);
       setStops(message.stops_realtime);
@@ -73,21 +68,21 @@ export default function Home() {
 
     ws.onerror = () => {
       console.log("Websocket errored.");
-      setWebsocket(WebSocketTypes.UNCONNECTED);
+      setWebsocket("UNCONNECTED");
 
       ws.close();
     };
 
     ws.onclose = () => {
       console.log("Websocket closed.");
-      setWebsocket(WebSocketTypes.UNCONNECTED);
+      setWebsocket("UNCONNECTED");
 
       ws.close();
     };
 
     return () => {
       console.log("Closing old websocket...");
-      setWebsocket(WebSocketTypes.UNCONNECTED);
+      setWebsocket("UNCONNECTED");
 
       ws.close();
     };
@@ -117,21 +112,16 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex grow flex-row gap-4 bg-[#B9D9EB] p-2 text-black">
+      <div className="flex grow flex-row gap-4 bg-[#162A5A] p-2 text-black">
         <div className="flex min-h-full basis-2/3 flex-col gap-4">
-          <div className="flex flex-row gap-4 grow">
-              {Object.values(config.subway).map((value) => {
-                return (
-                  <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2 basis-1/2">
-                    <Bulletin
-                      key={value.stop_ids[0]}
-                      stop={stops[value.stop_ids[0]]}
-                      walk_time={value.walk_time}
-                      routes={routes}
-                    ></Bulletin>
-                  </div>
-                );
-              })}
+          <div className="flex grow flex-row gap-4">
+            {Object.values(config.subway).map((value) => {
+              return (
+                <div className="flex h-full basis-1/2 flex-col gap-2 rounded-xl bg-black p-2" key={value.stop_ids[0]}>
+                  <Bulletin stop={stops[value.stop_ids[0]]} walk_time={value.walk_time} routes={routes}></Bulletin>
+                </div>
+              );
+            })}
           </div>
           <div className="flex flex-col gap-2 rounded-xl bg-black p-2">
             {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
@@ -155,17 +145,18 @@ export default function Home() {
       <div className="flex min-h-14 flex-row items-center bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
-          {(() => {switch (websocket) {
-              case WebSocketTypes.UNCONNECTED:
-                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
-              case WebSocketTypes.CONNECTED:
-                return <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>
-              case WebSocketTypes.LOADING:
-                return <span className="inline-flex items-baseline rounded-md bg-yellow-600 px-2">LOADING</span>
-              case WebSocketTypes.POSSIBLE_WIFI_ERROR:
-                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">CHECK WIFI</span>
+          {(() => {
+            switch (websocket) {
+              case "UNCONNECTED":
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>;
+              case "CONNECTED":
+                return <span className="inline-flex items-baseline rounded-md bg-green-600 px-2">OK</span>;
+              case "LOADING":
+                return <span className="inline-flex items-baseline rounded-md bg-yellow-600 px-2">LOADING</span>;
+              case "POSSIBLE_WIFI_ERROR":
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">CHECK WIFI</span>;
               default:
-                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>
+                return <span className="inline-flex items-baseline rounded-md bg-red-600 px-2">ERROR</span>;
             }
           })()}
         </h1>

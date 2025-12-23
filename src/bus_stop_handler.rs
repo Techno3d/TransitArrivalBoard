@@ -88,8 +88,9 @@ impl BusStopHandler {
                 .monitored_vehicle_journey
                 .line_ref
                 .split('_')
-                .last()
+                .next_back()
                 .unwrap_or(&visit.monitored_vehicle_journey.line_ref);
+
               let route_name = visit.monitored_vehicle_journey.published_line_name.first().unwrap();
 
               // Destination
@@ -97,7 +98,7 @@ impl BusStopHandler {
                 .monitored_vehicle_journey
                 .destination_ref
                 .split('_')
-                .last() // There should be at least one element
+                .next_back() // There should be at least one element
                 .unwrap(); // However, there should actually be two, because of MTA formating
 
               let destination_name = visit
@@ -161,7 +162,8 @@ impl BusStopHandler {
 
     self.trips = trips;
     self.destinations = destinations;
-    return true;
+
+    true
   }
 
   pub fn serialize(&self) -> Stop {
