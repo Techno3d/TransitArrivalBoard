@@ -117,45 +117,39 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex grow flex-col gap-4 bg-[#B9D9EB] p-2 text-black">
-        <div className="flex flex-row gap-4 grow">
-            <div className="flex flex-col basis-1/3">
-              <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-                  <Bulletin
-                    key={config.subway[0].stop_ids[0]}
-                    stop={stops[config.subway[0].stop_ids[0]]}
-                    routes={routes}
-                    walk_time={config.subway[0].walk_time}
-                  ></Bulletin>
-              </div>
-            </div>
-            <div className="flex flex-col basis-1/3">
-              <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-                  <Bulletin
-                    key={config.subway[1].stop_ids[0]}
-                    stop={stops[config.subway[1].stop_ids[0]]}
-                    routes={routes}
-                    walk_time={config.subway[1].walk_time}
-                  ></Bulletin>
-              </div>
-            </div>
-            <div className="flex flex-col basis-1/3">
-              <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-                {Object.values(config.bus).map((value) => {
-                  return (
+      <div className="flex grow flex-row gap-4 bg-[#B9D9EB] p-2 text-black">
+        <div className="flex min-h-full basis-2/3 flex-col gap-4">
+          <div className="flex flex-row gap-4 grow">
+              {Object.values(config.subway).map((value) => {
+                return (
+                  <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2 basis-1/2">
                     <Bulletin
                       key={value.stop_ids[0]}
                       stop={stops[value.stop_ids[0]]}
                       walk_time={value.walk_time}
                       routes={routes}
                     ></Bulletin>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                );
+              })}
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl bg-black p-2">
+            {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
+          </div>
         </div>
-        <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-          {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
+        <div className="flex min-h-full basis-1/3 flex-col gap-4">
+          <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
+            {Object.values(config.bus).map((value) => {
+              return (
+                <Bulletin
+                  key={value.stop_ids[0]}
+                  stop={stops[value.stop_ids[0]]}
+                  routes={routes}
+                  walk_time={value.walk_time}
+                ></Bulletin>
+              );
+            })}
+          </div>
         </div>
       </div>
       <div className="flex min-h-14 flex-row items-center bg-black">

@@ -99,13 +99,14 @@ impl BusStopHandler {
                 .split('_')
                 .last() // There should be at least one element
                 .unwrap(); // However, there should actually be two, because of MTA formating
+
               let destination_name = visit
                 .monitored_vehicle_journey
                 .destination_name
                 .first() // Should have a destination_name
                 .unwrap();
 
-              let route_dir = visit.monitored_vehicle_journey.direction_ref.unwrap_or(" ".to_owned());
+              let direction = visit.monitored_vehicle_journey.direction_ref.as_ref().unwrap();
 
               // Input data into trips
               trips.push(Vehicle {
@@ -113,7 +114,7 @@ impl BusStopHandler {
                 route_name: route_name.to_owned(),
                 destination_id: destination_id.to_owned(),
                 destination_name: destination_name.to_owned(),
-                direction: route_dir.to_owned(),
+                direction: direction.to_owned(),
                 minutes_until_arrival: duration,
               });
 
@@ -121,25 +122,25 @@ impl BusStopHandler {
               if !destinations.contains_key(route_id) {
                 destinations.insert(route_id.to_owned(), BTreeMap::new());
               }
-              if !destinations.get(route_id).unwrap().contains_key(destination_id) {
+              if !destinations.get(route_id).unwrap().contains_key(direction) {
                 // Key must exist because of above line
                 destinations
                   .get_mut(route_id) // Key must exist for same reason above
                   .unwrap()
-                  .insert(destination_id.to_owned(), Vec::new());
+                  .insert(direction.to_owned(), Vec::new());
               };
 
               destinations
                 .get_mut(route_id) // Key exists
                 .unwrap()
-                .get_mut(destination_id)
+                .get_mut(direction)
                 .unwrap() // Key exists due to above if statement check
                 .push(Vehicle {
                   route_id: route_id.to_owned(),
                   route_name: route_name.to_owned(),
                   destination_id: destination_id.to_owned(),
                   destination_name: destination_name.to_owned(),
-                  direction: route_dir,
+                  direction: direction.to_owned(),
                   minutes_until_arrival: duration,
                 });
             }
@@ -200,19 +201,19 @@ impl BusStopHandler {
         .destinations
         .get(&trip.route_id)
         .unwrap()
-        .contains_key(&trip.destination_id)
+        .contains_key(&trip.direction)
       {
         self
           .destinations
           .get_mut(&trip.route_id)
           .unwrap()
-          .insert(trip.destination_id.to_owned(), Vec::new());
+          .insert(trip.direction.to_owned(), Vec::new());
       };
       self
         .destinations
         .get_mut(&trip.route_id)
         .unwrap()
-        .get_mut(&trip.destination_id)
+        .get_mut(&trip.direction)
         .unwrap()
         .push(Vehicle {
           route_id: trip.route_id.to_owned(),

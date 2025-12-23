@@ -64,7 +64,7 @@ impl SubwayStopHandler {
 
               let route_id = route_bits.next().unwrap(); // No station name can be "_.."
 
-              let route_dir = route_bits.next().unwrap().chars().nth(0).unwrap_or(' ');
+              let direction = &route_bits.next().unwrap().chars().next().unwrap().to_string();
 
               let route_name = match data.subway_static_feed.get_route(route_id) {
                 // Theoretically, all routes should have a route name
@@ -93,7 +93,7 @@ impl SubwayStopHandler {
                 route_name: route_name.to_owned(),
                 destination_id: destination_id.to_owned(),
                 destination_name: destination_name.to_owned(),
-                direction: route_dir.to_string().trim().to_owned(),
+                direction: direction.to_string().trim().to_owned(),
                 minutes_until_arrival: duration,
               });
 
@@ -102,23 +102,23 @@ impl SubwayStopHandler {
               if !destinations.contains_key(route_id) {
                 destinations.insert(route_id.to_owned(), BTreeMap::new());
               }
-              if !destinations.get(route_id).unwrap().contains_key(destination_id) {
+              if !destinations.get(route_id).unwrap().contains_key(direction) {
                 destinations
                   .get_mut(route_id)
                   .unwrap()
-                  .insert(destination_id.to_owned(), Vec::new());
+                  .insert(direction.to_owned(), Vec::new());
               };
               destinations
                 .get_mut(route_id)
                 .unwrap()
-                .get_mut(destination_id)
+                .get_mut(direction)
                 .unwrap()
                 .push(Vehicle {
                   route_id: route_id.to_owned(),
                   route_name: route_name.to_owned(),
                   destination_id: destination_id.to_owned(),
                   destination_name: destination_name.to_owned(),
-                  direction: route_dir.to_string().trim().to_owned(),
+                  direction: direction.to_owned(),
                   minutes_until_arrival: duration,
                 });
             }
@@ -136,6 +136,20 @@ impl SubwayStopHandler {
       }
       Ordering::Equal
     });
+
+    for directions in destinations.values_mut() {
+      for vehicles in directions.values_mut() {
+        vehicles.sort_by(|a, b| {
+          if a.minutes_until_arrival > b.minutes_until_arrival {
+            return Ordering::Greater;
+          }
+          if a.minutes_until_arrival < b.minutes_until_arrival {
+            return Ordering::Less;
+          }
+          Ordering::Equal
+        });
+      }
+    }
 
     self.trips = trips;
     self.destinations = destinations;
@@ -177,19 +191,19 @@ impl SubwayStopHandler {
         .destinations
         .get(&trip.route_id)
         .unwrap()
-        .contains_key(&trip.destination_id)
+        .contains_key(&trip.direction)
       {
         self
           .destinations
           .get_mut(&trip.route_id)
           .unwrap()
-          .insert(trip.destination_id.to_owned(), Vec::new());
+          .insert(trip.direction.to_owned(), Vec::new());
       };
       self
         .destinations
         .get_mut(&trip.route_id)
         .unwrap()
-        .get_mut(&trip.destination_id)
+        .get_mut(&trip.direction)
         .unwrap()
         .push(Vehicle {
           route_id: trip.route_id.to_owned(),

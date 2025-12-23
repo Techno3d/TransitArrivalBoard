@@ -104,9 +104,9 @@ fn main() {
         data.write().unwrap().refresh_realtime();
 
         for i in 0..subway.len() {
-            // i must be in subway vector
-            subway.get_mut(i).unwrap().refresh();
-            stops_map.insert(
+          // i must be in subway vector
+          subway.get_mut(i).unwrap().refresh();
+          stops_map.insert(
             // There should be atleast one stop_id
             subway.get(i).unwrap().stop_ids.first().unwrap().to_owned(),
             subway.get(i).unwrap().serialize(),
@@ -114,13 +114,13 @@ fn main() {
         }
 
         for i in 0..bus.len() {
-            // i is within the bus vector length
-            if bus.get_mut(i).unwrap().refresh() {
-                num_predicts = 0;
-            } else {
-                num_predicts += 1;
-            }
-            stops_map.insert(
+          // i is within the bus vector length
+          if bus.get_mut(i).unwrap().refresh() {
+            num_predicts = 0;
+          } else {
+            num_predicts += 1;
+          }
+          stops_map.insert(
             // Atleast one stop_id must exist
             bus.get(i).unwrap().stop_ids.first().unwrap().to_string(),
             bus.get(i).unwrap().serialize(),
@@ -169,9 +169,9 @@ fn main() {
         let data = match serde_json::to_string(&data) {
           Ok(a) => a,
           Err(e) => {
-              eprintln!("Serde failed where it shouldn't have\n{}", e);
-              serde_json::to_string(&Export::default()).unwrap() // Send blank data
-          },
+            eprintln!("Serde failed where it shouldn't have\n{}", e);
+            serde_json::to_string(&Export::default()).unwrap() // Send blank data
+          }
         };
         let message = Message::Text(data);
 
@@ -185,22 +185,21 @@ fn main() {
             break;
           }
         };
-        
+
         // Hacky solution to network issue
         if num_predicts >= 30 {
-           let wifi_message = Message::Text("Possible Connection Issue".to_owned());
-            match ws.send(wifi_message) {
-              Ok(_) => {}
-              Err(_) => {
-                let _ = ws.close(Some(CloseFrame {
-                  code: CloseCode::Error,
-                  reason: "Could not send to WebSocket".into(),
-                }));
-                break;
-              }
-            };
+          let wifi_message = Message::Text("Possible Connection Issue".to_owned());
+          match ws.send(wifi_message) {
+            Ok(_) => {}
+            Err(_) => {
+              let _ = ws.close(Some(CloseFrame {
+                code: CloseCode::Error,
+                reason: "Could not send to WebSocket".into(),
+              }));
+              break;
+            }
+          };
         }
-
 
         thread::sleep(Duration::from_secs(60));
       }

@@ -94,17 +94,17 @@ impl FeedHandler {
       let resp = match minreq::get(uri).send() {
         Ok(a) => a,
         Err(e) => {
-            eprintln!("Failed to get bus static info for a borough {}\n{}", uri, e);
-            continue;
-        },
+          eprintln!("Failed to get bus static info for a borough {}\n{}", uri, e);
+          continue;
+        }
       };
       let bytes = resp.as_bytes();
       let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
         Ok(a) => a,
         Err(e) => {
-            eprintln!("GTFS deserialization failed {}\n{}", uri, e);
-            continue;
-        },
+          eprintln!("GTFS deserialization failed {}\n{}", uri, e);
+          continue;
+        }
       };
       self.bus_static_feed.push(gtfs);
     }
@@ -121,9 +121,9 @@ impl FeedHandler {
     let gtfs = match Gtfs::from_reader(Cursor::new(bytes)) {
       Ok(a) => a,
       Err(e) => {
-          eprintln!("Failed to deserialize gtfs data for subways\n{}", e);
-          return
-      },
+        eprintln!("Failed to deserialize gtfs data for subways\n{}", e);
+        return;
+      }
     };
     self.subway_static_feed = gtfs;
   }
