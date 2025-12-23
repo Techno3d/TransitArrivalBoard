@@ -39,6 +39,7 @@ pub struct MonitoredStopVisit {
 #[serde(rename_all = "PascalCase")]
 pub struct MonitoredVehicleJourney {
   pub line_ref: String,
+  pub direction_ref: Option<String>,
   pub framed_vehicle_journey_ref: Option<FramedVehicleJourneyRef>,
   pub journey_pattern_ref: Option<String>,
   pub published_line_name: Vec<String>,

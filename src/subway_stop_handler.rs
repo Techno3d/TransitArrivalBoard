@@ -54,22 +54,25 @@ impl SubwayStopHandler {
               //println!("{}, {}, {}", arrival_time, current_time, arrival_time-current_time);
 
               // Route
-              let route_id = trip_update
+              let mut route_bits = trip_update
                 .trip
                 .trip_id()
                 .split('_')
                 .last()
                 .unwrap() // No station name can be "_"
-                .split("..")
-                .next()
-                .unwrap(); // No station name can be "_.."
+                .split("..");
+
+              let route_id = route_bits.next().unwrap(); // No station name can be "_.."
+
+              let route_dir = route_bits.next().unwrap().chars().nth(0).unwrap_or(' ');
+
               let route_name = match data.subway_static_feed.get_route(route_id) {
                 // Theoretically, all routes should have a route name
                 Ok(route_name) => route_name.short_name.as_ref().unwrap(),
                 Err(e) => {
-                    eprintln!("Failed to get route name\n{}", e);
-                    continue
-                },
+                  eprintln!("Failed to get route name\n{}", e);
+                  continue;
+                }
               };
 
               // Destination
@@ -79,9 +82,9 @@ impl SubwayStopHandler {
                 // Theoritcally, all destination ids should reference a name
                 Ok(a) => a.name.as_ref().unwrap(),
                 Err(e) => {
-                    eprintln!("Failed to get destination name\n{}", e);
-                    return
-                },
+                  eprintln!("Failed to get destination name\n{}", e);
+                  return;
+                }
               };
 
               // Input data into trips
@@ -90,6 +93,7 @@ impl SubwayStopHandler {
                 route_name: route_name.to_owned(),
                 destination_id: destination_id.to_owned(),
                 destination_name: destination_name.to_owned(),
+                direction: route_dir.to_string().trim().to_owned(),
                 minutes_until_arrival: duration,
               });
 
@@ -114,6 +118,7 @@ impl SubwayStopHandler {
                   route_name: route_name.to_owned(),
                   destination_id: destination_id.to_owned(),
                   destination_name: destination_name.to_owned(),
+                  direction: route_dir.to_string().trim().to_owned(),
                   minutes_until_arrival: duration,
                 });
             }
@@ -191,6 +196,7 @@ impl SubwayStopHandler {
           route_name: trip.route_name.to_owned(),
           destination_id: trip.destination_id.to_owned(),
           destination_name: trip.destination_name.to_owned(),
+          direction: trip.direction.to_owned(),
           minutes_until_arrival: trip.minutes_until_arrival,
         });
     }

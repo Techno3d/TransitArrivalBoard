@@ -105,12 +105,15 @@ impl BusStopHandler {
                 .first() // Should have a destination_name
                 .unwrap();
 
+              let route_dir = visit.monitored_vehicle_journey.direction_ref.unwrap_or(" ".to_owned());
+
               // Input data into trips
               trips.push(Vehicle {
                 route_id: route_id.to_owned(),
                 route_name: route_name.to_owned(),
                 destination_id: destination_id.to_owned(),
                 destination_name: destination_name.to_owned(),
+                direction: route_dir.to_owned(),
                 minutes_until_arrival: duration,
               });
 
@@ -136,6 +139,7 @@ impl BusStopHandler {
                   route_name: route_name.to_owned(),
                   destination_id: destination_id.to_owned(),
                   destination_name: destination_name.to_owned(),
+                  direction: route_dir,
                   minutes_until_arrival: duration,
                 });
             }
@@ -215,6 +219,7 @@ impl BusStopHandler {
           route_name: trip.route_name.to_owned(),
           destination_id: trip.destination_id.to_owned(),
           destination_name: trip.destination_name.to_owned(),
+          direction: trip.direction.to_owned(),
           minutes_until_arrival: trip.minutes_until_arrival,
         });
     }

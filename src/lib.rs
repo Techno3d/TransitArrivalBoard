@@ -21,6 +21,7 @@ pub struct Vehicle {
   pub route_name: String,
   pub destination_id: String,
   pub destination_name: String,
+  pub direction: String,
   pub minutes_until_arrival: i32,
 }
 
