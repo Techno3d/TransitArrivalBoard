@@ -1,4 +1,4 @@
-module.exports = {
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -8,3 +8,5 @@ module.exports = {
     ],
   },
 };
+
+export default nextConfig;

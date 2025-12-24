@@ -1,4 +1,4 @@
-const config = {
+const tailwindConfig = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -34,4 +34,5 @@ const config = {
   },
   plugins: [],
 };
-export default config;
+
+export default tailwindConfig;

@@ -1,6 +1,6 @@
 "use client";
 
-import { config } from "@/config";
+import { config } from "@/app/config";
 import { Export } from "@/types/Export";
 import { Import } from "@/types/Import";
 import { Route } from "@/types/Route";
@@ -96,7 +96,7 @@ export default function Home() {
           hour12: true,
           timeZone: "America/New_York",
           timeStyle: "short",
-          dateStyle: "long",
+          dateStyle: "short",
         }),
       );
 
@@ -112,37 +112,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex grow flex-row gap-4 bg-[#162A5A] p-2 text-black">
-        <div className="flex min-h-full basis-2/3 flex-col gap-4">
-          <div className="flex grow flex-row gap-4">
-            {Object.values(config.subway).map((value) => {
-              return (
-                <div className="flex h-full basis-1/2 flex-col gap-2 rounded-xl bg-black p-2" key={value.stop_ids[0]}>
-                  <Bulletin stop={stops[value.stop_ids[0]]} walk_time={value.walk_time} routes={routes}></Bulletin>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl bg-black p-2">
-            {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
-          </div>
-        </div>
-        <div className="flex min-h-full basis-1/3 flex-col gap-4">
-          <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
-            {Object.values(config.bus).map((value) => {
-              return (
-                <Bulletin
-                  key={value.stop_ids[0]}
-                  stop={stops[value.stop_ids[0]]}
-                  routes={routes}
-                  walk_time={value.walk_time}
-                ></Bulletin>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      <div className="flex min-h-14 flex-row items-center bg-black">
+      <div className="flex h-14 flex-row items-center bg-black">
         <h1 className="mx-2 flex-1 text-start font-bold text-white 2xl:text-3xl">
           {"Status: "}
           {(() => {
@@ -184,7 +154,37 @@ export default function Home() {
             <span>David Wang</span>
           </span>
         </h1>
-        <h1 className="mx-2 flex-1  text-end font-bold text-white 2xl:text-3xl">{time}</h1>
+        <h1 className="mx-2 flex-1 text-end font-bold text-white 2xl:text-3xl">{time}</h1>
+      </div>
+      <div className="flex grow flex-row gap-4 bg-[#162A5A] p-2 text-black">
+        <div className="flex min-h-full basis-2/3 flex-col gap-4">
+          <div className="flex grow flex-row gap-4">
+            {Object.values(config.subway).map((value) => {
+              return (
+                <div className="flex h-full basis-1/2 flex-col gap-2 rounded-xl bg-black p-2" key={value.stop_ids[0]}>
+                  <Bulletin stop={stops[value.stop_ids[0]]} walk_time={value.walk_time} routes={routes}></Bulletin>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl bg-black p-2">
+            {<Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />}
+          </div>
+        </div>
+        <div className="flex min-h-full basis-1/3 flex-col gap-4">
+          <div className="flex h-full flex-col gap-2 rounded-xl bg-black p-2">
+            {Object.values(config.bus).map((value) => {
+              return (
+                <Bulletin
+                  key={value.stop_ids[0]}
+                  stop={stops[value.stop_ids[0]]}
+                  routes={routes}
+                  walk_time={value.walk_time}
+                ></Bulletin>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

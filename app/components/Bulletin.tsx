@@ -34,21 +34,21 @@ export function Bulletin(props: { routes: Record<string, Route>; stop: Stop; wal
                 className="flex min-h-29 flex-row items-center rounded-lg bg-slate-200 text-black"
                 key={times[0].route_id + "_" + times[0].destination_id}
               >
-                <div className="flex min-h-full basis-5/6 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
-                  <div className="flex min-h-full basis-4/5 flex-row items-center justify-start gap-2 px-2">
+                <div className="flex min-h-full w-4/5 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
+                  <div className="flex min-h-full basis-3/4 flex-row items-center justify-start gap-2 px-2">
                     <Bullet route={props.routes[times[0].route_id]} size={72} />
-                    <h1 className="line-clamp-2 text-wrap font-bold 2xl:text-4xl">{times[0].destination_name}</h1>
+                    <h1 className="line-clamp-2 font-bold text-wrap 2xl:text-4xl">{times[0].destination_name}</h1>
                   </div>
-                  <div className="flex min-h-full basis-1/5 flex-col items-center justify-center">
-                    <h1 className="font-black 2xl:text-6xl">{times[0].minutes_until_arrival}</h1>
+                  <div className="flex min-h-full basis-1/4 flex-col items-center justify-center">
+                    <h1 className="font-extrabold 2xl:text-6xl">{times[0].minutes_until_arrival}</h1>
                     <h1 className="font-semibold 2xl:text-2xl">min</h1>
                   </div>
                 </div>
 
-                <div className="flex min-h-full basis-1/6 flex-col items-center justify-center">
+                <div className="flex min-h-full w-1/5 flex-col items-center justify-center">
                   {times[1] ? (
                     <React.Fragment>
-                      <h1 className="font-black 2xl:text-6xl">{times[1].minutes_until_arrival}</h1>
+                      <h1 className="font-extrabold 2xl:text-6xl">{times[1].minutes_until_arrival}</h1>
                       <h1 className="font-semibold 2xl:text-2xl">min</h1>
                     </React.Fragment>
                   ) : undefined}

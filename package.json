@@ -2,7 +2,7 @@
   "name": "transit-board",
   "version": "0.1.0",
   "description": "Gets and displays public transit info around Bronx Science",
-  "main": "index.js",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Techno3d/TransitArrivalBoard.git"
@@ -17,32 +17,35 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "npx eslint . --fix",
     "prettify": "npx prettier . --write"
   },
   "dependencies": {
     "change-case": "^5.4.4",
-    "next": "14.2.1",
-    "react": "^18",
-    "react-dom": "^18",
-    "sharp": "^0.33.3",
-    "ws": "^8.17.0"
+    "next": "16.1.1",
+    "react": "^19",
+    "react-dom": "^19",
+    "sharp": "^0.34.5",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@typescript-eslint/parser": "^7.7.0",
-    "autoprefixer": "^10.4.19",
-    "eslint": "^8.56.0",
-    "eslint-config-next": "14.2.1",
-    "eslint-config-prettier": "^9.1.0",
-    "postcss": "^8",
-    "prettier": "^3.2.5",
-    "prettier-eslint": "^16.3.0",
-    "prettier-plugin-organize-imports": "^3.2.4",
-    "prettier-plugin-tailwindcss": "^0.5.14",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "@eslint/eslintrc": "^3.3.3",
+    "@eslint/js": "^9.39.2",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^25",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@typescript-eslint/parser": "^8.50.1",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.1",
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.5.6",
+    "prettier": "^3.7.4",
+    "prettier-eslint": "^16.4.2",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3"
   }
 }
