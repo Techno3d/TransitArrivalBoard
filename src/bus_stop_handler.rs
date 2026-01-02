@@ -160,6 +160,20 @@ impl BusStopHandler {
       Ordering::Equal
     });
 
+    for directions in destinations.values_mut() {
+      for vehicles in directions.values_mut() {
+        vehicles.sort_by(|a, b| {
+          if a.minutes_until_arrival > b.minutes_until_arrival {
+            return Ordering::Greater;
+          }
+          if a.minutes_until_arrival < b.minutes_until_arrival {
+            return Ordering::Less;
+          }
+          Ordering::Equal
+        });
+      }
+    }
+
     self.trips = trips;
     self.destinations = destinations;
 

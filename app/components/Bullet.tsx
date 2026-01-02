@@ -52,7 +52,7 @@ export function Bullet(props: { route: Route; size: number }) {
         }}
       >
         <span
-          className="flex rotate-[45deg] items-center justify-center"
+          className="flex rotate-45 items-center justify-center"
           style={{
             backgroundColor: `#${props.route.route_color}`,
             height: `${props.size / Math.sqrt(2)}px`,
@@ -60,7 +60,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="rotate-[-45deg] text-center font-bold text-nowrap"
+            className="-rotate-45 text-center font-bold text-nowrap"
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
