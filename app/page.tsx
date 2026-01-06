@@ -170,7 +170,7 @@ export default function Home() {
         <h1 className="mx-2 text-center font-bold text-white 2xl:text-3xl">
           {"Made with ❤️ by "}
           <span className="inline-flex items-baseline">
-            <Image
+            <img
               src="https://avatars.githubusercontent.com/u/76977073?"
               alt=""
               className="mx-1 self-center rounded-full"
@@ -181,7 +181,7 @@ export default function Home() {
           </span>
           {" and "}
           <span className="inline-flex items-baseline">
-            <Image
+            <img
               src="https://avatars.githubusercontent.com/u/95447323?"
               alt=""
               className="mx-1 self-center rounded-full"
