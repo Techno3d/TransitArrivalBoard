@@ -13,7 +13,7 @@ ifeq (, $(which zip))
 	zip -r out.zip out/
 endif
 	touch out/.env
-	echo "#Running Transit Board\nTo run Transit board, make sure you have python installed or change the run script to use a different http server.\n\n"
+	cp export_readme.md out/README.md
 
 install_deps:
 	npm ci

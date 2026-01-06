@@ -5,7 +5,6 @@ import { Export } from "@/types/Export";
 import { Import } from "@/types/Import";
 import { Route } from "@/types/Route";
 import { Stop } from "@/types/Stop";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Bulletin } from "./components/Bulletin";
 import { Countdown } from "./components/Countdown";
