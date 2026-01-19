@@ -1,33 +1,79 @@
-# Transit Arrival Board
+# Transit Board
 
-A hobby project that retrives and displays realtime MTA subway and bus info. It can be configured to track the departures of any station.
+A hobby project that retrives and displays realtime MTA subway and bus info. It can be configured to track the departures of any subway or bus stop.
 
-Originally designed for use by The Bronx High School of Science.
+Please follow this guide on how to setup and deploy this project on your device.
 
-## Environment Variables
+## Tools
 
-Create a `.env` file and add the following variables.
-
-### `MTABUSKEY`
-
-The MTA's BusTime feeds require an API key; [submit a request here](https://bustime.mta.info/wiki/Developers/Index).
-
-## Configuration
-
-The configuration file is located in `app/config.ts`. It is currently set to stops located near The Bronx High School of Science, but this file is meant to be edited to display any stop in the MTA network. Stops can be added (either subway or bus) with `StopConfig` objects, which is explained in depth below.
-
-### `stop_ids`
-
-Although each GTFS `stop_id` refers to a single platform, we have anticipated for the need to combine platforms with built-in transfers. The first `stop_id` is used to distinguish the `stop_name` and as a key.
-
-### `walk_time`
-
-Although the Rust backend uses the MTA's GTFS realtime feeds to get information about when a vehicle is scheduled to arrive at a station, it may be unhelpful for the vehicle to arrive faster than someone would be able to "catch" it. `walk_time` is used to remove vehicles from the React.js frontend that are deemed to be unlikely for someone to "catch" it.
-
-## Dependencies
-
-Install the following dependencies.
+Install the following tools.
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
 - [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
+
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following variables.\
+
+### `MTABUSKEY`
+
+Your MTA BusTime API key. [Request one here](https://bustime.mta.info/wiki/Developers/Index).
+
+## Configuration File
+
+Modify `app/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+
+### `stop_ids`
+
+You can group all of the various stations you wish to track together by inserting corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.
+
+### `walk_time`
+
+It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included.
+
+### `name`
+
+This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.
+
+## Deployment
+
+Before you begin, run the following command to install the project dependencies.
+
+```bash
+make install
+```
+
+### Development
+
+To run the project while in development, run each command in seperate terminals.
+
+```bash
+cargo run
+```
+
+```bash
+npm run dev
+```
+
+### Production
+
+To build and run the project for production, run the following command.
+
+```bash
+make build
+```
+
+Then, depending on your OS, run the following command.
+
+#### Windows
+
+```cmd
+run.bat
+```
+
+#### macOS/Linux
+
+```bash
+./run.sh
+```

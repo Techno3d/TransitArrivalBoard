@@ -1,10 +1,10 @@
-install:
-	cargo test
-	npm ci
-
 build: src/* proto/* app/*
 	cargo build --release
 	npm run build
+
+install:
+	cargo test
+	npm ci
 
 clean:
 	cargo clean
