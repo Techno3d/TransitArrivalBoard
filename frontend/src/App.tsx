@@ -14,7 +14,6 @@ export default function App() {
   const [stops, setStops] = useState<Record<string, Stop>>({});
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [headers, setHeaders] = useState<Array<string>>([]);
-  const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {
     const ws = new WebSocket("ws://127.0.0.1:9001");
@@ -61,12 +60,6 @@ export default function App() {
           headers.push(alert.header_text);
         });
       setHeaders(headers);
-      if (headers.length > 0) {
-        setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
-        return;
-      }
-
-      setIndex(0);
     };
 
     ws.onerror = () => {
@@ -91,21 +84,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    const loop = setInterval(() => {
-      if (headers.length > 0) {
-        setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
-        return;
-      }
-
-      setIndex(0);
-    }, 5000);
-
-    return () => {
-      clearInterval(loop);
-    };
-  }, [headers.length]);
-
   return (
     <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
       <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-25 gap-2 bg-emerald-800 p-2 text-black">
@@ -126,7 +104,7 @@ export default function App() {
         </div>
 
         <div className="col-span-2 row-span-9">
-          <Message name={"Service Alerts"} headers={headers} routes={routes} index={index} />
+          <Message name={"Service Alerts"} messages={headers} routes={routes} />
         </div>
 
         <div className="col-span-1 row-span-25">
