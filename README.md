@@ -12,13 +12,15 @@ Install the following tools.
 - [Node.js](https://nodejs.org/en/download)
 - [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
 
+[Firefox](https://www.firefox.com/en-US/download/all/) is optional, but we have provided scripts that will automate deployment if it is installed.
+
 ## Environment Variables
 
 Create a `.env` file in the `/backend` directory and add the following variables.
 
 ### `MTABUSKEY`
 
-Your MTA BusTime API key. [Request one here](https://bustime.mta.info/wiki/Developers/Index).
+[Request an API key](https://bustime.mta.info/wiki/Developers/Index) for the MTA BusTime API.
 
 ## Configuration File
 

@@ -1,11 +1,11 @@
 build: src/* proto/* app/*
-	cargo build --release
-	npm run build
+	cd backend && cargo build --release
+	cd frontend && npm run build
 
 install:
-	cargo test
-	npm ci
+	cd backend && cargo test
+	cd frontend && npm ci
 
 clean:
-	cargo clean
-	rm -rf node_modules .next types next-env.d.ts
+	cd backend && cargo clean
+	cd frontend && rm -rf node_modules .next next-env.d.ts
