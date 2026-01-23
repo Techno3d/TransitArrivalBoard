@@ -58,18 +58,13 @@ impl ServiceAlertHandler {
             None => continue,
           };
 
+          let time_now = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64;
+
           for (start, end) in active_period.iter().map(|ap| (ap.start, ap.end)) {
-            if (start.unwrap()
-              > SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)
-                .unwrap()
-                .as_secs() as i64)
-              || (end.unwrap()
-                < SystemTime::now()
-                  .duration_since(SystemTime::UNIX_EPOCH)
-                  .unwrap()
-                  .as_secs() as i64)
-            {
+            if (start.unwrap_or(time_now) > time_now) || (end.unwrap_or(time_now) < time_now) {
               continue 'entities;
             }
           }
