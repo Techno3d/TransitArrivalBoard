@@ -6,10 +6,10 @@ import { Import } from "@/types/Import";
 import { Route } from "@/types/Route";
 import { Stop } from "@/types/Stop";
 import { useEffect, useState } from "react";
-import { Bulletin } from "./components/Bulletin";
-import { Countdown } from "./components/Countdown";
-import { Message } from "./components/Message";
-import { Status, StatusBar } from "./components/StatusBar";
+import { Bulletin } from "@/components/Bulletin";
+import { Countdown } from "@/components/Countdown";
+import { Message } from "@/components/Message";
+import { Status, StatusBar } from "@/components/StatusBar";
 
 export default function Home() {
   const [status, setStatus] = useState<Status>({ type: "ERROR", message: "Offline" });

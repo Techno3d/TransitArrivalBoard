@@ -1,0 +1,8 @@
+# target
+/target
+
+# out
+out*.*
+
+# environment variable
+.env

@@ -1,15 +1,13 @@
 use std::sync::{Arc, RwLock};
 
 use serde::{Deserialize, Serialize};
-use ts_rs::TS;
 
 use crate::{
   bus_stop_handler::BusStopHandler, feed_handler::FeedHandler, service_alert_handler::ServiceAlertHandler,
   subway_stop_handler::SubwayStopHandler,
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export, rename = "Export")]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Config {
   subway: Vec<Vec<String>>,
   bus: Vec<Vec<String>>,

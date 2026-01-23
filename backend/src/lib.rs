@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, HashMap};
-use ts_rs::TS;
 
 use serde::{Deserialize, Serialize};
 
@@ -14,8 +13,7 @@ pub mod gtfsrt {
   include!(concat!(env!("OUT_DIR"), "/transit_realtime.rs"));
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Vehicle {
   pub route_id: String,
   pub route_name: String,
@@ -25,24 +23,21 @@ pub struct Vehicle {
   pub minutes_until_arrival: i32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Stop {
   pub name: String,
   pub trips: Vec<Vehicle>,
   pub destinations: BTreeMap<String, BTreeMap<String, Vec<Vehicle>>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Alert {
   pub route_id: String,
   pub sort_order: i32,
   pub header_text: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Route {
   pub route_id: String,
   pub route_name: String,
@@ -50,8 +45,7 @@ pub struct Route {
   pub route_text_color: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, TS)]
-#[ts(export, rename = "Import")]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Export {
   pub stops_realtime: BTreeMap<String, Stop>,
   pub service_alerts_realtime: Vec<Alert>,

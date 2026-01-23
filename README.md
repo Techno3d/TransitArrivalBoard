@@ -14,7 +14,7 @@ Install the following tools.
 
 ## Environment Variables
 
-Create a `.env` file in the root directory and add the following variables.\
+Create a `.env` file in the `/backend` directory and add the following variables.
 
 ### `MTABUSKEY`
 
@@ -22,7 +22,7 @@ Your MTA BusTime API key. [Request one here](https://bustime.mta.info/wiki/Devel
 
 ## Configuration File
 
-Modify `app/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+Modify `/frontend/src/app/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
 
 ### `stop_ids`
 
@@ -49,10 +49,12 @@ make install
 To run the project while in development, run each command in seperate terminals.
 
 ```bash
+cd backend
 cargo run
 ```
 
 ```bash
+cd frontend
 npm run dev
 ```
 
