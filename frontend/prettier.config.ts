@@ -1,4 +1,6 @@
-const prettierConfig = {
+import { type Config } from "prettier";
+
+const prettierConfig: Config = {
   printWidth: 120,
   tabWidth: 2,
   trailingComma: "all",
