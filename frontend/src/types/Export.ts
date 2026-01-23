@@ -1,1 +1,0 @@
-export type Export = { subway: Array<Array<string>>, bus: Array<Array<string>>, };

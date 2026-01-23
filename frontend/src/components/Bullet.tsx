@@ -1,4 +1,4 @@
-import { Route } from "@/types/Route";
+import { Route } from "@/types";
 import { Roboto_Mono } from "next/font/google";
 
 const roboto = Roboto_Mono({ subsets: ["latin"] });

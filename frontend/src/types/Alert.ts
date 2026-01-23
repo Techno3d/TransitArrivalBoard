@@ -1,1 +1,0 @@
-export type Alert = { route_id: string, sort_order: number, header_text: string, };

@@ -1,9 +1,7 @@
-import { Route } from "@/types/Route";
-import { Stop } from "@/types/Stop";
-import { Vehicle } from "@/types/Vehicle";
+import { Bullet } from "@/components/Bullet";
+import { formatStopName } from "@/lib/stop";
+import { Route, Stop, Vehicle } from "@/types";
 import { Fragment } from "react/jsx-runtime";
-import { formatStopName } from "../lib/stop";
-import { Bullet } from "./Bullet";
 
 export function Countdown(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {
   if (!props.stop) {

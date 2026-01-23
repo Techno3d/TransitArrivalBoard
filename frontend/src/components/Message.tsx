@@ -1,5 +1,5 @@
-import { Route } from "@/types/Route";
-import { Bullet } from "./Bullet";
+import { Bullet } from "@/components/Bullet";
+import { Route } from "@/types";
 
 export function Message(props: { routes: Record<string, Route>; name: string; headers: Array<string>; index: number }) {
   return (

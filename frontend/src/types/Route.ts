@@ -1,1 +1,0 @@
-export type Route = { route_id: string, route_name: string, route_color: string, route_text_color: string, };
