@@ -8,4 +8,4 @@ install:
 
 clean:
 	cargo clean
-	rm -rf node_modules
+	rm -rf node_modules .next types next-env.d.ts

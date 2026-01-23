@@ -75,5 +75,5 @@ run.bat
 #### macOS/Linux
 
 ```bash
-./run.sh
+run.sh
 ```
