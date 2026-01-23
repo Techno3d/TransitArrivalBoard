@@ -51,13 +51,11 @@ make install
 To run the project while in development, run each command in seperate terminals.
 
 ```bash
-cd backend
-cargo run
+cd backend && cargo run
 ```
 
 ```bash
-cd frontend
-npm run dev
+cd frontend && npm run dev
 ```
 
 ### Production
@@ -68,7 +66,7 @@ To build and run the project for production, run the following command.
 make build
 ```
 
-Then, depending on your OS, run the following command.
+If you have Firefox, you can run the following command depending on your OS.
 
 #### Windows
 
