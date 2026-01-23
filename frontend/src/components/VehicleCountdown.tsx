@@ -1,6 +1,6 @@
 import { Fragment } from "react/jsx-runtime";
-import { formatStopName } from "../lib/stop";
 import { type Route, type Stop, type Vehicle } from "../types";
+import { formatStopName } from "../utils/stop";
 import { Bullet } from "./Bullet";
 
 export function VehicleCountdown(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {

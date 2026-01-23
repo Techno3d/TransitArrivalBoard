@@ -11,6 +11,11 @@ export type Vehicle = {
   minutes_until_arrival: number;
 };
 
+export type Config = {
+  stop_ids: Array<string>;
+  walk_time: number;
+};
+
 export type Stop = {
   name: string;
   trips: Array<Vehicle>;

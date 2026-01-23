@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import config from "../../config.json";
 import { MessageList } from "./components/MessageList";
 import { RouteList } from "./components/RouteList";
 import { type Status, StatusBar } from "./components/StatusBar";
 import { VehicleCountdown } from "./components/VehicleCountdown";
-import { config } from "./config";
 import { type Export, type Import, type Route, type Stop } from "./types";
 
 export default function App() {
