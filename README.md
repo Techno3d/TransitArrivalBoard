@@ -6,17 +6,35 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 ## Tools
 
-Install the following tools.
+### Required
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
 - [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
 
-[Firefox](https://www.firefox.com/en-US/download/all/) is optional, but we have provided scripts that will automate deployment if it is installed.
+### Optional
+
+We have provided a `Makefile` that helps automate development and deployment. To use the `Makefile`, please run the following command, depending on your OS.
+
+Additionally, please install [Firefox](https://www.firefox.com/en-US/download/all/) to be able to automate deployment to production via the Makefile.
+
+#### Windows
+
+```powershell
+winget install Git.Git GnuWin32.Make
+```
+
+#### macOS
+
+Run the following command to install Make and Git.
+
+```bash
+xcode-select --install
+```
 
 ## Environment Variables
 
-Create a `.env` file in the `/backend` directory and add the following variables.
+Create a `.env` file in the `backend` directory and add the following variables.
 
 ### `MTABUSKEY`
 
@@ -24,7 +42,11 @@ Create a `.env` file in the `/backend` directory and add the following variables
 
 ## Configuration File
 
-Modify `/frontend/src/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+Modify `config.json` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+
+### `name`
+
+This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.
 
 ### `stop_ids`
 
@@ -34,11 +56,10 @@ You can group all of the various stations you wish to track together by insertin
 
 It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included.
 
-### `name`
-
-This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.
-
 ## Deployment
+
+> [!WARNING]
+> Please install the optional tools to run `make`. Otherwise, you are able to manually run these commands by inspecting the `Makefile`.
 
 Before you begin, run the following command to install the project dependencies.
 
@@ -62,22 +83,9 @@ You can view the webpage at <http://localhost:5173>.
 
 ### Production
 
-To build and run the project for production, run the following command.
+To build and run the project for production, run the following commands.
 
 ```bash
 make build
-```
-
-If you have Firefox, you can run the following command depending on your OS.
-
-#### Windows
-
-```cmd
-run.bat
-```
-
-#### macOS/Linux
-
-```bash
-run.sh
+make run
 ```
