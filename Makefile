@@ -8,8 +8,8 @@ install:
 
 format:
 	cd backend && cargo fmt
-	cd frontend && npm run format
+	cd frontend && npm run fmt
 
 clean:
 	cd backend && cargo clean
-	cd frontend && rm -rf node_modules
+	cd frontend && npm run clean
