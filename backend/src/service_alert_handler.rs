@@ -4,6 +4,7 @@ use std::{
 };
 
 use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 
 use crate::{feed_handler::FeedHandler, Alert};
 
@@ -42,7 +43,7 @@ impl ServiceAlertHandler {
         Some(a) => a,
         None => continue,
       };
-      for informed in informed_entities.iter() {
+      'entities: for informed in informed_entities.iter() {
         if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
           let decomposed: Vec<&str> = selector.sort_order.split(':').collect();
           // If the selector formating changes, then we need to change. This would become a bug, so
@@ -52,6 +53,26 @@ impl ServiceAlertHandler {
             Some(a) => a,
             None => continue,
           };
+          let active_period = match alert.active_period.as_ref() {
+            Some(a) => a,
+            None => continue,
+          };
+
+          for (start, end) in active_period.iter().map(|ap| (ap.start, ap.end)) {
+            if (start.unwrap()
+              > SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as i64)
+              || (end.unwrap()
+                < SystemTime::now()
+                  .duration_since(SystemTime::UNIX_EPOCH)
+                  .unwrap()
+                  .as_secs() as i64)
+            {
+              continue 'entities;
+            }
+          }
 
           self.subway.push(Alert {
             // Should always have a route_id
