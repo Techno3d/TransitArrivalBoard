@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { type Route } from "../types";
 import { Bullet } from "./Bullet";
 
-export function Message(props: { routes: Record<string, Route>; name: string; messages: Array<string> }) {
+export function MessageList(props: { routes: Record<string, Route>; name: string; messages: Array<string> }) {
   const [index, setIndex] = useState<number>(0);
 
   useEffect(() => {

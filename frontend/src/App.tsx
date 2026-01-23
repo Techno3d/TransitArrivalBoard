@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Bulletin } from "./components/Bulletin";
-import { Countdown } from "./components/Countdown";
-import { Message } from "./components/Message";
+import { MessageList } from "./components/MessageList";
+import { RouteList } from "./components/RouteList";
 import { type Status, StatusBar } from "./components/StatusBar";
+import { VehicleCountdown } from "./components/VehicleCountdown";
 import { config } from "./config";
 import { type Export, type Import, type Route, type Stop } from "./types";
 
@@ -88,31 +88,31 @@ export default function App() {
     <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
       <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-25 gap-2 bg-emerald-800 p-2 text-black">
         <div className="col-span-2 row-span-8">
-          <Countdown
+          <VehicleCountdown
             stop={stops[config.subway[0].stop_ids[0]]}
             walk_time={config.subway[0].walk_time}
             routes={routes}
-          ></Countdown>
+          ></VehicleCountdown>
         </div>
 
         <div className="col-span-2 row-span-8">
-          <Countdown
+          <VehicleCountdown
             stop={stops[config.subway[1].stop_ids[0]]}
             walk_time={config.subway[1].walk_time}
             routes={routes}
-          ></Countdown>
+          ></VehicleCountdown>
         </div>
 
         <div className="col-span-2 row-span-9">
-          <Message name={"Service Alerts"} messages={headers} routes={routes} />
+          <MessageList name={"Service Alerts"} messages={headers} routes={routes} />
         </div>
 
         <div className="col-span-1 row-span-25">
-          <Bulletin
+          <RouteList
             stop={stops[config.bus[0].stop_ids[0]]}
             routes={routes}
             walk_time={config.bus[0].walk_time}
-          ></Bulletin>
+          ></RouteList>
         </div>
       </div>
       <StatusBar

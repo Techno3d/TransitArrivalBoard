@@ -3,7 +3,7 @@ import { formatStopName } from "../lib/stop";
 import { type Route, type Stop, type Vehicle } from "../types";
 import { Bullet } from "./Bullet";
 
-export function Countdown(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {
+export function VehicleCountdown(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {
   if (!props.stop) {
     return (
       <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">

@@ -4,11 +4,11 @@
 
 @layer base {
   html {
-    @apply h-full;
+    height: 100%;
   }
 
   #root {
-    @apply h-full;
+    height: 100%;
   }
 }
 
@@ -40,6 +40,7 @@
   }
 
   @keyframes flashing {
+
     0%,
     100% {
       background-color: white;
