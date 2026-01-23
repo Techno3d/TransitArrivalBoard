@@ -8,4 +8,4 @@ install:
 
 clean:
 	cd backend && cargo clean
-	cd frontend && rm -rf node_modules .next next-env.d.ts
+	cd frontend && rm -rf node_modules
