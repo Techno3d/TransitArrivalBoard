@@ -58,7 +58,7 @@ cd backend && cargo run
 cd frontend && npm run dev
 ```
 
-You can view the webpage at <http://localhost:3000>.
+You can view the webpage at <localhost:5173>.
 
 ### Production
 
