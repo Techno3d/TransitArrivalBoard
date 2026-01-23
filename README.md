@@ -58,6 +58,8 @@ cd backend && cargo run
 cd frontend && npm run dev
 ```
 
+You can view the webpage at <http://localhost:3000>.
+
 ### Production
 
 To build and run the project for production, run the following command.
