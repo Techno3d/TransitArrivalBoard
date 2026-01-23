@@ -1,4 +1,7 @@
 import { Route } from "@/types/Route";
+import { Roboto_Mono } from "next/font/google";
+
+const roboto = Roboto_Mono({ subsets: ["latin"] });
 
 export function Bullet(props: { route: Route; size: number }) {
   if (!props.route) {
@@ -28,7 +31,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="text-center font-bold text-nowrap"
+            className={`${roboto.className} text-center font-bold text-nowrap`}
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
@@ -60,7 +63,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="-rotate-45 text-center font-bold text-nowrap"
+            className={`${roboto.className} -rotate-45 text-center font-bold text-nowrap`}
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
@@ -92,7 +95,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="text-center font-bold text-nowrap"
+            className={`${roboto.className} text-center font-bold text-nowrap`}
             style={{
               fontSize: `${props.size * 0.5}px`,
               color: `#${props.route.route_text_color}`,
@@ -108,14 +111,14 @@ export function Bullet(props: { route: Route; size: number }) {
   // Bus bullet
   return (
     <span
-      className="flex items-center justify-center rounded-3xl"
+      className="flex items-center justify-center rounded-2xl"
       style={{
         backgroundColor: `#${props.route.route_color}`,
         height: `${props.size}px`,
       }}
     >
       <h1
-        className="text-center font-bold text-nowrap"
+        className={`${roboto.className} text-center font-bold text-nowrap`}
         style={{
           fontSize: `${props.size * 0.65}px`,
           color: `#${props.route.route_text_color}`,

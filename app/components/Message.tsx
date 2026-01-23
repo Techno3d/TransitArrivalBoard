@@ -13,8 +13,8 @@ export function Message(props: { routes: Record<string, Route>; name: string; he
       </div>
 
       {props.headers.length > 0 ? (
-        <div className="flex grow flex-row items-start rounded-lg bg-slate-100 px-4">
-          <h1 className="line-clamp-4 text-5xl leading-tight font-semibold text-pretty">
+        <div className="flex grow flex-row items-start overflow-clip rounded-lg bg-slate-100 px-4">
+          <h1 className="text-5xl leading-tight font-semibold text-pretty">
             {props.headers[props.index].split(/(\[.*?\])/).map((text, index) => {
               if (text.length == 0) return;
               if (text.substring(0, 1) != "[" || text.substring(text.length - 1) != "]") return text;
