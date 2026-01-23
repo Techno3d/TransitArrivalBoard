@@ -1,7 +1,7 @@
-import { Bullet } from "@/components/Bullet";
-import { formatStopName } from "@/lib/stop";
-import { Route, Stop, Vehicle } from "@/types";
 import { Fragment } from "react/jsx-runtime";
+import { formatStopName } from "../lib/stop";
+import { type Route, type Stop, type Vehicle } from "../types";
+import { Bullet } from "./Bullet";
 
 export function Bulletin(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {
   if (!props.stop) {

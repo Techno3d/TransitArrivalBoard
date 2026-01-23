@@ -1,15 +1,16 @@
-"use client";
-
-import { config } from "@/app/config";
-import { Bulletin } from "@/components/Bulletin";
-import { Countdown } from "@/components/Countdown";
-import { Message } from "@/components/Message";
-import { Status, StatusBar } from "@/components/StatusBar";
-import { Export, Import, Route, Stop } from "@/types";
 import { useEffect, useState } from "react";
+import { Bulletin } from "./components/Bulletin";
+import { Countdown } from "./components/Countdown";
+import { Message } from "./components/Message";
+import { type Status, StatusBar } from "./components/StatusBar";
+import { config } from "./config";
+import { type Export, type Import, type Route, type Stop } from "./types";
 
-export default function Home() {
-  const [status, setStatus] = useState<Status>({ type: "ERROR", message: "Offline" });
+export default function App() {
+  const [status, setStatus] = useState<Status>({
+    type: "ERROR",
+    message: "Offline",
+  });
   const [stops, setStops] = useState<Record<string, Stop>>({});
   const [routes, setRoutes] = useState<Record<string, Route>>({});
   const [headers, setHeaders] = useState<Array<string>>([]);
@@ -60,7 +61,12 @@ export default function Home() {
           headers.push(alert.header_text);
         });
       setHeaders(headers);
-      headers.length > 0 ? setIndex((i) => ((i % headers.length) + headers.length) % headers.length) : setIndex(0);
+      if (headers.length > 0) {
+        setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
+        return;
+      }
+
+      setIndex(0);
     };
 
     ws.onerror = () => {
@@ -87,9 +93,12 @@ export default function Home() {
 
   useEffect(() => {
     const loop = setInterval(() => {
-      headers.length > 0
-        ? setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length)
-        : setIndex(0);
+      if (headers.length > 0) {
+        setIndex((i) => (((i + 1) % headers.length) + headers.length) % headers.length);
+        return;
+      }
+
+      setIndex(0);
     }, 5000);
 
     return () => {
@@ -98,7 +107,7 @@ export default function Home() {
   }, [headers.length]);
 
   return (
-    <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black select-none">
+    <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
       <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-25 gap-2 bg-emerald-800 p-2 text-black">
         <div className="col-span-2 row-span-8">
           <Countdown

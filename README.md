@@ -24,7 +24,7 @@ Create a `.env` file in the `/backend` directory and add the following variables
 
 ## Configuration File
 
-Modify `/frontend/src/app/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+Modify `/frontend/src/config.ts` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
 
 ### `stop_ids`
 

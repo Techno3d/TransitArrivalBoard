@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
 
 type StatusLevel = "OK" | "WARNING" | "ERROR";
@@ -71,12 +70,9 @@ export function StatusBar(props: { status: Status; maintainers: Array<{ name: st
                 return (
                   <Fragment key={maintainer.name}>
                     <span className="inline-flex items-baseline">
-                      <Image
+                      <img
                         src={`https://avatars.githubusercontent.com/u/${maintainer.github_id}`}
-                        alt=""
-                        className="mx-2 self-center rounded-full"
-                        height={36}
-                        width={36}
+                        className="mx-2 aspect-square h-9 self-center rounded-full"
                       />
                       <span>{maintainer.name}</span>
                     </span>
