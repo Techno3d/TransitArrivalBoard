@@ -41,7 +41,7 @@ export function AlertList() {
       {messages.length > 0 ? (
         <div className="flex grow flex-row gap-2">
           <div className="flex h-full flex-row items-center rounded-lg bg-slate-100 px-2">
-            <h1 className="font-mono text-4xl font-extrabold">{index + 1}</h1>
+            <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">{index + 1}</h1>
           </div>
           <div className="flex grow overflow-clip rounded-lg bg-slate-100 px-4">
             <h1 className="line-clamp-4 text-5xl leading-tight font-semibold text-pretty">
