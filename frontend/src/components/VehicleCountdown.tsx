@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
+import config from "../../../config.json";
 import { SocketContext } from "../context/SocketContext";
 import { type Vehicle } from "../types";
 import { formatStopName } from "../utils/stop";
@@ -13,7 +14,10 @@ export function VehicleCountdown(props: { config: { name: string; stop_ids: Arra
   if (!stop) {
     return (
       <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
-        <div className="flex min-h-16 items-center justify-center rounded-lg bg-emerald-800"></div>
+        <div
+          className="flex min-h-16 items-center justify-center rounded-lg"
+          style={{ backgroundColor: config.theme.primary_color, color: config.theme.text_color }}
+        ></div>
         <div className="flex grow flex-row rounded-lg bg-white"></div>
       </div>
     );
@@ -25,7 +29,10 @@ export function VehicleCountdown(props: { config: { name: string; stop_ids: Arra
 
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
-      <div className="flex min-h-16 items-center justify-center rounded-lg bg-emerald-800 text-4xl font-extrabold text-white">
+      <div
+        className="flex min-h-16 items-center justify-center rounded-lg text-4xl font-extrabold"
+        style={{ backgroundColor: config.theme.primary_color, color: config.theme.text_color }}
+      >
         <h1>{props.config.name ? props.config.name : formatStopName(stop.name)}</h1>
       </div>
       {times.length > 0 ? (

@@ -18,6 +18,11 @@
       "walk_time": 3
     }
   ],
+  "theme": {
+    "primary_color": "#007161",
+    "text_color": "#FFFFFF",
+    "background_color": "#007161"
+  },
   "credits": {
     "maintainers": [
       { "name": "Shadman Syed", "github_id": 76977073 },

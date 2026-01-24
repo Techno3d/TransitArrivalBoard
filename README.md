@@ -42,19 +42,45 @@ Create a `.env` file in the `backend` directory and add the following variables.
 
 ## Configuration File
 
-Modify `config.json` to customize the stops displayed on your board. By default, it tracks stops near **The Bronx High School of Science**.
+Modify `config.json` to customize your board to your liking. By default, it tracks stops near **The Bronx High School of Science**. Feel free to use it as an example if you need help understanding how to configure this.
 
-### `name`
+### `subway` and `bus`
+
+The MTA uses two different APIs for each, so you are unable to mix subway and bus stops together.
+
+#### `name`
 
 This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.
 
-### `stop_ids`
+#### `stop_ids`
 
 You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.
 
-### `walk_time`
+#### `walk_time`
 
 It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included.
+
+### `theme`
+
+#### `primary_color`
+
+This color will be used for the stop name title bar.
+
+#### `text_color`
+
+This color will be used on the text inside the stop name title bar.
+
+#### `background_color`
+
+This color will be used on the background of the page.
+
+### `credits`
+
+#### `maintainers`
+
+If you wanted to replace us, then you can modify who gets credited in the status bar at the bottom. Go ahead, we won't judge.
+
+`name` is the name of the maintainer, and `github_id` is their GitHub account ID. You can find a GitHub account's ID with their username by using the [GitHub API](https://api.github.com/users/REPLACE_WITH_USERNAME).
 
 ## Deployment
 
