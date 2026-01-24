@@ -50,7 +50,7 @@ This allows you to set a nickname for the stop being tracked. If left blank, the
 
 ### `stop_ids`
 
-You can group all of the various stations you wish to track together by inserting corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.
+You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.
 
 ### `walk_time`
 
