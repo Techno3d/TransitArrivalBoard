@@ -19,9 +19,9 @@
     }
   ],
   "theme": {
-    "primary_color": "#007161",
+    "primary_color": "#006045",
     "text_color": "#FFFFFF",
-    "background_color": "#007161"
+    "background_color": "#006045"
   },
   "credits": {
     "maintainers": [
