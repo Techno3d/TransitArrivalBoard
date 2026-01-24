@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
 import { Bullet } from "./Bullet";
 
-export function AlertList() {
+export function AlertList(props: { name: string; name_text_color: string; name_background_color: string }) {
   const { routes, alerts } = useContext(SocketContext);
 
   const messages: Array<string> = [];
@@ -34,8 +34,11 @@ export function AlertList() {
 
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-2xl border-black bg-black p-2">
-      <div className="flex min-h-16 items-center justify-center rounded-lg bg-red-800 text-4xl font-extrabold text-white">
-        <h1>Service Alerts</h1>
+      <div
+        className="flex min-h-16 items-center justify-center rounded-lg text-4xl font-extrabold"
+        style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
+      >
+        <h1>{props.name}</h1>
       </div>
 
       {messages.length > 0 ? (

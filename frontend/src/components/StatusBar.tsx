@@ -8,7 +8,7 @@ export type Status = {
   message: string;
 };
 
-export function StatusBar(props: { config: { maintainers: Array<{ name: string; github_id: number }> } }) {
+export function StatusBar(props: { maintainers: Array<{ name: string; github_id: number }> }) {
   const { status } = useContext(SocketContext);
 
   const [time, setTime] = useState<string>(
@@ -62,8 +62,8 @@ export function StatusBar(props: { config: { maintainers: Array<{ name: string; 
         <h1>
           {"Made with ❤️ by "}
 
-          {props.config.maintainers.length > 1
-            ? props.config.maintainers.map((maintainer, index) => {
+          {props.maintainers.length > 1
+            ? props.maintainers.map((maintainer, index) => {
                 return (
                   <Fragment key={maintainer.name}>
                     <span className="inline-flex items-baseline">
@@ -74,13 +74,9 @@ export function StatusBar(props: { config: { maintainers: Array<{ name: string; 
                       <span>{maintainer.name}</span>
                     </span>
 
-                    {props.config.maintainers.length >= 3 && index <= props.config.maintainers.length - 3 ? ", " : ""}
-                    {props.config.maintainers.length >= 3 && index == props.config.maintainers.length - 2
-                      ? ", and "
-                      : ""}
-                    {props.config.maintainers.length == 2 && index == props.config.maintainers.length - 2
-                      ? " and "
-                      : ""}
+                    {props.maintainers.length >= 3 && index <= props.maintainers.length - 3 ? ", " : ""}
+                    {props.maintainers.length >= 3 && index == props.maintainers.length - 2 ? ", and " : ""}
+                    {props.maintainers.length == 2 && index == props.maintainers.length - 2 ? " and " : ""}
                   </Fragment>
                 );
               })

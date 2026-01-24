@@ -1,22 +1,27 @@
 import { useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
-import config from "../../../config.json";
 import { SocketContext } from "../context/SocketContext";
 import { type Vehicle } from "../types";
 import { formatStopName } from "../utils/stop";
 import { Bullet } from "./Bullet";
 
-export function VehicleCountdown(props: { config: { name: string; stop_ids: Array<string>; walk_time: number } }) {
+export function VehicleCountdown(props: {
+  name: string;
+  name_text_color: string;
+  name_background_color: string;
+  stop_id: string;
+  walk_time: number;
+}) {
   const { routes, stops } = useContext(SocketContext);
 
-  const stop = stops[props.config.stop_ids[0]];
+  const stop = stops[props.stop_id];
 
   if (!stop) {
     return (
       <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
         <div
           className="flex min-h-16 items-center justify-center rounded-lg"
-          style={{ backgroundColor: config.theme.primary_color, color: config.theme.text_color }}
+          style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
         ></div>
         <div className="flex grow flex-row rounded-lg bg-white"></div>
       </div>
@@ -24,16 +29,16 @@ export function VehicleCountdown(props: { config: { name: string; stop_ids: Arra
   }
 
   const times: Array<Vehicle> = stop.trips.filter((vehicle) => {
-    return vehicle.minutes_until_arrival > props.config.walk_time / 2;
+    return vehicle.minutes_until_arrival > props.walk_time / 2;
   });
 
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
       <div
         className="flex min-h-16 items-center justify-center rounded-lg text-4xl font-extrabold"
-        style={{ backgroundColor: config.theme.primary_color, color: config.theme.text_color }}
+        style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
       >
-        <h1>{props.config.name ? props.config.name : formatStopName(stop.name)}</h1>
+        <h1>{props.name ? props.name : formatStopName(stop.name)}</h1>
       </div>
       {times.length > 0 ? (
         <div className="flex grow flex-row rounded-lg bg-slate-300">

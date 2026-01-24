@@ -74,13 +74,17 @@ This color will be used on the text inside the stop name title bar.
 
 This color will be used on the background of the page.
 
-### `credits`
-
-#### `maintainers`
+### `maintainers`
 
 If you wanted to replace us, then you can modify who gets credited in the status bar at the bottom. Go ahead, we won't judge.
 
-`name` is the name of the maintainer, and `github_id` is their GitHub account ID. You can find a GitHub account's ID with their username by using the [GitHub API](https://api.github.com/users/REPLACE_WITH_USERNAME).
+#### `name`
+
+The name (full name, nickname, etc.) of the maintainer.
+
+#### `github_id`
+
+The GitHub account ID of the maintainer. You can find a GitHub account's ID with their username by using to GitHub API. <https://api.github.com/users/REPLACE_WITH_USERNAME>.
 
 ## Deployment
 
