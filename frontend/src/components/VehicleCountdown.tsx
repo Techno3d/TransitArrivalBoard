@@ -3,8 +3,14 @@ import { type Route, type Stop, type Vehicle } from "../types";
 import { formatStopName } from "../utils/stop";
 import { Bullet } from "./Bullet";
 
-export function VehicleCountdown(props: { routes: Record<string, Route>; stop: Stop; walk_time: number }) {
-  if (!props.stop) {
+export function VehicleCountdown(props: {
+  routes: Record<string, Route>;
+  stops: Record<string, Stop>;
+  config: { name: string; stop_ids: Array<string>; walk_time: number };
+}) {
+  const stop = props.stops[props.config.stop_ids[0]];
+
+  if (!stop) {
     return (
       <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
         <div className="flex min-h-16 items-center justify-center rounded-lg bg-emerald-800"></div>
@@ -13,14 +19,14 @@ export function VehicleCountdown(props: { routes: Record<string, Route>; stop: S
     );
   }
 
-  const times: Array<Vehicle> = props.stop.trips.filter((vehicle) => {
-    return vehicle.minutes_until_arrival > props.walk_time / 2;
+  const times: Array<Vehicle> = stop.trips.filter((vehicle) => {
+    return vehicle.minutes_until_arrival > props.config.walk_time / 2;
   });
 
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
       <div className="flex min-h-16 items-center justify-center rounded-lg bg-emerald-800 text-4xl font-extrabold text-white">
-        <h1>{formatStopName(props.stop.name)}</h1>
+        <h1>{props.config.name ? props.config.name : formatStopName(stop.name)}</h1>
       </div>
       {times.length > 0 ? (
         <div className="flex grow flex-row rounded-lg bg-slate-300">

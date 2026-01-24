@@ -88,19 +88,11 @@ export default function App() {
     <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
       <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-25 gap-2 bg-emerald-800 p-2 text-black">
         <div className="col-span-2 row-span-8">
-          <VehicleCountdown
-            stop={stops[config.subway[0].stop_ids[0]]}
-            walk_time={config.subway[0].walk_time}
-            routes={routes}
-          ></VehicleCountdown>
+          <VehicleCountdown routes={routes} stops={stops} config={config.subway[0]}></VehicleCountdown>
         </div>
 
         <div className="col-span-2 row-span-8">
-          <VehicleCountdown
-            stop={stops[config.subway[1].stop_ids[0]]}
-            walk_time={config.subway[1].walk_time}
-            routes={routes}
-          ></VehicleCountdown>
+          <VehicleCountdown routes={routes} stops={stops} config={config.subway[1]}></VehicleCountdown>
         </div>
 
         <div className="col-span-2 row-span-9">
@@ -108,11 +100,7 @@ export default function App() {
         </div>
 
         <div className="col-span-1 row-span-25">
-          <RouteList
-            stop={stops[config.bus[0].stop_ids[0]]}
-            routes={routes}
-            walk_time={config.bus[0].walk_time}
-          ></RouteList>
+          <RouteList routes={routes} stops={stops} config={config.bus[0]}></RouteList>
         </div>
       </div>
       <StatusBar
