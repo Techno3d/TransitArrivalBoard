@@ -1,6 +1,85 @@
+import { useContext } from "react";
+import { SocketContext } from "../context/SocketContext";
 import { type Route } from "../types";
 
+function StatusDot(props: { size: number; severity: number }) {
+  if (props.severity <= 0) {
+    return;
+  }
+
+  if (props.severity <= 13) {
+    return (
+      <span
+        className="absolute flex items-center justify-center rounded-full border-white bg-slate-700"
+        style={{
+          left: `${props.size * 0.65}px`,
+          bottom: `${props.size * 0.65}px`,
+          height: `${props.size * 0.35}px`,
+          width: `${props.size * 0.35}px`,
+          borderWidth: `${props.size * 0.01}px`,
+        }}
+      >
+        <h1
+          className="text-center font-extrabold text-white"
+          style={{
+            fontSize: `${props.size * 0.25}px`,
+          }}
+        >
+          i
+        </h1>
+      </span>
+    );
+  }
+
+  if (props.severity <= 21) {
+    return (
+      <span
+        className="absolute flex items-center justify-center rounded-full border-white bg-yellow-500"
+        style={{
+          left: `${props.size * 0.65}px`,
+          bottom: `${props.size * 0.65}px`,
+          height: `${props.size * 0.35}px`,
+          width: `${props.size * 0.35}px`,
+          borderWidth: `${props.size * 0.01}px`,
+        }}
+      >
+        <h1
+          className="text-center font-extrabold text-black"
+          style={{
+            fontSize: `${props.size * 0.25}px`,
+          }}
+        >
+          i
+        </h1>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="absolute flex items-center justify-center rounded-full border-white bg-red-500"
+      style={{
+        left: `${props.size * 0.65}px`,
+        bottom: `${props.size * 0.65}px`,
+        height: `${props.size * 0.35}px`,
+        width: `${props.size * 0.35}px`,
+        borderWidth: `${props.size * 0.01}px`,
+      }}
+    >
+      <h1
+        className="text-center font-extrabold text-white"
+        style={{
+          fontSize: `${props.size * 0.25}px`,
+        }}
+      >
+        !
+      </h1>
+    </span>
+  );
+}
+
 export function Bullet(props: { route: Route; size: number }) {
+  const { alerts } = useContext(SocketContext);
   if (!props.route) {
     return;
   }
@@ -9,11 +88,22 @@ export function Bullet(props: { route: Route; size: number }) {
     return;
   }
 
+  let sort_order = 0;
+  alerts.forEach((alert) => {
+    if (alert.route_id.indexOf(props.route.route_id) == -1) return;
+
+    sort_order = Math.max(sort_order, alert.sort_order);
+  });
+
+  if (sort_order > 21) {
+    sort_order = 22;
+  }
+
   // Circle subway bullet
   if (props.route.route_name.length <= 1) {
     return (
       <span
-        className="flex items-center justify-center"
+        className="relative flex items-center justify-center"
         style={{
           height: `${props.size}px`,
           width: `${props.size}px`,
@@ -37,6 +127,7 @@ export function Bullet(props: { route: Route; size: number }) {
             {props.route.route_name}
           </h1>
         </span>
+        <StatusDot size={props.size} severity={sort_order} />
       </span>
     );
   }
@@ -45,7 +136,7 @@ export function Bullet(props: { route: Route; size: number }) {
   if (props.route.route_name.length <= 2 && props.route.route_name.substring(1) == "X") {
     return (
       <span
-        className="flex items-center justify-center"
+        className="relative flex items-center justify-center"
         style={{
           height: `${props.size}px`,
           width: `${props.size}px`,
@@ -69,6 +160,7 @@ export function Bullet(props: { route: Route; size: number }) {
             {props.route.route_name.substring(0, 1)}
           </h1>
         </span>
+        <StatusDot size={props.size} severity={sort_order} />
       </span>
     );
   }
@@ -77,7 +169,7 @@ export function Bullet(props: { route: Route; size: number }) {
   if (props.route.route_name.length <= 3 && props.route.route_name == "SIR") {
     return (
       <span
-        className="flex items-center justify-center"
+        className="relative flex items-center justify-center"
         style={{
           height: `${props.size}px`,
           width: `${props.size}px`,
@@ -101,6 +193,7 @@ export function Bullet(props: { route: Route; size: number }) {
             {props.route.route_name}
           </h1>
         </span>
+        <StatusDot size={props.size} severity={sort_order} />
       </span>
     );
   }
@@ -108,7 +201,7 @@ export function Bullet(props: { route: Route; size: number }) {
   // Bus bullet
   return (
     <span
-      className="flex items-center justify-center rounded-2xl"
+      className="relative flex items-center justify-center rounded-2xl"
       style={{
         backgroundColor: `#${props.route.route_color}`,
         height: `${props.size}px`,
