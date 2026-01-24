@@ -118,7 +118,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="text-center font-mono font-bold text-nowrap"
+            className="text-center font-bold text-nowrap"
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
@@ -151,7 +151,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="-rotate-45 text-center font-mono font-bold text-nowrap"
+            className="-rotate-45 text-center font-bold text-nowrap"
             style={{
               fontSize: `${props.size * 0.65}px`,
               color: `#${props.route.route_text_color}`,
@@ -184,7 +184,7 @@ export function Bullet(props: { route: Route; size: number }) {
           }}
         >
           <h1
-            className="text-center font-mono font-bold text-nowrap"
+            className="text-center font-bold text-nowrap"
             style={{
               fontSize: `${props.size * 0.5}px`,
               color: `#${props.route.route_text_color}`,
