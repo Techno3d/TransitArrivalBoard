@@ -1,14 +1,14 @@
+import { useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
-import { type Route, type Stop, type Vehicle } from "../types";
+import { SocketContext } from "../context/SocketContext";
+import { type Vehicle } from "../types";
 import { formatStopName } from "../utils/stop";
 import { Bullet } from "./Bullet";
 
-export function RouteList(props: {
-  routes: Record<string, Route>;
-  stops: Record<string, Stop>;
-  config: { name: string; stop_ids: Array<string>; walk_time: number };
-}) {
-  const stop = props.stops[props.config.stop_ids[0]];
+export function RouteList(props: { config: { name: string; stop_ids: Array<string>; walk_time: number } }) {
+  const { routes, stops } = useContext(SocketContext);
+
+  const stop = stops[props.config.stop_ids[0]];
 
   if (!stop) {
     return (
@@ -43,7 +43,7 @@ export function RouteList(props: {
                 >
                   <div className="flex h-full w-5/6 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
                     <div className="flex h-full w-4/5 flex-row items-center justify-start gap-4 p-2">
-                      <Bullet route={props.routes[times[0].route_id]} size={64} />
+                      <Bullet route={routes[times[0].route_id]} size={64} />
                       <h1 className="line-clamp-2 text-4xl font-bold text-wrap">
                         {formatStopName(times[0].destination_name)}
                       </h1>

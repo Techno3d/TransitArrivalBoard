@@ -11,21 +11,16 @@ export type Vehicle = {
   minutes_until_arrival: number;
 };
 
-export type Config = {
-  stop_ids: Array<string>;
-  walk_time: number;
-};
-
 export type Stop = {
   name: string;
   trips: Array<Vehicle>;
-  destinations: { [key: string]: { [key: string]: Array<Vehicle> } };
+  destinations: Record<string, Record<string, Array<Vehicle>>>;
 };
 
 export type Import = {
-  stops_realtime: { [key: string]: Stop };
+  stops_realtime: Record<string, Stop>;
   service_alerts_realtime: Array<Alert>;
-  routes_static: { [key: string]: Route };
+  routes_static: Record<string, Route>;
 };
 
 export type Export = { subway: Array<Array<string>>; bus: Array<Array<string>> };

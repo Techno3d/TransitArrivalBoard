@@ -1,4 +1,5 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
+import { SocketContext } from "../context/SocketContext";
 
 type StatusLevel = "OK" | "WARNING" | "ERROR";
 
@@ -7,7 +8,9 @@ export type Status = {
   message: string;
 };
 
-export function StatusBar(props: { status: Status; maintainers: Array<{ name: string; github_id: number }> }) {
+export function StatusBar(props: { maintainers: Array<{ name: string; github_id: number }> }) {
+  const { status } = useContext(SocketContext);
+
   const [time, setTime] = useState<string>(
     new Date().toLocaleString("en-US", {
       hour12: true,
@@ -40,23 +43,17 @@ export function StatusBar(props: { status: Status; maintainers: Array<{ name: st
         <h1>
           {"Status: "}
           {(() => {
-            switch (props.status.type) {
+            switch (status.type) {
               case "OK":
                 return (
-                  <span className="inline-flex items-baseline rounded-xl bg-green-600 px-2">
-                    {props.status.message}
-                  </span>
+                  <span className="inline-flex items-baseline rounded-xl bg-green-600 px-2">{status.message}</span>
                 );
               case "WARNING":
                 return (
-                  <span className="inline-flex items-baseline rounded-xl bg-yellow-600 px-2">
-                    {props.status.message}
-                  </span>
+                  <span className="inline-flex items-baseline rounded-xl bg-yellow-600 px-2">{status.message}</span>
                 );
               default:
-                return (
-                  <span className="inline-flex items-baseline rounded-xl bg-red-600 px-2">{props.status.message}</span>
-                );
+                return <span className="inline-flex items-baseline rounded-xl bg-red-600 px-2">{status.message}</span>;
             }
           })()}
         </h1>

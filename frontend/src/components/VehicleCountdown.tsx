@@ -1,14 +1,14 @@
+import { useContext } from "react";
 import { Fragment } from "react/jsx-runtime";
-import { type Route, type Stop, type Vehicle } from "../types";
+import { SocketContext } from "../context/SocketContext";
+import { type Vehicle } from "../types";
 import { formatStopName } from "../utils/stop";
 import { Bullet } from "./Bullet";
 
-export function VehicleCountdown(props: {
-  routes: Record<string, Route>;
-  stops: Record<string, Stop>;
-  config: { name: string; stop_ids: Array<string>; walk_time: number };
-}) {
-  const stop = props.stops[props.config.stop_ids[0]];
+export function VehicleCountdown(props: { config: { name: string; stop_ids: Array<string>; walk_time: number } }) {
+  const { routes, stops } = useContext(SocketContext);
+
+  const stop = stops[props.config.stop_ids[0]];
 
   if (!stop) {
     return (
@@ -39,7 +39,7 @@ export function VehicleCountdown(props: {
                   </h1>
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
-                  <Bullet route={props.routes[times[0].route_id]} size={96} />
+                  <Bullet route={routes[times[0].route_id]} size={96} />
                   <div className="flex items-baseline">
                     <h1 className="text-8xl font-bold text-black">{times[0].minutes_until_arrival}</h1>
                     <h1 className="text-4xl font-semibold text-black">min</h1>
@@ -51,7 +51,7 @@ export function VehicleCountdown(props: {
               {times[1] ? (
                 <Fragment>
                   <div className="flex basis-2/5 flex-row items-center">
-                    <Bullet route={props.routes[times[1].route_id]} size={72} />
+                    <Bullet route={routes[times[1].route_id]} size={72} />
                   </div>
                   <div className="flex basis-3/5 flex-row items-center gap-4">
                     <div className="flex items-baseline">
@@ -67,7 +67,7 @@ export function VehicleCountdown(props: {
             {times[2] ? (
               <Fragment>
                 <div className="flex basis-2/5 flex-row items-center">
-                  <Bullet route={props.routes[times[2].route_id]} size={72} />
+                  <Bullet route={routes[times[2].route_id]} size={72} />
                 </div>
                 <div className="flex basis-3/5 flex-row items-center gap-4">
                   <div className="flex items-baseline">
