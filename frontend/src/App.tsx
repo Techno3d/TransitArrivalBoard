@@ -1,5 +1,5 @@
 import config from "../../config.json";
-import { MessageList } from "./components/MessageList";
+import { AlertList } from "./components/AlertList";
 import { RouteList } from "./components/RouteList";
 import { StatusBar } from "./components/StatusBar";
 import { VehicleCountdown } from "./components/VehicleCountdown";
@@ -17,19 +17,14 @@ export default function App() {
         </div>
 
         <div className="col-span-2 row-span-9">
-          <MessageList name={"Service Alerts"} />
+          <AlertList />
         </div>
 
         <div className="col-span-1 row-span-25">
           <RouteList config={config.bus[0]}></RouteList>
         </div>
       </div>
-      <StatusBar
-        maintainers={[
-          { name: "Shadman Syed", github_id: 76977073 },
-          { name: "David Wang", github_id: 95447323 },
-        ]}
-      ></StatusBar>
+      <StatusBar config={config.credits}></StatusBar>
     </div>
   );
 }

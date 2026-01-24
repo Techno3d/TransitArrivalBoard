@@ -17,5 +17,11 @@
       "stop_ids": ["100017", "103400", "100723"],
       "walk_time": 3
     }
-  ]
+  ],
+  "credits": {
+    "maintainers": [
+      { "name": "Shadman Syed", "github_id": 76977073 },
+      { "name": "David Wang", "github_id": 95447323 }
+    ]
+  }
 }
