@@ -9,8 +9,7 @@ run:
 	@$(BACKEND_BIN) & 
 	@npm run start & 
 	@sleep 5 
-	@firefox --new-tab $(BROWSER_URL) ||"C:\Program Files\Mozilla Firefox\firefox.exe" $(BROWSER_URL)
-
+	@firefox --new-tab $(FRONTEND_URL) ||"C:\Program Files\Mozilla Firefox\firefox.exe" $(FRONTEND_URL)
 
 install:
 	cd backend && cargo test
