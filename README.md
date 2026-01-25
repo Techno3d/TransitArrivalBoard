@@ -16,8 +16,6 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 We have provided a `Makefile` that helps automate development and deployment. To use the `Makefile`, please run the following command, depending on your OS.
 
-Additionally, please install [Firefox](https://www.firefox.com/en-US/download/all/) to be able to automate deployment to production via the Makefile.
-
 #### Windows
 
 ```powershell
@@ -113,9 +111,20 @@ You can view the webpage at <http://localhost:5173>.
 
 ### Production
 
-To build and run the project for production, run the following commands.
+To build the project for production, run the following command.
 
 ```bash
 make build
-make run
 ```
+
+To run the project, run each command in seperate terminals.
+
+```bash
+cd backend && ./target/release/transit-board
+```
+
+```bash
+cd frontend && npm run preview
+```
+
+You can view the webpage at <http://localhost:5173>.

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "clean": "rm -rf node_modules",
+    "clean": "rm -rf node_modules dist",
     "fmt": "npx prettier . --write",
     "preview": "vite preview"
   },
