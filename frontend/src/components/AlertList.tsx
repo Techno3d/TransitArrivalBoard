@@ -19,18 +19,13 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
 
   useEffect(() => {
     const loop = setInterval(() => {
-      if (messages.length > 0) {
-        setIndex((i) => (((i + 1) % messages.length) + messages.length) % messages.length);
-        return;
-      }
-
-      setIndex(0);
+      setIndex(index + 1);
     }, 5000);
 
     return () => {
       clearInterval(loop);
     };
-  }, [messages.length]);
+  });
 
   return (
     <div className="flex h-full flex-col gap-2 rounded-2xl border-black bg-black p-2">
@@ -44,11 +39,13 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
       {messages.length > 0 ? (
         <div className="flex min-h-0 grow flex-row gap-2 overflow-hidden">
           <div className="flex h-full flex-row items-center rounded-lg bg-slate-100 px-2">
-            <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">{index + 1}</h1>
+            <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">
+              {(index % messages.length) + 1}
+            </h1>
           </div>
           <div className="flex min-h-0 grow overflow-hidden rounded-lg bg-slate-100 px-4">
             <h1 className="text-5xl leading-tight font-semibold text-pretty">
-              {messages[index].split(/(\[.*?\])/).map((text, section) => {
+              {messages[index % messages.length].split(/(\[.*?\])/).map((text, section) => {
                 if (!routes[text.substring(1, text.length - 1)]) return text;
                 return (
                   <div className="mx-1 inline-flex -translate-y-1.5" key={section}>
