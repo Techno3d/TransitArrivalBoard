@@ -6,9 +6,9 @@ import { VehicleCountdown } from "./components/VehicleCountdown";
 
 export default function App() {
   return (
-    <div className="flex h-full w-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
-      <div className="grid grow grid-flow-dense grid-cols-3 grid-rows-3 gap-2 bg-emerald-800 p-2 text-black">
-        <div className="col-span-2 row-span-1">
+    <div className="flex h-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
+      <div className="grid min-h-0 grow grid-flow-dense grid-cols-3 grid-rows-3 gap-2 overflow-hidden bg-emerald-800 p-2 text-black">
+        <div className="col-span-2 row-span-1 overflow-hidden">
           <VehicleCountdown
             name={config.subway[0].name}
             name_text_color={config.theme.text_color}
@@ -18,7 +18,7 @@ export default function App() {
           ></VehicleCountdown>
         </div>
 
-        <div className="col-span-2 row-span-1">
+        <div className="col-span-2 row-span-1 overflow-hidden">
           <VehicleCountdown
             name={config.subway[1].name}
             name_text_color={config.theme.text_color}
@@ -28,11 +28,11 @@ export default function App() {
           ></VehicleCountdown>
         </div>
 
-        <div className="col-span-2 row-span-1">
+        <div className="col-span-2 row-span-1 overflow-hidden">
           <AlertList name={"Service Alerts"} name_text_color={"#FFFFFF"} name_background_color={"#9f0712"} />
         </div>
 
-        <div className="col-span-1 row-span-3">
+        <div className="col-span-1 row-span-3 overflow-hidden">
           <RouteList
             name={config.bus[0].name}
             name_text_color={config.theme.text_color}

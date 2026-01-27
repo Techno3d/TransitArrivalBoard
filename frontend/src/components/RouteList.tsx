@@ -18,12 +18,12 @@ export function RouteList(props: {
 
   if (!stop) {
     return (
-      <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
+      <div className="flex h-full flex-col gap-2 rounded-xl border-black bg-black p-2">
         <div
-          className="flex min-h-16 items-center justify-center rounded-lg"
+          className="flex h-16 shrink-0 items-center justify-center rounded-lg"
           style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
         ></div>
-        <div className="flex grow flex-row rounded-lg bg-white"></div>
+        <div className="flex min-h-0 grow flex-row overflow-hidden rounded-lg bg-white"></div>
       </div>
     );
   }
@@ -33,9 +33,9 @@ export function RouteList(props: {
   });
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
+    <div className="flex h-full flex-col gap-2 rounded-xl border-black bg-black p-2">
       <div
-        className="flex min-h-16 items-center justify-center rounded-lg text-4xl font-extrabold"
+        className="flex h-16 shrink-0 items-center justify-center rounded-lg text-4xl font-extrabold"
         style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
       >
         <h1>{props.name ? props.name : formatStopName(stop.name)}</h1>
@@ -50,7 +50,7 @@ export function RouteList(props: {
 
               return times.length > 0 ? (
                 <div
-                  className="flex min-h-24 flex-row items-center rounded-lg bg-slate-200 text-black"
+                  className="flex h-24 shrink-0 flex-row items-center rounded-lg bg-slate-200 text-black"
                   key={times[0].route_id + "_" + times[0].destination_id}
                 >
                   <div className="flex h-full w-5/6 flex-row items-center rounded-lg bg-slate-100 shadow-2xl">
@@ -80,7 +80,7 @@ export function RouteList(props: {
           })}
         </div>
       ) : (
-        <div className="flex grow items-center justify-center bg-white text-5xl font-semibold text-black">
+        <div className="flex min-h-0 grow items-center justify-center overflow-hidden bg-white text-5xl font-semibold text-black">
           <h1 className="text-center">No scheduled vehicles</h1>
         </div>
       )}

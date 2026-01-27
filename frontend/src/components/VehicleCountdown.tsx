@@ -18,12 +18,12 @@ export function VehicleCountdown(props: {
 
   if (!stop) {
     return (
-      <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
+      <div className="flex h-full flex-col gap-2 rounded-xl border-black bg-black p-2">
         <div
-          className="flex min-h-16 items-center justify-center rounded-lg"
+          className="flex h-16 shrink-0 items-center justify-center rounded-lg"
           style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
         ></div>
-        <div className="flex grow flex-row rounded-lg bg-white"></div>
+        <div className="flex min-h-0 grow flex-row overflow-hidden rounded-lg bg-white"></div>
       </div>
     );
   }
@@ -33,18 +33,18 @@ export function VehicleCountdown(props: {
   });
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 rounded-xl border-black bg-black p-2">
+    <div className="flex h-full flex-col gap-2 rounded-xl border-black bg-black p-2">
       <div
-        className="flex min-h-16 items-center justify-center rounded-lg text-4xl font-extrabold"
+        className="flex h-16 shrink-0 items-center justify-center rounded-lg text-4xl font-extrabold"
         style={{ backgroundColor: props.name_background_color, color: props.name_text_color }}
       >
         <h1>{props.name ? props.name : formatStopName(stop.name)}</h1>
       </div>
       {times.length > 0 ? (
-        <div className="flex grow flex-row rounded-lg bg-slate-300">
-          <div className="flex grow basis-3/4 flex-row rounded-lg bg-slate-200 shadow-2xl">
-            <div className="flex grow basis-2/3 rounded-lg bg-slate-100 shadow-2xl">
-              <div className="flex grow flex-col px-6 py-2">
+        <div className="flex min-h-0 grow flex-row overflow-hidden rounded-lg bg-slate-300">
+          <div className="flex min-h-0 grow basis-3/4 flex-row overflow-hidden rounded-lg bg-slate-200 shadow-2xl">
+            <div className="flex min-h-0 grow basis-2/3 overflow-hidden rounded-lg bg-slate-100 shadow-2xl">
+              <div className="flex min-h-0 grow flex-col overflow-hidden px-6 py-2">
                 <div className="flex basis-2/5 flex-row items-center">
                   <h1 className="line-clamp-1 text-5xl leading-normal font-bold text-black">
                     {formatStopName(times[0].destination_name)}
@@ -59,7 +59,7 @@ export function VehicleCountdown(props: {
                 </div>
               </div>
             </div>
-            <div className="flex grow basis-1/3 flex-col px-6 py-2">
+            <div className="flex min-h-0 grow basis-1/3 flex-col overflow-hidden px-6 py-2">
               {times[1] ? (
                 <Fragment>
                   <div className="flex basis-2/5 flex-row items-center">
@@ -75,7 +75,7 @@ export function VehicleCountdown(props: {
               ) : undefined}
             </div>
           </div>
-          <div className="flex grow basis-1/4 flex-col px-6 py-2">
+          <div className="flex min-h-0 grow basis-1/4 flex-col overflow-hidden px-6 py-2">
             {times[2] ? (
               <Fragment>
                 <div className="flex basis-2/5 flex-row items-center">
@@ -92,7 +92,7 @@ export function VehicleCountdown(props: {
           </div>
         </div>
       ) : (
-        <div className="flex grow items-center justify-center bg-white text-5xl font-semibold text-black">
+        <div className="flex min-h-0 grow items-center justify-center overflow-hidden bg-white text-5xl font-semibold text-black">
           <h1 className="">No scheduled vehicles</h1>
         </div>
       )}

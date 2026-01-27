@@ -1,8 +1,16 @@
 import { type ReactNode, useEffect, useState } from "react";
 import config from "../../../config.json";
 import { type Status } from "../components/StatusBar";
-import { type Alert, type Export, type Import, type Route, type Stop } from "../types";
+import { type Alert, type Route, type Stop } from "../types";
 import { SocketContext } from "./SocketContext";
+
+type Import = {
+  stops_realtime: Record<string, Stop>;
+  service_alerts_realtime: Array<Alert>;
+  routes_static: Record<string, Route>;
+};
+
+type Export = { subway: Array<Array<string>>; bus: Array<Array<string>> };
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   const [stops, setStops] = useState<Record<string, Stop>>({});

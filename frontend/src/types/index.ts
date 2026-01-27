@@ -16,11 +16,3 @@ export type Stop = {
   trips: Array<Vehicle>;
   destinations: Record<string, Record<string, Array<Vehicle>>>;
 };
-
-export type Import = {
-  stops_realtime: Record<string, Stop>;
-  service_alerts_realtime: Array<Alert>;
-  routes_static: Record<string, Route>;
-};
-
-export type Export = { subway: Array<Array<string>>; bus: Array<Array<string>> };
