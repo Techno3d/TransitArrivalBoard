@@ -1,11 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
 import { Bullet } from "./Bullet";
+import type { Route } from "../types";
 
 export function AlertList(props: { name: string; name_text_color: string; name_background_color: string }) {
   const { routes, alerts } = useContext(SocketContext);
 
   const messages: Array<string> = [];
+  const affectedRoutes: Array<Route> = []
   alerts
     .slice()
     .reverse()
@@ -13,7 +15,10 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
       if (messages.indexOf(alert.header_text) != -1) return;
       if (alert.sort_order < 22) return;
       messages.push(alert.header_text);
+      let choppedDescriptor = alert.route_id.split('..')[0].split('_');
+      affectedRoutes.push(routes[choppedDescriptor[choppedDescriptor.length-1]]);
     });
+    affectedRoutes.sort((a, b) => a.route_id < b.route_id ? -1 : 1)
 
   const [index, setIndex] = useState<number>(0);
 
@@ -35,25 +40,35 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
       >
         <h1>{props.name}</h1>
       </div>
-
       {messages.length > 0 ? (
-        <div className="flex min-h-0 grow flex-row gap-2 overflow-hidden">
-          <div className="flex h-full flex-row items-center rounded-lg bg-slate-100 px-2">
-            <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">
-              {(index % messages.length) + 1}
-            </h1>
+        <div className="flex flex-col grow min-h-0 gap-2">
+          <div className="flex min-h-0 grow flex-row gap-2 overflow-hidden">
+            <div className="flex h-full flex-row items-center rounded-lg bg-slate-100 px-2">
+              <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">
+                {(index % messages.length) + 1}
+              </h1>
+            </div>
+            <div className="flex min-h-0 grow overflow-hidden rounded-lg bg-slate-100 px-4">
+              <h1 className="text-5xl leading-tight font-semibold text-pretty">
+                {messages[index % messages.length].split(/(\[.*?\])/).map((text, section) => {
+                  if (!routes[text.substring(1, text.length - 1)]) return text;
+                  return (
+                    <div className="mx-1 inline-flex -translate-y-1.5" key={section}>
+                      <Bullet route={routes[text.substring(1, text.length - 1)]} size={42} />
+                    </div>
+                  );
+                })}
+              </h1>
+            </div>
           </div>
-          <div className="flex min-h-0 grow overflow-hidden rounded-lg bg-slate-100 px-4">
-            <h1 className="text-5xl leading-tight font-semibold text-pretty">
-              {messages[index % messages.length].split(/(\[.*?\])/).map((text, section) => {
-                if (!routes[text.substring(1, text.length - 1)]) return text;
-                return (
-                  <div className="mx-1 inline-flex -translate-y-1.5" key={section}>
-                    <Bullet route={routes[text.substring(1, text.length - 1)]} size={42} />
-                  </div>
-                );
-              })}
-            </h1>
+          <div className="flex gap-3 p-2 rounded-lg bg-slate-100">
+            {affectedRoutes.map((route) => {
+              return (
+                <div className="flex" key={route.route_id}>
+                  <Bullet route={route} size={40}></Bullet>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
