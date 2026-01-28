@@ -43,8 +43,9 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
       >
         <h1>{props.name}</h1>
       </div>
-      {messages.length > 0 ? (
-        <div className="flex min-h-0 grow flex-col gap-2">
+
+      <div className="flex min-h-0 grow flex-col gap-2">
+        {messages.length > 0 ? (
           <div className="flex min-h-0 grow flex-row overflow-hidden rounded-lg bg-slate-200">
             <div className="flex h-full flex-row items-center rounded-lg bg-slate-100 px-2 shadow-2xl">
               <h1 className="w-[1ch] font-mono text-4xl leading-none font-extrabold break-all">
@@ -64,17 +65,19 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
               </h1>
             </div>
           </div>
-          <div className="flex h-13 shrink-0 flex-row items-center gap-2 overflow-hidden rounded-lg bg-slate-100 px-2">
+        ) : (
+          <div className="flex min-h-0 grow items-center justify-center overflow-hidden rounded-lg bg-white text-5xl font-semibold text-black">
+            <h1 className="text-center">No active alerts</h1>
+          </div>
+        )}
+        {affected_routes.length > 0 ? (
+          <div className="flex shrink-0 flex-row items-center gap-2 overflow-hidden rounded-lg bg-slate-100 p-2">
             {affected_routes.map((route_id) => {
               return <Bullet route={routes[route_id]} size={36}></Bullet>;
             })}
           </div>
-        </div>
-      ) : (
-        <div className="flex min-h-0 grow items-center justify-center overflow-hidden rounded-lg bg-white text-5xl font-semibold text-black">
-          <h1 className="text-center">No active alerts</h1>
-        </div>
-      )}
+        ) : null}
+      </div>
     </div>
   );
 }
