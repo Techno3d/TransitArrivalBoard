@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
+import type { Route } from "../types";
 import { Bullet } from "./Bullet";
 
 export function AlertList(props: { name: string; name_text_color: string; name_background_color: string }) {
@@ -15,13 +16,14 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
       messages.push(alert.header_text);
     });
 
-  const affected_routes: Array<string> = [];
+  const affected_routes: Array<Route> = [];
   alerts.slice().map((alert) => {
-    if (affected_routes.indexOf(alert.route_id) != -1) return;
+    if (!routes[alert.route_id]) return;
+    if (affected_routes.indexOf(routes[alert.route_id]) != -1) return;
     if (alert.sort_order < 14) return;
-    affected_routes.push(alert.route_id);
+    affected_routes.push(routes[alert.route_id]);
   });
-  affected_routes.sort((a, b) => (a < b ? -1 : 1));
+  affected_routes.sort((a, b) => (a.route_sort_order < b.route_sort_order ? -1 : 1));
 
   const [index, setIndex] = useState<number>(0);
 
@@ -72,8 +74,8 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
         )}
         {affected_routes.length > 0 ? (
           <div className="flex shrink-0 flex-row items-center gap-2 overflow-hidden rounded-lg bg-slate-100 p-2">
-            {affected_routes.map((route_id) => {
-              return <Bullet route={routes[route_id]} size={36}></Bullet>;
+            {affected_routes.map((routes) => {
+              return <Bullet route={routes} size={36}></Bullet>;
             })}
           </div>
         ) : null}

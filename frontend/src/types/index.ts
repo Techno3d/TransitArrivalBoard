@@ -1,6 +1,12 @@
 export type Alert = { route_id: string; sort_order: number; header_text: string };
 
-export type Route = { route_id: string; route_name: string; route_color: string; route_text_color: string };
+export type Route = {
+  route_id: string;
+  route_name: string;
+  route_color: string;
+  route_text_color: string;
+  route_sort_order: number;
+};
 
 export type Vehicle = {
   route_id: string;

@@ -43,6 +43,7 @@ pub struct Route {
   pub route_name: String,
   pub route_color: String,
   pub route_text_color: String,
+  pub route_sort_order: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]

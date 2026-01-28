@@ -146,15 +146,16 @@ fn main() {
           let route = Route {
             route_id: value.id.to_owned(),
             route_name: value.short_name.as_ref().unwrap().to_owned(),
-            route_color: format!("{:02X}{:02X}{:02X}", value.color.r, value.color.g, value.color.b)
+            route_color: format!("#{:02X}{:02X}{:02X}", value.color.r, value.color.g, value.color.b)
               .as_str()
               .to_owned(),
             route_text_color: format!(
-              "{:02X}{:02X}{:02X}",
+              "#{:02X}{:02X}{:02X}",
               value.text_color.r, value.text_color.g, value.text_color.b
             )
             .as_str()
             .to_owned(),
+            route_sort_order: value.order.unwrap_or(0).to_owned(),
           };
           routes_static.insert(key.to_owned(), route.to_owned());
         }
