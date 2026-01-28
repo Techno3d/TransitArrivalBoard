@@ -6,7 +6,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
-use crate::{feed_handler::FeedHandler, Alert};
+use crate::{feed_handler::FeedHandler, mercury_structs::Periods, Alert};
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ServiceAlertHandler {
@@ -43,7 +43,7 @@ impl ServiceAlertHandler {
         Some(a) => a,
         None => continue,
       };
-      'entities: for informed in informed_entities.iter() {
+      for informed in informed_entities.iter() {
         if let Some(selector) = &informed.transit_realtime_mercury_entity_selector {
           let decomposed: Vec<&str> = selector.sort_order.split(':').collect();
           // If the selector formating changes, then we need to change. This would become a bug, so
@@ -58,15 +58,8 @@ impl ServiceAlertHandler {
             None => continue,
           };
 
-          let time_now = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as i64;
-
-          for (start, end) in active_period.iter().map(|ap| (ap.start, ap.end)) {
-            if (start.unwrap_or(time_now) > time_now) || (end.unwrap_or(time_now) < time_now) {
-              continue 'entities;
-            }
+          if !Self::check_active_period(active_period.to_owned()) {
+            continue;
           }
 
           self.subway.push(Alert {
@@ -101,5 +94,20 @@ impl ServiceAlertHandler {
         });
       }
     }
+  }
+
+  fn check_active_period(active_period: Vec<Periods>) -> bool {
+    let time_now = SystemTime::now()
+      .duration_since(SystemTime::UNIX_EPOCH)
+      .unwrap()
+      .as_secs() as i64;
+
+    for (start, end) in active_period.iter().map(|ap| (ap.start, ap.end)) {
+      if (start.unwrap_or(time_now) <= time_now) && (end.unwrap_or(time_now) >= time_now) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
