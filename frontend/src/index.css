@@ -10,44 +10,9 @@
   #root {
     height: 100%;
   }
-}
 
-@layer base {
   :root {
-    --spacing-14_5: 58px;
-    --spacing-21: 104px;
-    --spacing-29: 116px;
-    --spacing-62: 248px;
-
-    --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
-    --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
-
-    --animate-infinite-scroll: infinite-scroll 7.5s linear infinite;
-    --animate-flashing: flashing 2s ease-in-out infinite;
-
     --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
     --font-mono: "Roboto Mono Variable", "Roboto Mono", ui-monospace, monospace;
-  }
-
-  @keyframes infinite-scroll {
-    from {
-      transform: translateX(100%);
-    }
-
-    to {
-      transform: translateX(-100%);
-    }
-  }
-
-  @keyframes flashing {
-
-    0%,
-    100% {
-      background-color: white;
-    }
-
-    50% {
-      background-color: #fcd34d;
-    }
   }
 }
