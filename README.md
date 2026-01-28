@@ -38,7 +38,7 @@ Create a `.env` file in the `backend` directory and add the following variables.
 
 ## Configuration
 
-Modify `config.json` in the root directory to customize your board to your liking. By default, it tracks stops near **The Bronx High School of Science**.
+Modify `config.json` in the root directory to customize your board to your liking. By default, it tracks stops near [The Bronx High School of Science](https://bxscience.edu).
 
 ### Root
 
@@ -49,7 +49,7 @@ Modify `config.json` in the root directory to customize your board to your likin
 | `theme`       | `Theme`             | The color theme for the components. Provide the colors in hex. |
 | `maintainers` | `Array<Maintainer>` | The list of developers that should be credited.                |
 
-### `Stop`
+### Object: `Stop`
 
 | Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
 | ----------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -57,7 +57,7 @@ Modify `config.json` in the root directory to customize your board to your likin
 | `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.                                                                     |
 | `walk_time` | `number`        | It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included. |
 
-### `Theme`
+### Object: `Theme`
 
 | Key                | Type     | Description                                                         |
 | ------------------ | -------- | ------------------------------------------------------------------- |
@@ -65,12 +65,12 @@ Modify `config.json` in the root directory to customize your board to your likin
 | `text_color`       | `string` | This color will be used on the text inside the stop name title bar. |
 | `background_color` | `string` | This color will be used on the background of the page.              |
 
-### `Maintainer`
+### Object: `Maintainer`
 
-| Key         | Type     | Description                                                                                                                                                                   |
-| ----------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`      | `string` | The name (full name, username, nickname, etc.) of the maintainer.                                                                                                             |
-| `github_id` | `number` | The GitHub account ID of the maintainer. You can find a GitHub account's ID with their username by using to GitHub API: <https://api.github.com/users/REPLACE_WITH_USERNAME>. |
+| Key         | Type     | Description                                                       |
+| ----------- | -------- | ----------------------------------------------------------------- |
+| `name`      | `string` | The name (full name, username, nickname, etc.) of the maintainer. |
+| `github_id` | `number` | The GitHub account ID of the maintainer.                          |
 
 ## Deployment
 
@@ -85,7 +85,7 @@ make install
 
 ### Development
 
-To run the project while in development, run each command in seperate terminals.
+To bio;d amd run the project for development, run each command in seperate terminals.
 
 ```bash
 cd backend && cargo run
