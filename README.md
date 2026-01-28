@@ -1,6 +1,6 @@
 # Transit Board
 
-A hobby project that retrives and displays realtime MTA subway and bus info. It can be configured to track the departures of any subway or bus stop.
+A hobby project that retrives and displays realtime MTA subway and bus arrival information for any stop. It also tracks service alerts for subway.
 
 Please follow this guide on how to setup and deploy this project on your device.
 
@@ -10,11 +10,11 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
-- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
+- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf)
 
 ### Optional
 
-We have provided a `Makefile` that helps automate development and deployment. To use the `Makefile`, please run the following command, depending on your OS.
+We have provided a `Makefile` that helps automate development and deployment. To use it, please install Make and Git using the command that corresponds to your OS.
 
 #### Windows
 
@@ -24,8 +24,6 @@ winget install Git.Git GnuWin32.Make
 
 #### macOS
 
-Run the following command to install Make and Git.
-
 ```bash
 xcode-select --install
 ```
@@ -34,55 +32,45 @@ xcode-select --install
 
 Create a `.env` file in the `backend` directory and add the following variables.
 
-### `MTABUSKEY`
+| Key         | Value                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| `MTABUSKEY` | An API key for the MTA BusTime API. [Request one here](https://bustime.mta.info/wiki/Developers/Index). |
 
-[Request an API key](https://bustime.mta.info/wiki/Developers/Index) for the MTA BusTime API.
+## Configuration
 
-## Configuration File
+Modify `config.json` in the root directory to customize your board to your liking. By default, it tracks stops near [The Bronx High School of Science](https://bxscience.edu).
 
-Modify `config.json` to customize your board to your liking. By default, it tracks stops near **The Bronx High School of Science**. Feel free to use it as an example if you need help understanding how to configure this.
+### Root
 
-### `subway` and `bus`
+| Key           | Type                | Description                                                    |
+| ------------- | ------------------- | -------------------------------------------------------------- |
+| `subway`      | `Array<Stop>`       | The list of subway stops you want to track.                    |
+| `bus`         | `Array<Stop>`       | The list of bus stops you want to track.                       |
+| `theme`       | `Theme`             | The color theme for the components. Provide the colors in hex. |
+| `maintainers` | `Array<Maintainer>` | The list of developers that should be credited.                |
 
-The MTA uses two different APIs for each, so you are unable to mix subway and bus stops together.
+### Object: `Stop`
 
-#### `name`
+| Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`      | `string`        | This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.                                                                                                                                                                                           |
+| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.                                                                     |
+| `walk_time` | `number`        | It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included. |
 
-This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.
+### Object: `Theme`
 
-#### `stop_ids`
+| Key                | Type     | Description                                                         |
+| ------------------ | -------- | ------------------------------------------------------------------- |
+| `primary_color`    | `string` | This color will be used for the stop name title bar.                |
+| `text_color`       | `string` | This color will be used on the text inside the stop name title bar. |
+| `background_color` | `string` | This color will be used on the background of the page.              |
 
-You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.
+### Object: `Maintainer`
 
-#### `walk_time`
-
-It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included.
-
-### `theme`
-
-#### `primary_color`
-
-This color will be used for the stop name title bar.
-
-#### `text_color`
-
-This color will be used on the text inside the stop name title bar.
-
-#### `background_color`
-
-This color will be used on the background of the page.
-
-### `maintainers`
-
-If you wanted to replace us, then you can modify who gets credited in the status bar at the bottom. Go ahead, we won't judge.
-
-#### `name`
-
-The name (full name, nickname, etc.) of the maintainer.
-
-#### `github_id`
-
-The GitHub account ID of the maintainer. You can find a GitHub account's ID with their username by using to GitHub API. <https://api.github.com/users/REPLACE_WITH_USERNAME>.
+| Key         | Type     | Description                                                       |
+| ----------- | -------- | ----------------------------------------------------------------- |
+| `name`      | `string` | The name (full name, username, nickname, etc.) of the maintainer. |
+| `github_id` | `number` | The GitHub account ID of the maintainer.                          |
 
 ## Deployment
 
@@ -97,7 +85,7 @@ make install
 
 ### Development
 
-To run the project while in development, run each command in seperate terminals.
+To build amd run the project for development, run each command in seperate terminals.
 
 ```bash
 cd backend && cargo run
@@ -127,4 +115,4 @@ cd backend && ./target/release/transit-board
 cd frontend && npm run preview
 ```
 
-You can view the webpage at <http://localhost:5173>.
+You can view the webpage at <http://localhost:4173>.
