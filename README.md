@@ -85,7 +85,7 @@ make install
 
 ### Development
 
-To bio;d amd run the project for development, run each command in seperate terminals.
+To build amd run the project for development, run each command in seperate terminals.
 
 ```bash
 cd backend && cargo run
