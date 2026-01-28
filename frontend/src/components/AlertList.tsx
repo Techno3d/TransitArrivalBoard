@@ -52,7 +52,7 @@ export function AlertList(props: { name: string; name_text_color: string; name_b
                 {(index % messages.length) + 1}
               </h1>
             </div>
-            <div className="flex min-h-0 grow overflow-hidden rounded-lg bg-slate-200 px-4">
+            <div className="flex min-h-0 grow overflow-hidden rounded-lg px-4">
               <h1 className="text-4xl leading-tight font-semibold text-pretty">
                 {messages[index % messages.length].split(/(\[.*?\])/).map((text, section) => {
                   if (!routes[text.substring(1, text.length - 1)]) return text;
