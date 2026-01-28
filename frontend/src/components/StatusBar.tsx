@@ -39,7 +39,7 @@ export function StatusBar(props: { maintainers: Array<{ name: string; github_id:
 
   return (
     <div className="flex h-12 shrink-0 flex-row items-center overflow-hidden bg-black px-2 text-3xl font-semibold text-white">
-      <div className="min-h-0 grow overflow-hidden text-start">
+      <div className="flex-1 text-start">
         <h1>
           {"Status: "}
           {(() => {
@@ -83,7 +83,7 @@ export function StatusBar(props: { maintainers: Array<{ name: string; github_id:
             : "no one"}
         </h1>
       </div>
-      <div className="min-h-0 grow overflow-hidden text-end">
+      <div className="flex-1 text-end">
         <h1>{time}</h1>
       </div>
     </div>
