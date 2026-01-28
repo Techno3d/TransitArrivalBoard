@@ -7,7 +7,10 @@ import { VehicleCountdown } from "./components/VehicleCountdown";
 export default function App() {
   return (
     <div className="flex h-full touch-none flex-col gap-2 overflow-hidden overscroll-none bg-black font-sans select-none">
-      <div className="grid min-h-0 grow grid-flow-dense grid-cols-3 grid-rows-3 gap-2 overflow-hidden bg-emerald-800 p-2 text-black">
+      <div
+        className="grid min-h-0 grow grid-flow-dense grid-cols-3 grid-rows-3 gap-2 overflow-hidden p-2 text-black"
+        style={{ backgroundColor: config.theme.background_color }}
+      >
         <div className="col-span-2 row-span-1 overflow-hidden">
           <VehicleCountdown
             name={config.subway[0].name}
