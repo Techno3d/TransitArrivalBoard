@@ -8,9 +8,9 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 ### Required
 
-- [Rust](https://www.rust-lang.org/tools/install)
+- [Rust](https://rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
-- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf)
+- [Protobuf Compiler](https://protobuf.dev/installation)
 
 ### Optional
 
@@ -54,7 +54,7 @@ Modify `config.json` in the root directory to customize your board to your likin
 | Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
 | ----------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`      | `string`        | This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.                                                                                                                                                                                           |
-| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.                                                                     |
+| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://mta.info/developers) provided by the MTA.                                                                     |
 | `walk_time` | `number`        | It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included. |
 
 ### Object: `Theme`
