@@ -52,15 +52,19 @@ export function Fallback() {
         <div className="text-center">
           <h1>
             {"Made with ❤️ by "}
-            {config.maintainers.length > 1
+
+            {config.maintainers.length > 0
               ? config.maintainers.map((maintainer, index) => {
                   return (
                     <Fragment key={maintainer.name}>
                       <span className="inline-flex items-baseline">
-                        <img
-                          src={`https://avatars.githubusercontent.com/u/${maintainer.github_id}`}
-                          className="mx-2 aspect-square h-9 self-center rounded-full"
-                        />
+                        {maintainer.github_id ? (
+                          <img
+                            src={`https://avatars.githubusercontent.com/u/${maintainer.github_id}`}
+                            className="mx-2 aspect-square h-9 self-center rounded-full"
+                          />
+                        ) : null}
+
                         <span>{maintainer.name}</span>
                       </span>
 
