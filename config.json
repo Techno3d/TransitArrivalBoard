@@ -1,0 +1,30 @@
+{
+  "subway": [
+    {
+      "name": "",
+      "stop_ids": ["405S"],
+      "walk_time": 10
+    },
+    {
+      "name": "",
+      "stop_ids": ["D03S"],
+      "walk_time": 14
+    }
+  ],
+  "bus": [
+    {
+      "name": "",
+      "stop_ids": ["100017", "103400", "100723"],
+      "walk_time": 3
+    }
+  ],
+  "theme": {
+    "primary_color": "#006045",
+    "text_color": "#FFFFFF",
+    "background_color": "#006045"
+  },
+  "maintainers": [
+    { "name": "Shadman Syed", "github_id": 76977073 },
+    { "name": "David Wang", "github_id": 95447323 }
+  ]
+}

@@ -1,10 +1,15 @@
-build: src/* proto/* app/*
-	cargo build --release
-	npm run build
+build:
+	cd backend && cargo build --release
+	cd frontend && npm run build
 
-install_deps:
-	npm ci
+install:
+	cd backend && cargo test
+	cd frontend && npm ci
+
+format:
+	cd backend && cargo fmt
+	cd frontend && npm run fmt
 
 clean:
-	cargo clean
-	rm -rf node_modules
+	cd backend && cargo clean
+	cd frontend && npm run clean

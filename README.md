@@ -1,67 +1,118 @@
-# Transit Arrival Board
+# Transit Board
 
-A hobby project that uses the MTA's GTFS static and realtime feeds to get realtime transit info about public transit near our high school, The Bronx High School of Science.
+A hobby project that retrives and displays realtime MTA subway and bus arrival information for any stop. It also tracks service alerts for subway.
 
-## Environment Variables
+Please follow this guide on how to setup and deploy this project on your device.
 
-Create a `.env` file and add the following variables.
+## Tools
 
-### `MTABUSKEY`
-
-The MTA's BusTime feeds require an API key, which you can obtain [here](https://bustime.mta.info/wiki/Developers/Index).
-
-## Configuration
-
-The configuration file is located in `config.ts`. It is currently set to stops located near The Bronx High School of Science, but this file is meant to be edited to display any stop in the MTA network. Stops can be added (either subway or bus) with `StopConfig` objects, which is explained in depth below.
-
-### `stop_ids`
-
-Although each GTFS `stop_id` refers to a single platform, we have anticipated for the need to combine platforms with built-in transfers. The first `stop_id` is used to distinguish the `stop_name` and as a key.
-
-### `walk_time`
-
-Although the Rust backend uses the MTA's GTFS realtime feeds to get information about when a vehicle is scheduled to arrive at a station, it may be unhelpful for the vehicle to arrive faster than someone would be able to "catch" it. `walk_time` is used to remove vehicles from the React.js frontend that are deemed to be unlikely for someone to "catch" it.
-
-## Dependencies
-
-Install the following dependencies.
+### Required
 
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
-- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf?tab=readme-ov-file#protobuf-compiler-installation)
+- [Protobuf Compiler](https://github.com/protocolbuffers/protobuf)
 
-## Deploying
+### Optional
 
-The webpage can be found at http://localhost:3000/ after deploying.
+We have provided a `Makefile` that helps automate development and deployment. To use it, please install Make and Git using the command that corresponds to your OS.
+
+#### Windows
+
+```powershell
+winget install Git.Git GnuWin32.Make
+```
+
+#### macOS
+
+```bash
+xcode-select --install
+```
+
+## Environment Variables
+
+Create a `.env` file in the `backend` directory and add the following variables.
+
+| Key         | Value                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------- |
+| `MTABUSKEY` | An API key for the MTA BusTime API. [Request one here](https://bustime.mta.info/wiki/Developers/Index). |
+
+## Configuration
+
+Modify `config.json` in the root directory to customize your board to your liking. By default, it tracks stops near [The Bronx High School of Science](https://bxscience.edu).
+
+### Root
+
+| Key           | Type                | Description                                                    |
+| ------------- | ------------------- | -------------------------------------------------------------- |
+| `subway`      | `Array<Stop>`       | The list of subway stops you want to track.                    |
+| `bus`         | `Array<Stop>`       | The list of bus stops you want to track.                       |
+| `theme`       | `Theme`             | The color theme for the components. Provide the colors in hex. |
+| `maintainers` | `Array<Maintainer>` | The list of developers that should be credited.                |
+
+### Object: `Stop`
+
+| Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
+| ----------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`      | `string`        | This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.                                                                                                                                                                                           |
+| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://www.mta.info/developers) provided by the MTA.                                                                     |
+| `walk_time` | `number`        | It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included. |
+
+### Object: `Theme`
+
+| Key                | Type     | Description                                                         |
+| ------------------ | -------- | ------------------------------------------------------------------- |
+| `primary_color`    | `string` | This color will be used for the stop name title bar.                |
+| `text_color`       | `string` | This color will be used on the text inside the stop name title bar. |
+| `background_color` | `string` | This color will be used on the background of the page.              |
+
+### Object: `Maintainer`
+
+| Key         | Type     | Description                                                       |
+| ----------- | -------- | ----------------------------------------------------------------- |
+| `name`      | `string` | The name (full name, username, nickname, etc.) of the maintainer. |
+| `github_id` | `number` | The GitHub account ID of the maintainer.                          |
+
+## Deployment
+
+> [!WARNING]
+> Please install the optional tools to run `make`. Otherwise, you are able to manually run these commands by inspecting the `Makefile`.
+
+Before you begin, run the following command to install the project dependencies.
+
+```bash
+make install
+```
 
 ### Development
 
-Open 2 terminals and run the following commands.
+To build amd run the project for development, run each command in seperate terminals.
 
 ```bash
-cargo test
-cargo run
+cd backend && cargo run
 ```
 
 ```bash
-npm install
-npm run dev
+cd frontend && npm run dev
 ```
+
+You can view the webpage at <http://localhost:5173>.
 
 ### Production
 
-Open 2 terminals and run the following commands.
-
-> Note: `start` is a command only found on Windows.
+To build the project for production, run the following command.
 
 ```bash
-cargo test
-cargo build --release
-start .\target\release\transit-board.exe
+make build
+```
+
+To run the project, run each command in seperate terminals.
+
+```bash
+cd backend && ./target/release/transit-board
 ```
 
 ```bash
-npm install
-npm run build
-npm run start
+cd frontend && npm run preview
 ```
+
+You can view the webpage at <http://localhost:4173>.
