@@ -10,7 +10,7 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 - [Rust](https://rust-lang.org/tools/install)
 - [Node.js](https://nodejs.org/en/download)
-- [Protobuf Compiler](https://protobuf.dev/installation)
+- [Protobuf](https://protobuf.dev/installation)
 
 ### Optional
 
