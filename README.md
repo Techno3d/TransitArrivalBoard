@@ -49,6 +49,10 @@ Modify `config.json` in the root directory to customize your board to your likin
 | `theme`       | `Theme`             | The color theme for the components. Provide the colors in hex. |
 | `maintainers` | `Array<Maintainer>` | The list of developers that should be credited.                |
 
+### Object: `Array`
+
+You can find a detailed reference on the [MDN Web Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array).
+
 ### Object: `Stop`
 
 | Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
