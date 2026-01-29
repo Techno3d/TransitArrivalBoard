@@ -8,7 +8,7 @@ export type Status = {
   message: string;
 };
 
-export function StatusBar(props: { maintainers: Array<{ name: string; github_id: number }> }) {
+export function StatusBar(props: { maintainers: Array<{ name: string; github_id?: number }> }) {
   const { status } = useContext(SocketContext);
 
   const [time, setTime] = useState<string>(
@@ -62,15 +62,18 @@ export function StatusBar(props: { maintainers: Array<{ name: string; github_id:
         <h1>
           {"Made with ❤️ by "}
 
-          {props.maintainers.length > 1
+          {props.maintainers.length > 0
             ? props.maintainers.map((maintainer, index) => {
                 return (
                   <Fragment key={maintainer.name}>
                     <span className="inline-flex items-baseline">
-                      <img
+                      {
+                        maintainer.github_id ? ( <img
                         src={`https://avatars.githubusercontent.com/u/${maintainer.github_id}`}
                         className="mx-2 aspect-square h-9 self-center rounded-full"
-                      />
+                      /> ) : null
+                      }
+                      
                       <span>{maintainer.name}</span>
                     </span>
 

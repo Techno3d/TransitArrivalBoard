@@ -67,10 +67,10 @@ Modify `config.json` in the root directory to customize your board to your likin
 
 ### Object: `Maintainer`
 
-| Key         | Type     | Description                                                       |
-| ----------- | -------- | ----------------------------------------------------------------- |
-| `name`      | `string` | The name (full name, username, nickname, etc.) of the maintainer. |
-| `github_id` | `number` | The GitHub account ID of the maintainer.                          |
+| Key         | Type     | Description                                                     |
+| ----------- | -------- | ----------------------------------------------------------------|
+| `name`      | `string` | The name of the maintainer. Can be a person or an organization. |
+| `github_id` | `number` | Optional. The GitHub ID of the maintainer.                      |
 
 ## Deployment
 
