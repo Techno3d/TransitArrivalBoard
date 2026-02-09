@@ -23,8 +23,5 @@
     "text_color": "#FFFFFF",
     "background_color": "#006045"
   },
-  "maintainers": [
-    { "name": "Shadman Syed", "github_id": 76977073 },
-    { "name": "David Wang", "github_id": 95447323 }
-  ]
+  "credits": "Made with ❤️ by [https://avatars.githubusercontent.com/u/76977073] Shadman Syed and [https://avatars.githubusercontent.com/u/95447323] David Wang"
 }

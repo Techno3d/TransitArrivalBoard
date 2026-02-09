@@ -14,12 +14,12 @@ Please follow this guide on how to setup and deploy this project on your device.
 
 ### Optional
 
-We have provided a `Makefile` that helps automate development and deployment. To use it, please install Make and Git using the command that corresponds to your OS.
+We have provided a `Makefile` that helps automate development and deployment. To use it, please install Make using the command that corresponds to your operating system.
 
 #### Windows
 
 ```powershell
-winget install Git.Git GnuWin32.Make
+winget install GnuWin32.Make
 ```
 
 #### macOS
@@ -42,12 +42,12 @@ Modify `config.json` in the root directory to customize your board to your likin
 
 ### Root
 
-| Key           | Type                | Description                                                    |
-| ------------- | ------------------- | -------------------------------------------------------------- |
-| `subway`      | `Array<Stop>`       | The list of subway stops you want to track.                    |
-| `bus`         | `Array<Stop>`       | The list of bus stops you want to track.                       |
-| `theme`       | `Theme`             | The color theme for the components. Provide the colors in hex. |
-| `maintainers` | `Array<Maintainer>` | The list of developers that should be credited.                |
+| Key       | Type          | Description                                                               |
+| --------- | ------------- | ------------------------------------------------------------------------- |
+| `subway`  | `Array<Stop>` | The list of subway stops you want to track.                               |
+| `bus`     | `Array<Stop>` | The list of bus stops you want to track.                                  |
+| `theme`   | `Theme`       | The color theme for the components. Provide the colors in hex.            |
+| `credits` | `string`      | The credits on the status bar. Wrap links to images with square brackets. |
 
 ### Object: `Array`
 
@@ -58,7 +58,7 @@ You can find a detailed reference on the [MDN Web Docs](https://developer.mozill
 | Key         | Type            | Description                                                                                                                                                                                                                                                                                                                             |
 | ----------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `name`      | `string`        | This allows you to set a nickname for the stop being tracked. If left blank, the `stop_name` of the first element in `stop_ids` will be used.                                                                                                                                                                                           |
-| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://mta.info/developers) provided by the MTA.                                                                     |
+| `stop_ids`  | `Array<string>` | You can group all of the various stations you wish to track together by inserting its corresponding `stop_id` in the array. If you need help finding a station's `stop_id`, you can download the [GTFS feeds](https://mta.info/developers) provided by the MTA.                                                                         |
 | `walk_time` | `number`        | It may be unhelpful to include vehicles that will depart faster than it would take someone to walk to the station. `walk_time` should be the average time it takes for someone to comfortably walk from the location of the board to the station. All vehicles that will arrive in less than half the `walk_time` will not be included. |
 
 ### Object: `Theme`
@@ -68,13 +68,6 @@ You can find a detailed reference on the [MDN Web Docs](https://developer.mozill
 | `primary_color`    | `string` | This color will be used for the stop name title bar.                |
 | `text_color`       | `string` | This color will be used on the text inside the stop name title bar. |
 | `background_color` | `string` | This color will be used on the background of the page.              |
-
-### Object: `Maintainer`
-
-| Key         | Type     | Description                                                     |
-| ----------- | -------- | ----------------------------------------------------------------|
-| `name`      | `string` | The name of the maintainer. Can be a person or an organization. |
-| `github_id` | `number` | Optional. The GitHub ID of the maintainer.                      |
 
 ## Deployment
 
@@ -89,7 +82,7 @@ make install
 
 ### Development
 
-To build amd run the project for development, run each command in seperate terminals.
+To build and run the project for development, run each command in seperate terminals.
 
 ```bash
 cd backend && cargo run

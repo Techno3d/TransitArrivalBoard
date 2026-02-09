@@ -11,41 +11,34 @@ export default function App() {
         className="grid min-h-0 grow grid-flow-dense grid-cols-3 grid-rows-3 gap-2 overflow-hidden p-2 text-black"
         style={{ backgroundColor: config.theme.background_color }}
       >
-        <div className="col-span-2 row-span-1 overflow-hidden">
-          <VehicleCountdown
-            name={config.subway[0].name}
-            name_text_color={config.theme.text_color}
-            name_background_color={config.theme.primary_color}
-            stop_id={config.subway[0].stop_ids[0]}
-            walk_time={config.subway[0].walk_time}
-          ></VehicleCountdown>
-        </div>
-
-        <div className="col-span-2 row-span-1 overflow-hidden">
-          <VehicleCountdown
-            name={config.subway[1].name}
-            name_text_color={config.theme.text_color}
-            name_background_color={config.theme.primary_color}
-            stop_id={config.subway[1].stop_ids[0]}
-            walk_time={config.subway[1].walk_time}
-          ></VehicleCountdown>
-        </div>
-
-        <div className="col-span-2 row-span-1 overflow-hidden">
+        <div className="col-span-2 row-span-3 flex flex-col gap-2 overflow-hidden">
+          {config.subway.map((subway) => (
+            <VehicleCountdown
+              key={subway.stop_ids[0]}
+              name={subway.name}
+              name_text_color={config.theme.text_color}
+              name_background_color={config.theme.primary_color}
+              stop_id={subway.stop_ids[0]}
+              walk_time={subway.walk_time}
+            ></VehicleCountdown>
+          ))}
           <AlertList name={"Service Alerts"} name_text_color={"#FFFFFF"} name_background_color={"#9f0712"} />
         </div>
 
-        <div className="col-span-1 row-span-3 overflow-hidden">
-          <RouteList
-            name={config.bus[0].name}
-            name_text_color={config.theme.text_color}
-            name_background_color={config.theme.primary_color}
-            stop_id={config.bus[0].stop_ids[0]}
-            walk_time={config.bus[0].walk_time}
-          ></RouteList>
+        <div className="col-span-1 row-span-3 flex flex-col gap-2 overflow-hidden">
+          {config.bus.map((stop) => (
+            <RouteList
+              key={stop.stop_ids[0]}
+              name={stop.name}
+              name_text_color={config.theme.text_color}
+              name_background_color={config.theme.primary_color}
+              stop_id={stop.stop_ids[0]}
+              walk_time={stop.walk_time}
+            ></RouteList>
+          ))}
         </div>
       </div>
-      <StatusBar maintainers={config.maintainers}></StatusBar>
+      <StatusBar credits={config.credits}></StatusBar>
     </div>
   );
 }

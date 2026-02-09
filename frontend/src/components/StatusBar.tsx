@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
 
 type StatusLevel = "OK" | "WARNING" | "ERROR";
@@ -8,7 +8,7 @@ export type Status = {
   message: string;
 };
 
-export function StatusBar(props: { maintainers: Array<{ name: string; github_id?: number }> }) {
+export function StatusBar(props: { credits: string }) {
   const { status } = useContext(SocketContext);
 
   const [time, setTime] = useState<string>(
@@ -58,33 +58,19 @@ export function StatusBar(props: { maintainers: Array<{ name: string; github_id?
           })()}
         </h1>
       </div>
-      <div className="text-center">
-        <h1>
-          {"Made with ❤️ by "}
-
-          {props.maintainers.length > 0
-            ? props.maintainers.map((maintainer, index) => {
-                return (
-                  <Fragment key={maintainer.name}>
-                    <span className="inline-flex items-baseline">
-                      {
-                        maintainer.github_id ? ( <img
-                        src={`https://avatars.githubusercontent.com/u/${maintainer.github_id}`}
-                        className="mx-2 aspect-square h-9 self-center rounded-full"
-                      /> ) : null
-                      }
-                      
-                      <span>{maintainer.name}</span>
-                    </span>
-
-                    {props.maintainers.length >= 3 && index <= props.maintainers.length - 3 ? ", " : ""}
-                    {props.maintainers.length >= 3 && index == props.maintainers.length - 2 ? ", and " : ""}
-                    {props.maintainers.length == 2 && index == props.maintainers.length - 2 ? " and " : ""}
-                  </Fragment>
-                );
-              })
-            : "no one"}
-        </h1>
+      <div className="flex flex-row text-center">
+        {props.credits.split(/(\[.*?\])/).map((text, section) => {
+          if (text.startsWith("[") && text.endsWith("]")) {
+            return (
+              <img
+                key={section}
+                src={text.substring(1, text.length - 1)}
+                className="mx-2 aspect-square h-9 self-center rounded-full"
+              />
+            );
+          }
+          return <h1>{text}</h1>;
+        })}
       </div>
       <div className="flex-1 text-end">
         <h1>{time}</h1>
